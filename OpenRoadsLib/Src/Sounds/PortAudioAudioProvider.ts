@@ -57,7 +57,7 @@
         constructor() {
             var audio = <CoreAudio>require('./Node/node_modules/node-core-audio');
             this.engine = audio.createNewAudioEngine();
-            this.engine.setOptions({ inputChannels: 1, outputChannels: 1, interleaved: true, numSamples: 1024, useMicrophone: false });
+            this.engine.setOptions({ inputChannels: 1, outputChannels: 1, interleaved: true, numSamples: 1024, numBuffers: 11, useMicrophone: false });
             this.engine.addAudioCallback((chans) => {
                 return this.fillBuffer(chans);
             });
@@ -90,6 +90,7 @@
                 out[i] = 0;
             }
 
+            var min = Infinity, max = -Infinity;
             for (var i = 0; i < players.length; i++) {
                 var p = players[i];
                 if (!p.fillAudioBuffer(buff)) {
@@ -98,13 +99,15 @@
                 }
 
                 for (var j = 0; j < len; j++) {
-                    out[j] += buff[j] * this.gain;
+                    var v = buff[j] * this.gain;
+                    min = Math.min(v, min);
+                    max = Math.max(v, max);
+                    out[j] += v;
                 }
             }
 
-            for (var i = 0; i < len; i++) {
-                if (out[j] > 1.0) out[j] = 1.0;
-                if (out[j] < -1.0) out[j] = -1.0;
+            if (min < -1.0 || max > 1.0) {
+                console.log(min + ' < ' + max);
             }
 
             return out;

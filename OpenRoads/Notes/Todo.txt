@@ -1,5 +1,4 @@
-﻿Have level loading occur during black screen fade
-Fix sound envelope issue
+﻿Fix sound envelope issue
 Fix "Road Completed" text positioning
 
 Add joystick support
