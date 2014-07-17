@@ -1,0 +1,27 @@
+﻿Fix FadeIn/Out for 3D
+Improve loading performance.  Maybe use a web-worker to do in parallel?  We don't want this interfering with music
+Fix "Road Completed" text positioning
+
+Add joystick support
+Add stars to background/world
+
+Refactor source code
+
+Tight node deployment
+Improve Website
+--Fix all links
+--Add Oculus information
+
+Weird fades from "Demo" with ESC and Winning
+
+Have message when WebAudioAPI or WebGL not found
+Fix music performance in Firefox!
+ --Lots of room in OPL.ts:processOsc
+ ---Get rid of inline arrays (kslm, freqStart, freqSteps, )
+ ---Precalculate more things.  Sin waves, step counts, vibrato, tremolo
+
+GO LIVE VERSION!
+
+Fix the music emulator for more accurate sound
+
+Fix "ANIM" missing ship parts

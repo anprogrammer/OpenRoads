@@ -1,0 +1,15 @@
+﻿Oxygen:
+OxygenLevel -= 0x7530 / (0x24 * LevelOxygenVal) (per frame)
+
+
+Y values:
+0x2800 == on ground
+0x3200 == On l1
+0x3c00 == on l2
+0x3700 == On l3
+
+Center X 0x8000
+Min: 0x2F80
+Max: 0xD080
+
+After death the game waits 108 frames before resetting

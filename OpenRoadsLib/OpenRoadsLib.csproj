@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{08BAE2E0-368A-482C-9F3E-41DA2359F99A}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>1.0</TypeScriptToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>OpenRoadsLib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>63309</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:63309/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptModuleKind>none</TypeScriptModuleKind>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+    <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
+  </PropertyGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Libs\Promise.ts" />
+    <TypeScriptCompile Include="Libs\tsm-0.7.d.ts" />
+    <TypeScriptCompile Include="Libs\webaudio.d.ts" />
+    <TypeScriptCompile Include="Src\Configurations\Node.ts" />
+    <TypeScriptCompile Include="Src\Data\ArrayBitStream.ts" />
+    <TypeScriptCompile Include="Src\Data\BinaryReader.ts" />
+    <TypeScriptCompile Include="Src\Data\BitStream.ts" />
+    <TypeScriptCompile Include="Src\Data\Color.ts" />
+    <TypeScriptCompile Include="Src\Data\CompressedByteStream.ts" />
+    <TypeScriptCompile Include="Src\Drawing\CanvasProvider.ts" />
+    <TypeScriptCompile Include="Src\Drawing\HTMLCanvasProvider.ts" />
+    <TypeScriptCompile Include="Src\Drawing\Mesh.ts" />
+    <TypeScriptCompile Include="Src\Drawing\NodeCanvasProvider.ts" />
+    <TypeScriptCompile Include="Src\Drawing\Sprite.ts" />
+    <TypeScriptCompile Include="Src\Drawing\TextHelper.ts" />
+    <TypeScriptCompile Include="Src\Drawing\TextureFragment.ts" />
+    <TypeScriptCompile Include="Src\Engine\BrowserDocumentProvider.ts" />
+    <TypeScriptCompile Include="Src\Engine\CameraState.ts" />
+    <TypeScriptCompile Include="Src\Engine\ClassicState2DDrawer.ts" />
+    <TypeScriptCompile Include="Src\Engine\ClassicState3DDrawer.ts" />
+    <TypeScriptCompile Include="Src\Engine\Clock.ts" />
+    <TypeScriptCompile Include="Src\Engine\DocumentProvider.ts" />
+    <TypeScriptCompile Include="Src\Engine\FrameManager.ts" />
+    <TypeScriptCompile Include="Src\Engine\KeyboardManager.ts" />
+    <TypeScriptCompile Include="Src\Engine\NodeDocumentProvider.ts" />
+    <TypeScriptCompile Include="Src\Engine\State2D.ts" />
+    <TypeScriptCompile Include="Src\Engine\State3D.ts" />
+    <TypeScriptCompile Include="Src\Engine\VRState2DDrawer.ts" />
+    <TypeScriptCompile Include="Src\Engine\VRState3DDrawer.ts" />
+    <TypeScriptCompile Include="Src\ExeData\ExeDataManager.ts" />
+    <TypeScriptCompile Include="Src\ExeData\ExeReader.ts" />
+    <TypeScriptCompile Include="Src\Game\CarSprite.ts" />
+    <TypeScriptCompile Include="Src\Game\Controller.ts" />
+    <TypeScriptCompile Include="Src\Game\Dashboard.ts" />
+    <TypeScriptCompile Include="Src\Game\DemoController.ts" />
+    <TypeScriptCompile Include="Src\Game\KeyboardController.ts" />
+    <TypeScriptCompile Include="Src\Game\Ship.ts" />
+    <TypeScriptCompile Include="Src\Game\StateManager.ts" />
+    <TypeScriptCompile Include="Src\Images\Loader.ts" />
+    <TypeScriptCompile Include="Src\Levels\Level.ts" />
+    <TypeScriptCompile Include="Src\Levels\LevelToTableRenderer.ts" />
+    <TypeScriptCompile Include="Src\Levels\Loader.ts" />
+    <TypeScriptCompile Include="Src\Levels\MeshBuilder.ts" />
+    <TypeScriptCompile Include="Src\Managers\ManagerSet.ts" />
+    <TypeScriptCompile Include="Src\Managers\SettingsManager.ts" />
+    <TypeScriptCompile Include="Src\Managers\ShaderManager.ts" />
+    <TypeScriptCompile Include="Src\Managers\SoundManager.ts" />
+    <TypeScriptCompile Include="Src\Managers\StreamManager.ts" />
+    <TypeScriptCompile Include="Src\Managers\TextureManager.ts" />
+    <TypeScriptCompile Include="Src\Music\MusicPlayer.ts" />
+    <TypeScriptCompile Include="Src\Music\OPL.ts" />
+    <TypeScriptCompile Include="Src\Music\OPLConstants.ts" />
+    <TypeScriptCompile Include="Src\Shaders\ClassicShaderProvider.ts" />
+    <TypeScriptCompile Include="Src\Shaders\ShaderProvider.ts" />
+    <TypeScriptCompile Include="Src\Shaders\VRShaderProvider.ts" />
+    <TypeScriptCompile Include="Src\Sounds\AudioProvider.ts" />
+    <TypeScriptCompile Include="Src\Sounds\PortAudioAudioProvider.ts" />
+    <TypeScriptCompile Include="Src\Sounds\Sound.ts" />
+    <TypeScriptCompile Include="Src\Sounds\WebAPIAudioProvider.ts" />
+    <TypeScriptCompile Include="Src\States\ControlsState.ts" />
+    <TypeScriptCompile Include="Src\States\EmptyState.ts" />
+    <TypeScriptCompile Include="Src\States\FadeState.ts" />
+    <TypeScriptCompile Include="Src\States\GameState.ts" />
+    <TypeScriptCompile Include="Src\States\GLStateHelper.ts" />
+    <TypeScriptCompile Include="Src\States\GoMenuState.ts" />
+    <TypeScriptCompile Include="Src\States\HelpState.ts" />
+    <TypeScriptCompile Include="Src\States\Intro.ts" />
+    <TypeScriptCompile Include="Src\States\MainMenuState.ts" />
+    <TypeScriptCompile Include="Src\Storage\AJAXFileProvider.ts" />
+    <TypeScriptCompile Include="Src\Storage\FileProvider.ts" />
+    <TypeScriptCompile Include="Src\Storage\FSStore.ts" />
+    <TypeScriptCompile Include="Src\Storage\KVStore.ts" />
+    <TypeScriptCompile Include="Src\Storage\LocalFileProvider.ts" />
+    <TypeScriptCompile Include="Src\Storage\LocalStorageStore.ts" />
+    <TypeScriptCompile Include="Src\TestRuns\TestCar.ts" />
+    <TypeScriptCompile Include="Src\TestRuns\TestDats.ts" />
+    <TypeScriptCompile Include="Src\TestRuns\TestImages.ts" />
+    <TypeScriptCompile Include="Src\TestRuns\TestLevels.ts" />
+    <TypeScriptCompile Include="Src\TestRuns\TestMusic.ts" />
+    <TypeScriptCompile Include="Src\TestRuns\TestPhysics.ts" />
+    <TypeScriptCompile Include="Src\TestRuns\TestSounds.ts" />
+    <TypeScriptCompile Include="Src\TestRuns\TestTrakDat.ts" />
+    <TypeScriptCompile Include="Src\Vertices\Vertex2D.ts" />
+    <TypeScriptCompile Include="Src\Vertices\Vertex3DC.ts" />
+    <TypeScriptCompile Include="Src\VR\NodeVRProvider.ts" />
+    <TypeScriptCompile Include="Src\VR\VRProvider.ts" />
+    <TypeScriptCompile Include="Src\WGL\Attrib.ts" />
+    <TypeScriptCompile Include="Src\WGL\Buffer.ts" />
+    <TypeScriptCompile Include="Src\WGL\Framebuffer.ts" />
+    <TypeScriptCompile Include="Src\WGL\Renderable.ts" />
+    <TypeScriptCompile Include="Src\WGL\RenderableTexture.ts" />
+    <TypeScriptCompile Include="Src\WGL\Renderbuffer.ts" />
+    <TypeScriptCompile Include="Src\WGL\Shader.ts" />
+    <TypeScriptCompile Include="Src\WGL\ShaderUniform.ts" />
+    <TypeScriptCompile Include="Src\WGL\Texture.ts" />
+    <TypeScriptCompile Include="Src\WGL\VertexDescriptor.ts" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptNoImplicitAny>True</TypeScriptNoImplicitAny>
+    <TypeScriptOutFile>RoadsLib.js</TypeScriptOutFile>
+    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+    <TypeScriptCompileOnSaveEnabled>False</TypeScriptCompileOnSaveEnabled>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y ..\RoadsLib.js ..\..\OpenRoads\
+xcopy /Y ..\RoadsLib.js.map ..\..\OpenRoads\
+xcopy /Y ..\RoadsLib.d.ts ..\..\OpenRoads\</PostBuildEvent>
+  </PropertyGroup>
+</Project>

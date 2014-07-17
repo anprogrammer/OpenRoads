@@ -1,0 +1,375 @@
+﻿module Music {
+    export enum WaveType {
+        Sine,
+        HalfSine,
+        AbsSign,
+        PulseSign,
+        SineEven,
+        AbsSineEven,
+        Square,
+        DerivedSquare
+    }
+
+    export enum KeyState {
+        Off,
+        Attack,
+        Sustain,
+        Decay,
+        Release
+    }
+
+    export class OscDesc {
+        public Tremolo: boolean = false;
+        public Vibrato: boolean = false;
+        public SoundSustaining: boolean = true;
+        public KeyScaling: boolean = false;
+        public Multiplication: number = 1.0;
+
+        public KeyScaleLevel: number = 0.0;
+        public OutputLevel: number = 1.0;
+
+        public AttackRate: number = 0;
+        public DecayRate: number = 0;
+
+        public SustainLevel: number = 0;
+        public ReleaseRate: number = 0;
+
+        public AttackSteps: number = 0;
+        public DecaySteps: number = 0;
+        public ReleaseSteps: number = 0;
+        public KSLDamping: number = 0;
+
+        public WaveForm: WaveType = WaveType.Sine;
+    }
+
+    export class OscState {
+        public Config: OscDesc = new OscDesc();
+        public State: KeyState = KeyState.Off;
+        public Volume: number = 0;
+        public EnvelopeStep: number = 0;
+        public Angle: number = 0;
+    }
+
+    class Channel {
+        public A: OscState = new OscState();
+        public B: OscState = new OscState();
+        public Additive: boolean = false;
+        public Feedback: number = 0;
+
+        public FreqNum: number = 0.0;
+        public BlockNum: number = 0.0;
+
+        public Output0: number = 0.0;
+        public Output1: number = 0.0;
+
+        public M1: number = 0.0;
+        public M2: number = 0.0;
+        public FeedbackFactor: number = 0.0;
+
+
+        public ProcessFunc: (c: Channel) => number;
+    }
+
+    export class OPL {
+        private audioContext: AudioContext;
+        private channels: Channel[];
+        private sampleRate: number = 44100;
+        private src: Player = null;
+        private timeSinceNote: number = 0;
+        private noteTickRate: number = 5 / 1000.0;
+        private time: number = 0.0;
+        private synthTime: number = 0.0;
+        private timePassed: number = 0.0;
+        private VMin: number = -96.0;
+        private VMax: number = 0.0;
+        private cb: EventListener;
+        private node: ScriptProcessorNode;
+        private managers: Managers.ManagerSet;
+
+
+        private logsin: number[] = [];
+        private exp: number[] = [];
+
+        constructor(managers: Managers.ManagerSet, audioContext: AudioContext) {
+            this.managers = managers;
+            this.audioContext = audioContext;
+            this.channels = [];
+
+            for (var i = 0; i < 256; i++) {
+                //Thanks to Matthew Gambrell and Olli Niemitalo for decapsulating the OPL
+                this.logsin.push(Math.round(-Math.log(Math.sin((i + 0.5) * Math.PI / 256 / 2)) / Math.log(2) * 256));
+                this.exp.push(Math.round((Math.pow(2, i / 256) - 1) * 1024));
+            }
+
+            for (var i = 0; i < 15; i++) {
+                this.channels.push(new Channel());
+                this.channels[i].ProcessFunc = this.processChannelOutputFM;
+            }
+
+            this.sampleRate = audioContext.sampleRate;
+            var node = audioContext.createScriptProcessor(1024, 0, 1);
+            this.cb = (evt: Event) => {
+                this.handleTick(<any>evt);
+            };
+            node.onaudioprocess = this.cb;
+            node.connect(audioContext.destination);
+            this.node = node;
+        }
+
+        public setSource(mp: Player) {
+            this.src = mp;
+            for (var i = 0; i < this.channels.length; i++) {
+                this.stopNote(i);
+            }
+        }
+
+        public setChannelConfig(n: number, a: OscDesc, b: OscDesc, isAdditive: boolean, feedbackAmt: number) {
+            if (n >= this.channels.length) {
+                return;
+            }
+            this.channels[n].A.Config = a;
+            this.channels[n].B.Config = b;
+            this.channels[n].Additive = isAdditive;
+            this.channels[n].Feedback = feedbackAmt;
+            var v = 0.0;
+            var feedbackFactor = feedbackAmt > 0 ? Math.pow(2.0, feedbackAmt + 8) : 0;
+            var radiansPerWave = 2 * Math.PI;
+            var dbuPerWave = 1024 * 16.0;
+            var volAsDbu = 1.0 * 0x4000 * 0x10000 * 1.0 / 0x4000;
+            var m2 = radiansPerWave * volAsDbu / dbuPerWave;
+            var m1 = m2 / 2.0 / 0x10000;
+            this.channels[n].M1 = m1;
+            this.channels[n].M2 = m2;
+            this.channels[n].FeedbackFactor = feedbackFactor;
+            this.channels[n].ProcessFunc = isAdditive ? this.processChannelOutputAdditive : this.processChannelOutputFM;
+        }
+
+        public setChannelVolume(n: number, v: number) {
+            if (n >= this.channels.length) {
+                return;
+            }
+            this.channels[n].B.Config.OutputLevel = v;
+        }
+
+        public startNote(channel: number, freqNum: number, blockNum: number): void {
+            var chan = this.channels[channel];
+            function configureOSC(osc: OscState) {
+                if (chan.FreqNum == freqNum && chan.BlockNum == blockNum && osc.State == KeyState.Sustain) {
+                    return;
+                }
+
+                var conf = osc.Config;
+
+                osc.State = KeyState.Attack;
+                osc.EnvelopeStep = 0;
+
+                var keyScaleNum = blockNum * 2 + (freqNum >> 7);
+                var rof = conf.KeyScaling ? keyScaleNum : Math.floor(keyScaleNum / 4);
+
+                function getRate(n: number) {
+                    return Math.min(n > 0 ? rof + n * 4 : 0, 63);
+                }
+
+                function getSteps(baseRate: number, rates: number[]): number {
+                    var rate = getRate(baseRate);
+                    var timeToAttack = rates[rate];
+                    if (timeToAttack === null) {
+                        return -1.0;
+                    }
+                    return Math.floor(timeToAttack / 1000.0 / OPLConstants.SampleTime);
+                }
+
+                conf.AttackSteps = getSteps(conf.AttackRate, OPLConstants.AttackRates);
+                conf.DecaySteps = getSteps(conf.DecayRate, OPLConstants.DecayRates);
+                conf.ReleaseSteps = getSteps(conf.ReleaseRate, OPLConstants.DecayRates);
+
+                if (osc.Config.KeyScaleLevel > 0) {
+                    var kslm = [0, 1.0, 0.5, 2.0][osc.Config.KeyScaleLevel];
+                    osc.Config.KSLDamping = -kslm * OPLConstants.KeyScaleLevels[blockNum][freqNum >> 6];
+                } else {
+                    osc.Config.KSLDamping = 0.0;
+                }
+            }
+
+
+            configureOSC(chan.A);
+            configureOSC(chan.B);
+            chan.FreqNum = freqNum;
+            chan.BlockNum = blockNum;
+        }
+
+        public stopNote(channel: number) {
+            var chan = this.channels[channel];
+            function configureOSC(osc: OscState) {
+                if (osc.State == KeyState.Off) {
+                    return;
+                }
+
+                osc.State = KeyState.Release;
+            }
+
+
+            configureOSC(chan.A);
+            configureOSC(chan.B);
+        }
+
+        private handleTick(evt: AudioProcessingEvent) {
+            var buffer = evt.outputBuffer.getChannelData(0);
+            var synthOut = 0.0;
+            var volume = this.managers.Settings.getVolume();
+
+            if (this.src == null || !this.managers.Settings.PlayMusic) {
+                for (var i = 0; i < buffer.length; i++) {
+                    buffer[i] = 0;
+                }
+                return;
+            }
+
+
+            this.timePassed = 1.0 / this.sampleRate;
+            for (var i = 0; i < buffer.length; i++) {
+                this.timeSinceNote += this.timePassed;
+
+                if (this.timeSinceNote > this.noteTickRate) {
+                    this.src.readNote();
+                    this.timeSinceNote -= this.noteTickRate;
+                }
+
+                this.time += this.timePassed;
+                this.synthTime += this.timePassed;
+                while (this.synthTime >= OPLConstants.SampleTime) {
+                    synthOut = 0.0;
+                    for (var j = 0; j < this.channels.length; j++) {
+                        synthOut += this.channels[j].ProcessFunc.call(this, this.channels[j]);
+                    }
+                    this.synthTime -= OPLConstants.SampleTime;
+                }
+
+                buffer[i] = synthOut * volume;
+            }
+        }
+
+        private processChannelOutputAdditive(c: Channel): number {
+            var a = this.processOsc(c.A, c.FreqNum, c.BlockNum, (c.Output0 + c.Output1) * c.FeedbackFactor * c.M1);
+            var b = this.processOsc(c.B, c.FreqNum, c.BlockNum, 0.0);
+            c.Output1 = c.Output0;
+            c.Output0 = a;
+            return a + b;
+        }
+
+        private processChannelOutputFM(c: Channel): number {
+            var a = this.processOsc(c.A, c.FreqNum, c.BlockNum, (c.Output0 + c.Output1) * c.FeedbackFactor * c.M1);
+            var b = this.processOsc(c.B, c.FreqNum, c.BlockNum, a * c.M2);
+            c.Output1 = c.Output0;
+            c.Output0 = a;
+            return b;
+        }
+
+        private processOsc(osc: OscState, freqNum: number, blockNum: number, modulator: number): number {
+            var state = osc.State;
+            var conf = osc.Config;
+
+            if (state == KeyState.Off) {
+                return 0.0;
+            }
+
+
+            //TODO: Proper KEYBOARD SPLIT SECTION Implementation - pg.43
+            //Actual OutputLevel
+            //Actual KSR/KSS etc
+            //Feedback modulation
+            //Tremelo
+            //Vibrato
+
+
+            switch (osc.State) {
+                case KeyState.Attack:
+
+
+                    if (conf.AttackSteps == 0) {
+                        osc.Volume = this.VMax;
+                        osc.EnvelopeStep = 0;
+                        osc.State = KeyState.Decay;
+                    } else if (conf.AttackSteps === -1.0) {
+                        osc.State = KeyState.Off;
+                        return 0.0;
+                    } else {
+                        var p = 3.0;
+                        osc.Volume = -96.0 * Math.pow((conf.AttackSteps - osc.EnvelopeStep) / conf.AttackSteps, p);
+                        osc.EnvelopeStep++;
+                        if (osc.EnvelopeStep >= conf.AttackSteps) {
+                            osc.EnvelopeStep = 0;
+                            osc.Volume = this.VMax;
+                            osc.State = KeyState.Decay;
+                        }
+                    }
+                    break;
+                case KeyState.Decay:
+                    if (conf.DecaySteps === 0) {
+                        osc.Volume = conf.SustainLevel;
+                        osc.EnvelopeStep = 0;
+                        osc.State = KeyState.Sustain;
+                    } else if (conf.DecaySteps !== -1.0) {
+                        var decreaseAmt = conf.SustainLevel / conf.DecaySteps;
+                        osc.Volume += decreaseAmt;
+                        osc.EnvelopeStep++;
+                        if (osc.EnvelopeStep >= conf.DecaySteps) {
+                            osc.EnvelopeStep = 0;
+                            osc.State = KeyState.Sustain;
+                        }
+                    }
+                    break;
+                case KeyState.Sustain:
+                    if (!conf.SoundSustaining) {
+                        osc.State = KeyState.Release;
+                    }
+                    break;
+                case KeyState.Release:
+                    var decreaseAmt = (this.VMin - conf.SustainLevel) / conf.ReleaseSteps;
+                    osc.Volume += decreaseAmt;
+                    osc.EnvelopeStep++;
+                    if (osc.EnvelopeStep == conf.ReleaseSteps) {
+                        osc.Volume = this.VMin;
+                        osc.State = KeyState.Off;
+                    }
+                    break;
+            }
+
+            var freq = OPLConstants.FreqStarts[blockNum] + OPLConstants.FreqSteps[blockNum] * freqNum;
+            freq *= (conf.Multiplication == 0 ? 0.5 : conf.Multiplication);
+
+            var vib = conf.Vibrato ? Math.cos(this.time * 2 * Math.PI) * 0.00004 + 1.0 : 1.0;
+            osc.Angle += OPLConstants.SampleTime * 2 * Math.PI * freq * vib;
+
+            var angle = osc.Angle + modulator;
+            var s = -Math.sin(angle);
+            var wave: number = s;
+            switch (conf.WaveForm) {
+                case WaveType.HalfSine:
+                    wave = Math.max(s, 0.0);
+                    break;
+                case WaveType.AbsSign:
+                    wave = Math.abs(s);
+                    break;
+                case WaveType.PulseSign:
+                    wave = angle % 6.28 < 1.57 ? s : 0.0;
+                    break;
+                case WaveType.SineEven:
+                    wave = angle % 12.56 < 6.28 ? s : 0.0;
+                    break;
+                case WaveType.AbsSineEven:
+                    wave = angle % 12.56 < 6.28 ? Math.abs(s) : 0.0;
+                    break;
+                case WaveType.Square:
+                    wave = s > 1.0 ? 1.0 : 0.0;
+                    break;
+                case WaveType.DerivedSquare:
+                    wave = s > 1.0 ? 1.0 : 0.0;
+                    break;
+            }
+
+            var tremolo = conf.Tremolo ? Math.abs(Math.cos(this.time * Math.PI * 3.7)) * 1 : 0.0;
+            return wave * Math.pow(10.0, (osc.Volume + conf.OutputLevel + tremolo + conf.KSLDamping) / 10.0);
+        }
+    }
+} 

@@ -201,3 +201,7 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
+
+#Skyroads files
+OpenRoads/Data
+OpenRoads/Data.XMas

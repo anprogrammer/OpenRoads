@@ -1,0 +1,25 @@
+﻿Left-most tile starts at x=-3.5, ends at x=2.5
+
+
+XP = A * (X + B) / Z + C
+YP = D * (Y + E) / Z + F
+
+XP = A * X / Z + B / Z + C
+YP = D * Y / Z + E / Z + F
+
+24 = A * 23 / 2 + B / 2 + C
+102 = C * 80 / 2 + E / 2 + F
+
+15 = A * 23 / 3 + C
+76 = C * 80 / 3 + F
+
+10 = A * 23 / 4 + B
+61 = C * 80 / 4 + D
+
+7 = A * 23 / 5 + B
+52 = C * 80 / 5 + D
+
+5 = A * 23 / 6 + B
+46 = C * 80 / 6 + D
+
+lbfgs([%o1,%o2,%o3,%o4,%o5,%o6,%o7,%o8],[A,B,C,D],[0,0,0,0],1e-4,[1,0]);

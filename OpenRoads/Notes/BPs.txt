@@ -1,0 +1,56 @@
+SM 1A2:224 E9 E3 00
+
+BP 1A2:2308
+BPVAR 0 Ident DEAD
+BPVAR 0 InAccel [DS:933C]
+BPVAR 0 InTurn [DS:9600]
+BPVAR 0 InJump [DS:5488]
+BPVAR 0 CurrentX [DS:AF2C]
+BPVAR 0 CurrentY [DS:AF3C]
+BPVAR 0 CurrentZHigh [DS:962A]
+BPVAR 0 CurrentZLow [DS:9628]
+BPVAR 0 XMovementBase [DS:4576]
+BPVAR 0 YVelocity [DS:9342]
+BPVAR 0 ZVelocity [DS:54B8]
+BPVAR 0 ExpectedX [DS:BP-1A]
+BPVAR 0 ExpectedY [DS:BP-1C]
+BPVAR 0 ExpectedZHigh [DS:BP-1E]
+BPVAR 0 ExpectedZLow [DS:BP-20]
+
+BP 1A2:2369
+BPVAR 0 Ident BEEF
+BPVAR 0 TouchEffect
+
+BP 1A2:26C7
+BPVAR 0 Ident CAFE
+BPVAR 0 InAccel [DS:933C]
+BPVAR 0 InTurn [DS:9600]
+BPVAR 0 InJump [DS:5488]
+BPVAR 0 CurrentX [DS:AF2C]
+BPVAR 0 CurrentY [DS:AF3C]
+BPVAR 0 CurrentZHigh [DS:962A]
+BPVAR 0 CurrentZLow [DS:9628]
+BPVAR 0 XMovementBase [DS:4576]
+BPVAR 0 YVelocity [DS:9342]
+BPVAR 0 ZVelocity [DS:54B8]
+BPVAR 0 ExpectedX [DS:BP-1A]
+BPVAR 0 ExpectedY [DS:BP-1C]
+BPVAR 0 ExpectedZHigh [DS:BP-1E]
+BPVAR 0 ExpectedZLow [DS:BP-20]
+
+BP 1A2:26CD
+BPVAR 0 Ident FEED
+BPVAR 0 InAccel [DS:933C]
+BPVAR 0 InTurn [DS:9600]
+BPVAR 0 InJump [DS:5488]
+BPVAR 0 CurrentX [DS:AF2C]
+BPVAR 0 CurrentY [DS:AF3C]
+BPVAR 0 CurrentZHigh [DS:962A]
+BPVAR 0 CurrentZLow [DS:9628]
+BPVAR 0 XMovementBase [DS:4576]
+BPVAR 0 YVelocity [DS:9342]
+BPVAR 0 ZVelocity [DS:54B8]
+BPVAR 0 ExpectedX [DS:BP-1A]
+BPVAR 0 ExpectedY [DS:BP-1C]
+BPVAR 0 ExpectedZHigh [DS:BP-1E]
+BPVAR 0 ExpectedZLow [DS:BP-20]

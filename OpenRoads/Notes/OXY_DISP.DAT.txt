@@ -1,0 +1,15 @@
+﻿Low numbers indicate colors
+0-Transparent
+1-Dark purple
+2-Light purple
+
+First one of these is at offset 14
+Bytes 0x179 and onwards represent the last "sector" of oxy display
+bytes 0x177 & 0x178 are w & h of section
+short 0x175 is offset from pixel 0
+
+
+For OXY_DISP.DAT & FUL_DISP.DAT: Starts @ 0x14:
+Uint16:  for position
+Uint8: w, h
+W*H Uint8: 0 transparent, 1 dark, 2 light

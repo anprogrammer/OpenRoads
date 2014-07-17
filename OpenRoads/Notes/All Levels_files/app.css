@@ -1,0 +1,55 @@
+﻿html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+		width: 100%;
+		height: 100%;
+		background: #3075ba; /* Old browsers */
+
+		background: -moz-linear-gradient(top, #3075ba 0%, #000000 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#3075ba), color-stop(100%,#000000)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top, #3075ba 0%,#000000 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top, #3075ba 0%,#000000 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top, #3075ba 0%,#000000 100%); /* IE10+ */
+		background: linear-gradient(to bottom, #3075ba 0%,#000000 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3075ba', endColorstr='#000000',GradientType=0 ); /* IE6-9 */
+}
+
+canvas {
+	position: absolute;
+	border: none;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+}
+
+span {
+    font-style: italic;
+}
+
+.debugTable {
+	padding: 0;
+	margin: 0;
+	border-spacing: 0;
+}
+
+.debugTable tr {
+	margin: 0;
+	padding: 0;
+}
+.debugTable td {
+	padding: 0;
+	margin: 0;
+	margin: 1px solid black;
+}
+
+.debugTable div {
+	margin: 0;
+}

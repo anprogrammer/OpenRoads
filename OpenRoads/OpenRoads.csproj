@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{890344E7-4FA3-4AA7-915A-D923DD4A546E}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>1.0</TypeScriptToolsVersion>
+    <UseIISExpress>false</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="app.css" />
+    <Content Include="Data\INTRO.SND" />
+    <Content Include="Data\SFX.SND" />
+    <Content Include="Data\SKYROADS.EXE" />
+    <Content Include="index.html" />
+    <Content Include="JsLibs\tsm-node.js" />
+    <Content Include="JsLibs\tsm-0.7.js" />
+    <Content Include="Notes\CARS.LZS.txt" />
+    <Content Include="Notes\DEMO.REC.txt" />
+    <Content Include="Notes\Fonts.txt" />
+    <Content Include="Notes\GamePlay.txt" />
+    <Content Include="Notes\matFromEqs.py" />
+    <Content Include="Notes\matFromPts.py" />
+    <Content Include="Notes\OPLCorrectPitch.txt" />
+    <Content Include="Notes\oplRevised.txt" />
+    <Content Include="Notes\oplRevised2.txt" />
+    <Content Include="Notes\OXY_DISP.DAT.txt" />
+    <Content Include="Notes\Rendering.txt" />
+    <Content Include="Notes\RenderingEqs.txt" />
+    <Content Include="Notes\RenderingPts.txt" />
+    <Content Include="Notes\sound.txt" />
+    <Content Include="Notes\Todo.txt" />
+    <Content Include="Shaders\basic_2d.fs" />
+    <Content Include="Shaders\color_3d.fs" />
+    <Content Include="Shaders\sprite_3d.fs" />
+    <Content Include="Shaders\texture_p3d.fs" />
+    <Content Include="web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Notes\MUZAX.LCS.txt" />
+    <Content Include="Notes\INTOR.SND.txt" />
+    <TypeScriptCompile Include="GameMain.ts" />
+    <TypeScriptCompile Include="Libs\tsm-0.7.d.ts" />
+    <TypeScriptCompile Include="Libs\webaudio.d.ts" />
+    <TypeScriptCompile Include="NodeMain.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data.XMas\CARS.LZS" />
+    <Content Include="Data.XMas\DASHBRD.LZS" />
+    <Content Include="Data.XMas\DEMO.REC" />
+    <Content Include="Data.XMas\GOMENU.LZS" />
+    <Content Include="Data.XMas\HELPMENU.LZS" />
+    <Content Include="Data.XMas\INTRO.LZS" />
+    <Content Include="Data.XMas\MAINMENU.LZS" />
+    <Content Include="Data.XMas\MUZAX.LZS" />
+    <Content Include="Data.XMas\ROADS.LZS" />
+    <Content Include="Data.XMas\SETMENU.LZS" />
+    <Content Include="Data.XMas\TREKDAT.LZS" />
+    <Content Include="Data.XMas\WORLD0.LZS" />
+    <Content Include="Data.XMas\WORLD1.LZS" />
+    <Content Include="Data.XMas\WORLD2.LZS" />
+    <Content Include="Data.XMas\WORLD3.LZS" />
+    <Content Include="Data.XMas\WORLD4.LZS" />
+    <Content Include="Data.XMas\WORLD5.LZS" />
+    <Content Include="Data.XMas\WORLD6.LZS" />
+    <Content Include="Data.XMas\WORLD7.LZS" />
+    <Content Include="Data.XMas\WORLD8.LZS" />
+    <Content Include="Data.XMas\WORLD9.LZS" />
+    <Content Include="Data\ANIM.LZS" />
+    <Content Include="Data\CARS.LZS" />
+    <Content Include="Data\DASHBRD.LZS" />
+    <Content Include="Data\DEMO.REC" />
+    <Content Include="Data\FUL_DISP.DAT" />
+    <Content Include="Data\GOMENU.LZS" />
+    <Content Include="Data\HELPMENU.LZS" />
+    <Content Include="Data\INTRO.LZS" />
+    <Content Include="Data\MAINMENU.LZS" />
+    <Content Include="Data\MUZAX.LZS" />
+    <Content Include="Data\OXY_DISP.DAT" />
+    <Content Include="Data\ROADS.LZS" />
+    <Content Include="Data\SETMENU.LZS" />
+    <Content Include="Data\SPEED.DAT" />
+    <Content Include="Data\TREKDAT.LZS" />
+    <Content Include="Data\WORLD0.LZS" />
+    <Content Include="Data\WORLD1.LZS" />
+    <Content Include="Data\WORLD2.LZS" />
+    <Content Include="Data\WORLD3.LZS" />
+    <Content Include="Data\WORLD4.LZS" />
+    <Content Include="Data\WORLD5.LZS" />
+    <Content Include="Data\WORLD6.LZS" />
+    <Content Include="Data\WORLD7.LZS" />
+    <Content Include="Data\WORLD8.LZS" />
+    <Content Include="Data\WORLD9.LZS" />
+    <Content Include="Shaders\basic_2d.vs" />
+    <Content Include="Shaders\title_2d.vs" />
+    <Content Include="Shaders\title_2d.fs" />
+    <Content Include="Shaders\color_3d.vs" />
+    <Content Include="Shaders\texture_p3d.vs" />
+    <Content Include="Shaders\sprite_3d.vs" />
+    <None Include="web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>OpenRoads</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>58421</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost/OpenRoads</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
+    <TypeScriptNoImplicitAny>True</TypeScriptNoImplicitAny>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+    <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets')" />
+</Project>

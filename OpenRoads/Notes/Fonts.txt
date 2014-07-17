@@ -1,0 +1,25 @@
+﻿Number-set starts at 0x13C
+Each character 0x14 units long.  5 Tall, 4 wide.  Numbers should be seperated by a space.
+Gravity drawn starting at: 96, 156
+
+Number is (gravity-num - 3) * 100
+
+Jump-o-master starts at 0x204, each img is 26 wide, 5 tall
+Draw to: 203, 156
+
+Progress indicators is 29 pixels wide, starts at 42 pixels from left of screen, 143 from top.
+You go from 0-% * 29, start at pixel (x, 143), work up until no longer purple.  Then work your way down, filling in purple, until you hit non-purple again.  Easy-peezy-like
+
+For flashing O2:
+Inside 7x7 pixel box at 0xA0, 0xA1 swap all red pixels for white and vice-versa
+For flashing Fuel:
+Inside 16x5 pixel box at 0x9B, 0xA9 swap all red pixels for white and vice-versa
+
+
+CraftState:
+5 = OutOfOxygen
+4 = OutOfFuel
+3 = FallingToDeath
+1 = Exploded
+2 = NotSure
+0 = Alive

@@ -1,0 +1,3 @@
+﻿Both sound files are literally a stream of 8 - bit audio Data
+Need to find "split" locations in SFX.SND
+Intro just play at start 

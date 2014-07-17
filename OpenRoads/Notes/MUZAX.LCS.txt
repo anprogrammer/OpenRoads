@@ -1,0 +1,27 @@
+﻿Top of file is 6 - byte headers
+2 - bytes(location in file to decompress from)
+2 - Offset into decompressed stream to start "playing" from (* 0x10)
+2 - Length to decompress 
+
+
+First sends to OPL
+40 <- 3F
+F4 <- 0 (waveform select sine wave)
+
+
+(func 0 example.  End note config sequence)
+Example from song 1:
+Start from 0x90
+Load EAX = 8A00
+BX == 0 (LowestThreeBits)
+EAX = 0x8A00
+Tells interrupt that is all notes for now
+
+
+(func 1 example)
+0x0301 is second word loaded:
+BX == 1
+AH == 0x03
+AL == 0x01
+
+(func 2.  Drum or note off)

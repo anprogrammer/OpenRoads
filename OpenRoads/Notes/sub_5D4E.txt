@@ -1,0 +1,24 @@
+ax = arg_6
+if (arg_6 != 0) {
+	ax = arg_0;
+	dx = arg_2;
+	bx = arg_4;
+	cx = arg_6;
+	
+	shrunk20 = arg_2:arg_0 >> numbits(arg6);
+	shrunk64 = arg_6:arg_4 >> numbits(arg6);
+	
+	ratio = shrunk20 / shrunk64;
+	dx:cx = (shrunk20 / shrunk64) * arg_6;
+	dx:ax = arg_4 * ratio;
+	
+	dx += cx;
+	
+	if (overflowed || dx > arg_2 || (dx == arg_2 && ax <= arg_0)) {
+		ratio--;
+	}
+	
+	return 0:ratio
+} else if (arg_6 == 0) {
+	return (arg_2 / arg_4):(arg_0 / arg_4) //DX:AX
+}
