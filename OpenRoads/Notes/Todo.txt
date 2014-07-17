@@ -1,5 +1,4 @@
-﻿Fix sound envelope issue
-Fix "Road Completed" text positioning
+﻿Fix "Road Completed" text positioning
 
 Add joystick support
 Add stars to background/world

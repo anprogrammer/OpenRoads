@@ -129,6 +129,10 @@
             this.dash.draw(gl, cam, scaleVec);
 
             if (this.game.didWin) {
+                this.roadCompleted.ModelMatrix.setIdentity();
+                this.roadCompleted.ModelMatrix.translate(new TSM.vec3([0.0, -100.0, -150.0]));
+                this.roadCompleted.ViewMatrix.copy(cam.HeadOrientation.toMat4());
+                this.roadCompleted.ProjectionMatrix = cam.ProjectionMatrix;
                 this.roadCompleted.draw();
             }
         }

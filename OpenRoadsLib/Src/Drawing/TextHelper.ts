@@ -25,7 +25,7 @@
 
             var tf = new TextureFragment(tex, 0, 0, cvs.width, cvs.height);
 
-            return new Drawing.Sprite(gl, managers, tf);
+            return managers.Graphics.get3DSprite(gl, managers, tf);
         }
     }
 } 

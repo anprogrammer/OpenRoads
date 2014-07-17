@@ -75,7 +75,7 @@
 
         drawFrame2D(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo): void {
             var dotCountForLevel = (n: number): number => {
-                return this.myManagers.Settings.wonLevelCount(n);
+                return Math.min(7, this.myManagers.Settings.wonLevelCount(n));
             };
 
             var posForLevel = (n: number): TSM.vec2 => {
