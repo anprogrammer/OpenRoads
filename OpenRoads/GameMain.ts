@@ -57,6 +57,9 @@ function runGame() {
     ]).done(() => {
             var exe = new ExeData.ExeDataLoader(managers);
             exe.load();
+            var combine = new Images.GaugeCompressor();
+            combine.combineGauges(managers);
+
             document.getElementById('loading').style.display = 'none';
             var cvs = <HTMLCanvasElement>document.getElementById('cvs');
             cvs.style.display = 'block';
@@ -70,9 +73,9 @@ function runGame() {
             managers.Player = player;
 
             var demoCon = new Game.DemoController(manager.getRawArray('DEMO.REC'));
-        var state = new States.Intro(managers);
-        //var state = new States.GoMenu(managers);
-        //var state = new States.MainMenu(managers);
+            var state = new States.Intro(managers);
+            //var state = new States.GoMenu(managers);
+            //var state = new States.MainMenu(managers);
             managers.Frames = new Engine.FrameManager(new Engine.BrowserDocumentProvider(), cvs, managers, state, new Engine.Clock());
         });
 }

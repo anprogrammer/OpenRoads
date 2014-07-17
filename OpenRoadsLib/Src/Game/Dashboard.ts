@@ -93,15 +93,15 @@
             configAndDrawSprite(this.back);
             configAndDrawSprite(this.dash);
             var drawGauge = (gs: Drawing.Sprite[], amt: number) => {
-                for (var i = 0; i < gs.length * Math.min(1.0, amt); i++) {
-                    configAndDrawSprite(gs[i]);
-                }
+                configAndDrawSprite(gs[Math.floor(Math.min(1.0, amt) * (gs.length - 1))]);
             };
 
             drawGauge(this.oxyGauge, this.oxyAmt);
             drawGauge(this.fuelGauge, this.fuelAmt);
             drawGauge(this.speedGauge, this.speedAmt);
-            drawGauge(this.progressGauge, this.zPosition / this.zLevelLength);
+            if (this.zLevelLength > 0) {
+                drawGauge(this.progressGauge, this.zPosition / this.zLevelLength);
+            }
 
             if (this.jumpMasterInUse) {
                 configAndDrawSprite(this.jumpMasterOn);

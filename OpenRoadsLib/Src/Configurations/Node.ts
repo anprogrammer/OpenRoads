@@ -7,7 +7,7 @@ module Configurations {
             agent.start(9999, 'localhost', 3333, true);
         } catch (e) {
         }
-        
+
         var wgl = require('./Node/node_modules/node-webgl');
 
         var manager = new Managers.StreamManager(new Stores.LocalFileProvider()), shaderManager = new Managers.ShaderManager(manager);
@@ -52,6 +52,9 @@ module Configurations {
         ]).done(() => {
                 var exe = new ExeData.ExeDataLoader(managers);
                 exe.load();
+                var combine = new Images.GaugeCompressor();
+                combine.combineGauges(managers);
+
                 var doc = wgl.document();
                 var cvs = doc.createElement('canvas', 1280, 800, true);
                 cvs.setTitle('SkyRoads VR');

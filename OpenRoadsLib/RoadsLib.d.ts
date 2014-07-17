@@ -610,6 +610,13 @@ declare module Game {
     }
 }
 declare module Images {
+    class GaugeCompressor {
+        public combineGauges(managers: Managers.ManagerSet): void;
+        private compress(managers, name);
+        private compressPart(managers, parts, upTo);
+    }
+}
+declare module Images {
     class ImageFragment {
         public Canvas: HTMLCanvasElement;
         public Palette: Data.Color[];

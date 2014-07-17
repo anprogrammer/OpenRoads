@@ -455,6 +455,9 @@ var Configurations;
         ]).done(function () {
             var exe = new ExeData.ExeDataLoader(managers);
             exe.load();
+            var combine = new Images.GaugeCompressor();
+            combine.combineGauges(managers);
+
             var doc = wgl.document();
             var cvs = doc.createElement('canvas', 1280, 800, true);
             cvs.setTitle('SkyRoads VR');
@@ -1661,15 +1664,15 @@ var Game;
             configAndDrawSprite(this.back);
             configAndDrawSprite(this.dash);
             var drawGauge = function (gs, amt) {
-                for (var i = 0; i < gs.length * Math.min(1.0, amt); i++) {
-                    configAndDrawSprite(gs[i]);
-                }
+                configAndDrawSprite(gs[Math.floor(Math.min(1.0, amt) * (gs.length - 1))]);
             };
 
             drawGauge(this.oxyGauge, this.oxyAmt);
             drawGauge(this.fuelGauge, this.fuelAmt);
             drawGauge(this.speedGauge, this.speedAmt);
-            drawGauge(this.progressGauge, this.zPosition / this.zLevelLength);
+            if (this.zLevelLength > 0) {
+                drawGauge(this.progressGauge, this.zPosition / this.zLevelLength);
+            }
 
             if (this.jumpMasterInUse) {
                 configAndDrawSprite(this.jumpMasterOn);
@@ -2414,6 +2417,54 @@ var Game;
     })();
     Game.StateManager = StateManager;
 })(Game || (Game = {}));
+var Images;
+(function (Images) {
+    var GaugeCompressor = (function () {
+        function GaugeCompressor() {
+        }
+        GaugeCompressor.prototype.combineGauges = function (managers) {
+            this.compress(managers, 'OXY_DISP.DAT');
+            this.compress(managers, 'FUL_DISP.DAT');
+            this.compress(managers, 'SPEED.DAT');
+            this.compress(managers, 'PROGRESS_INDICATOR');
+        };
+
+        GaugeCompressor.prototype.compress = function (managers, name) {
+            var _this = this;
+            var parts = managers.Textures.getImages(name);
+            var combinedParts = parts.map(function (part, idx) {
+                return _this.compressPart(managers, parts, idx);
+            });
+            managers.Textures.setImages(name, combinedParts);
+        };
+
+        GaugeCompressor.prototype.compressPart = function (managers, parts, upTo) {
+            var minX = Infinity, maxX = -Infinity;
+            var minY = Infinity, maxY = -Infinity;
+            for (var i = 0; i <= upTo; i++) {
+                var p = parts[i];
+                minX = Math.min(p.XOffset, minX);
+                maxX = Math.max(p.XOffset + p.Canvas.width, maxX);
+                minY = Math.min(p.YOffset, minY);
+                maxY = Math.max(p.YOffset + p.Canvas.height, maxY);
+            }
+
+            var cvs = managers.Canvas.getCanvas();
+            cvs.width = maxX - minX;
+            cvs.height = maxY - minY;
+
+            var ctx = cvs.getContext('2d');
+            for (var i = 0; i <= upTo; i++) {
+                var p = parts[i];
+                ctx.drawImage(p.Canvas, p.XOffset - minX, p.YOffset - minY);
+            }
+
+            return new Images.ImageFragment(cvs, parts[0].Palette, minX, minY);
+        };
+        return GaugeCompressor;
+    })();
+    Images.GaugeCompressor = GaugeCompressor;
+})(Images || (Images = {}));
 var Images;
 (function (Images) {
     var ImageFragment = (function () {

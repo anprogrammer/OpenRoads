@@ -58,6 +58,9 @@ function runGame() {
     ]).done(function () {
         var exe = new ExeData.ExeDataLoader(managers);
         exe.load();
+        var combine = new Images.GaugeCompressor();
+        combine.combineGauges(managers);
+
         document.getElementById('loading').style.display = 'none';
         var cvs = document.getElementById('cvs');
         cvs.style.display = 'block';
