@@ -48,7 +48,7 @@
             this.game.runFrame();
             if (this.game.currentZPosition >= this.game.level.length() || this.myManagers.Keyboard.isDown(27)) {
                 this.myManagers.Frames.popState();
-                this.myManagers.Frames.addState(new Fade(this.myManagers, 1.0, this, false));
+                this.myManagers.Frames.addState(new Fade3D(this.myManagers, 1.0, this, false));
 
                 if (this.game.didWin) {
                     this.myManagers.Settings.incrementWonLevelCount(this.levelNum);
@@ -67,8 +67,8 @@
                 var gameState = new GameState(this.myManagers, this.levelNum, this.controller);
                 frameManager.popState();
                 this.myManagers.Frames.addState(gameState);
-                this.myManagers.Frames.addState(new Fade(this.myManagers, 0.0, gameState, true));
-                this.myManagers.Frames.addState(new Fade(this.myManagers, 1.0, this, false));
+                this.myManagers.Frames.addState(new Fade3D(this.myManagers, 0.0, gameState, true));
+                this.myManagers.Frames.addState(new Fade3D(this.myManagers, 1.0, this, false));
             }
         }
 

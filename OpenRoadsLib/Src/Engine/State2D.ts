@@ -26,7 +26,7 @@
         }
 
         drawFrame2D(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, frameManager: FrameManager, frameTimeInfo: FrameTimeInfo, cam: CameraState): void {
-            throw "NOT IMPLEMENTED";
+            throw "drawFrame2D NOT IMPLEMENTED";
         }
     }
 } 

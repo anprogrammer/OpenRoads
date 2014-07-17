@@ -96,10 +96,10 @@ module States {
                     this.creditFrame.Alpha = (fps * 4 - seq) / fps;
                     if (this.creditFrame.Alpha < 0.1 && creditIdx == this.frames.length - 1) {
                         var demoState = new GameState(managers, 0, new Game.DemoController(managers.Streams.getRawArray('DEMO.REC')));
-                        managers.Frames.addState(new Fade(managers, 0.0, this, false));
+                        managers.Frames.addState(new Fade2D(managers, 0.0, this, false));
                         managers.Frames.addState(demoState);
-                        managers.Frames.addState(new Fade(managers, 0.0, demoState, true));
-                        managers.Frames.addState(new Fade(managers, 1.0, this, false));
+                        managers.Frames.addState(new Fade3D(managers, 0.0, demoState, true));
+                        managers.Frames.addState(new Fade2D(managers, 1.0, this, false));
                         this.frame = 0;
                         this.creditFrame.Alpha = 0.0;
                         this.updatePhysics(frameManager, frameTimeInfo);
@@ -111,11 +111,11 @@ module States {
 
             if (managers.Keyboard.isDown(68)) {
                 var demoState = new GameState(managers, 0, new Game.DemoController(managers.Streams.getRawArray('DEMO.REC')));
-                managers.Frames.addState(new Fade(managers, 0.0, this, false));
-                managers.Frames.addState(new Fade(managers, 1.0, demoState, false));
+                managers.Frames.addState(new Fade2D(managers, 0.0, this, false));
+                managers.Frames.addState(new Fade3D(managers, 1.0, demoState, false));
                 managers.Frames.addState(demoState);
-                managers.Frames.addState(new Fade(managers, 0.0, demoState, true));
-                managers.Frames.addState(new Fade(managers, 1.0, this, false));
+                managers.Frames.addState(new Fade3D(managers, 0.0, demoState, true));
+                managers.Frames.addState(new Fade2D(managers, 1.0, this, false));
             }
         }
 

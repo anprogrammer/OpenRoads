@@ -26,7 +26,7 @@
         }
 
         drawFrame3D(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, frameManager: FrameManager, frameTimeInfo: FrameTimeInfo, cam: CameraState): void {
-            throw "NOT IMPLEMENTED";
+            throw "drawFrame3D NOT IMPLEMENTED";
         }
     }
 } 

@@ -45,27 +45,27 @@
             switch (this.menuPos) {
                 case 0: //Start
                     var goState = new GoMenu(this.myManagers);
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 0.0, this, false));
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 1.0, goState, false));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 0.0, this, false));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 1.0, goState, false));
                     this.myManagers.Frames.addState(goState);
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 0.0, goState, true));
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 1.0, this, false));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 0.0, goState, true));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 1.0, this, false));
                     break;
                 case 1: //Config
                     var configState = new ControlsMenu(this.myManagers);
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 0.0, this, false));
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 1.0, configState, false));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 0.0, this, false));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 1.0, configState, false));
                     this.myManagers.Frames.addState(configState);
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 0.0, configState, true));
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 1.0, this, false));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 0.0, configState, true));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 1.0, this, false));
                     break; //TODO
                 case 2: //Help
                     var helpState = new Help(this.myManagers);
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 0.0, this, false));
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 1.0, helpState, false));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 0.0, this, false));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 1.0, helpState, false));
                     this.myManagers.Frames.addState(helpState);
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 0.0, helpState, true));
-                    this.myManagers.Frames.addState(new Fade(this.myManagers, 1.0, this, false));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 0.0, helpState, true));
+                    this.myManagers.Frames.addState(new Fade2D(this.myManagers, 1.0, this, false));
                     break; //TODO
             }
         }

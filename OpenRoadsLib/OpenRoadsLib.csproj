@@ -117,7 +117,8 @@
     <TypeScriptCompile Include="Src\Sounds\WebAPIAudioProvider.ts" />
     <TypeScriptCompile Include="Src\States\ControlsState.ts" />
     <TypeScriptCompile Include="Src\States\EmptyState.ts" />
-    <TypeScriptCompile Include="Src\States\FadeState.ts" />
+    <TypeScriptCompile Include="Src\States\FadeState2D.ts" />
+    <TypeScriptCompile Include="Src\States\FadeState3D.ts" />
     <TypeScriptCompile Include="Src\States\GameState.ts" />
     <TypeScriptCompile Include="Src\States\GLStateHelper.ts" />
     <TypeScriptCompile Include="Src\States\GoMenuState.ts" />
@@ -163,6 +164,7 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y ..\RoadsLib.js ..\..\OpenRoads\
 xcopy /Y ..\RoadsLib.js.map ..\..\OpenRoads\
-xcopy /Y ..\RoadsLib.d.ts ..\..\OpenRoads\</PostBuildEvent>
+xcopy /Y ..\RoadsLib.d.ts ..\..\OpenRoads\
+xcopy /Y ..\Src ..\..\OpenRoads\Src /e</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -59,10 +59,10 @@
 
         private enterLevel() {
             var gameState = new GameState(this.myManagers, this.selLevel, new Game.KeyboardController(this.myManagers.Keyboard));
-            this.myManagers.Frames.addState(new Fade(this.myManagers, 0.0, this, false));
+            this.myManagers.Frames.addState(new Fade2D(this.myManagers, 0.0, this, false));
             this.myManagers.Frames.addState(gameState);
-            this.myManagers.Frames.addState(new Fade(this.myManagers, 0.0, gameState, true));
-            this.myManagers.Frames.addState(new Fade(this.myManagers, 1.0, this, false));
+            this.myManagers.Frames.addState(new Fade3D(this.myManagers, 0.0, gameState, true));
+            this.myManagers.Frames.addState(new Fade2D(this.myManagers, 1.0, this, false));
             this.myManagers.Player.loadSong(Math.floor(Math.random() * 11) + 2);
         }
 

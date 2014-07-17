@@ -1010,18 +1010,33 @@ declare module States {
     }
 }
 declare module States {
-    class Fade extends Engine.State2D implements Engine.GameState {
+    class Fade2D extends Engine.State2D implements Engine.GameState {
         private myManagers;
         private position;
         private direction;
         private drawState;
         private back;
         private firstFrame;
-        constructor(managers: Managers.ManagerSet, start: number, drawState: any, runPhysicsFirst: boolean);
+        constructor(managers: Managers.ManagerSet, start: number, drawState: Engine.State2D, runPhysicsFirst: boolean);
         public load(gl: WebGLRenderingContext): void;
         public unload(): void;
         public updatePhysics(frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo): void;
         public drawFrame2D(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo, cam: Engine.CameraState): void;
+    }
+}
+declare module States {
+    class Fade3D extends Engine.State3D implements Engine.GameState {
+        private myManagers;
+        private position;
+        private direction;
+        private drawState;
+        private back;
+        private firstFrame;
+        constructor(managers: Managers.ManagerSet, start: number, drawState: Engine.State3D, runPhysicsFirst: boolean);
+        public load(gl: WebGLRenderingContext): void;
+        public unload(): void;
+        public updatePhysics(frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo): void;
+        public drawFrame3D(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo, cam: Engine.CameraState): void;
     }
 }
 declare module States {

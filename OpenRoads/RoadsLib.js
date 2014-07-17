@@ -1231,7 +1231,7 @@ var Engine;
         };
 
         State2D.prototype.drawFrame2D = function (gl, canvas, frameManager, frameTimeInfo, cam) {
-            throw "NOT IMPLEMENTED";
+            throw "drawFrame2D NOT IMPLEMENTED";
         };
         return State2D;
     })();
@@ -1258,7 +1258,7 @@ var Engine;
         };
 
         State3D.prototype.drawFrame3D = function (gl, canvas, frameManager, frameTimeInfo, cam) {
-            throw "NOT IMPLEMENTED";
+            throw "drawFrame3D NOT IMPLEMENTED";
         };
         return State3D;
     })();
@@ -4371,16 +4371,11 @@ var States;
     })();
     States.EmptyState = EmptyState;
 })(States || (States = {}));
-/* INTRO TODO:
-* Music
-* Demo level sequence
-*/
 var States;
 (function (States) {
-    var Fade = (function (_super) {
-        __extends(Fade, _super);
-        //TODO:  We need to make this accept a State2D only, create a new fade for 3D stuff.
-        function Fade(managers, start, drawState, runPhysicsFirst) {
+    var Fade2D = (function (_super) {
+        __extends(Fade2D, _super);
+        function Fade2D(managers, start, drawState, runPhysicsFirst) {
             _super.call(this, managers);
             this.myManagers = managers;
             this.position = start;
@@ -4388,7 +4383,7 @@ var States;
             this.drawState = drawState;
             this.firstFrame = runPhysicsFirst;
         }
-        Fade.prototype.load = function (gl) {
+        Fade2D.prototype.load = function (gl) {
             _super.prototype.load.call(this, gl);
 
             var blackTex = new WGL.Texture(gl);
@@ -4408,10 +4403,10 @@ var States;
             this.back.Alpha = 1.0 - this.position;
         };
 
-        Fade.prototype.unload = function () {
+        Fade2D.prototype.unload = function () {
         };
 
-        Fade.prototype.updatePhysics = function (frameManager, frameTimeInfo) {
+        Fade2D.prototype.updatePhysics = function (frameManager, frameTimeInfo) {
             this.position += this.direction * frameTimeInfo.getPhysicsStep();
             if (this.position <= 0.0 || this.position >= 1.0) {
                 frameManager.popState();
@@ -4424,15 +4419,70 @@ var States;
             }
         };
 
-        Fade.prototype.drawFrame2D = function (gl, canvas, frameManager, frameTimeInfo, cam) {
-            if (this.drawState.drawFrame2D) {
-                this.drawState.drawFrame2D(gl, canvas, frameManager, frameTimeInfo, cam);
-            }
+        Fade2D.prototype.drawFrame2D = function (gl, canvas, frameManager, frameTimeInfo, cam) {
+            this.drawState.drawFrame2D(gl, canvas, frameManager, frameTimeInfo, cam);
             this.back.draw();
         };
-        return Fade;
+        return Fade2D;
     })(Engine.State2D);
-    States.Fade = Fade;
+    States.Fade2D = Fade2D;
+})(States || (States = {}));
+var States;
+(function (States) {
+    //TODO: Refactor out the common logic between Fade3D and Fade2D
+    var Fade3D = (function (_super) {
+        __extends(Fade3D, _super);
+        function Fade3D(managers, start, drawState, runPhysicsFirst) {
+            _super.call(this, managers);
+            this.myManagers = managers;
+            this.position = start;
+            this.direction = start > 0.5 ? -1.0 : 1.0;
+            this.drawState = drawState;
+            this.firstFrame = runPhysicsFirst;
+        }
+        Fade3D.prototype.load = function (gl) {
+            _super.prototype.load.call(this, gl);
+
+            var blackTex = new WGL.Texture(gl);
+            var cvs = this.myManagers.Canvas.getCanvas();
+            cvs.width = 32;
+            cvs.height = 32;
+
+            var ctx = cvs.getContext('2d');
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, cvs.width, cvs.height);
+
+            blackTex.loadData(cvs);
+            blackTex.setFilters(gl.NEAREST, gl.NEAREST);
+
+            var blackFrag = new Drawing.TextureFragment(blackTex, 0, 0, 320, 200);
+            this.back = new Drawing.Sprite(gl, this.myManagers, blackFrag);
+            this.back.Alpha = 1.0 - this.position;
+        };
+
+        Fade3D.prototype.unload = function () {
+        };
+
+        Fade3D.prototype.updatePhysics = function (frameManager, frameTimeInfo) {
+            this.position += this.direction * frameTimeInfo.getPhysicsStep();
+            if (this.position <= 0.0 || this.position >= 1.0) {
+                frameManager.popState();
+            } else {
+                this.back.Alpha = 1.0 - this.position;
+            }
+            if (this.firstFrame) {
+                this.drawState.updatePhysics(frameManager, frameTimeInfo);
+                this.firstFrame = false;
+            }
+        };
+
+        Fade3D.prototype.drawFrame3D = function (gl, canvas, frameManager, frameTimeInfo, cam) {
+            this.drawState.drawFrame3D(gl, canvas, frameManager, frameTimeInfo, cam);
+            this.back.draw();
+        };
+        return Fade3D;
+    })(Engine.State3D);
+    States.Fade3D = Fade3D;
 })(States || (States = {}));
 var States;
 (function (States) {
@@ -4473,7 +4523,7 @@ var States;
             this.game.runFrame();
             if (this.game.currentZPosition >= this.game.level.length() || this.myManagers.Keyboard.isDown(27)) {
                 this.myManagers.Frames.popState();
-                this.myManagers.Frames.addState(new States.Fade(this.myManagers, 1.0, this, false));
+                this.myManagers.Frames.addState(new States.Fade3D(this.myManagers, 1.0, this, false));
 
                 if (this.game.didWin) {
                     this.myManagers.Settings.incrementWonLevelCount(this.levelNum);
@@ -4492,8 +4542,8 @@ var States;
                 var gameState = new GameState(this.myManagers, this.levelNum, this.controller);
                 frameManager.popState();
                 this.myManagers.Frames.addState(gameState);
-                this.myManagers.Frames.addState(new States.Fade(this.myManagers, 0.0, gameState, true));
-                this.myManagers.Frames.addState(new States.Fade(this.myManagers, 1.0, this, false));
+                this.myManagers.Frames.addState(new States.Fade3D(this.myManagers, 0.0, gameState, true));
+                this.myManagers.Frames.addState(new States.Fade3D(this.myManagers, 1.0, this, false));
             }
         };
 
@@ -4660,10 +4710,10 @@ var States;
 
         GoMenu.prototype.enterLevel = function () {
             var gameState = new States.GameState(this.myManagers, this.selLevel, new Game.KeyboardController(this.myManagers.Keyboard));
-            this.myManagers.Frames.addState(new States.Fade(this.myManagers, 0.0, this, false));
+            this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 0.0, this, false));
             this.myManagers.Frames.addState(gameState);
-            this.myManagers.Frames.addState(new States.Fade(this.myManagers, 0.0, gameState, true));
-            this.myManagers.Frames.addState(new States.Fade(this.myManagers, 1.0, this, false));
+            this.myManagers.Frames.addState(new States.Fade3D(this.myManagers, 0.0, gameState, true));
+            this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 1.0, this, false));
             this.myManagers.Player.loadSong(Math.floor(Math.random() * 11) + 2);
         };
 
@@ -4862,10 +4912,10 @@ var States;
                     this.creditFrame.Alpha = (fps * 4 - seq) / fps;
                     if (this.creditFrame.Alpha < 0.1 && creditIdx == this.frames.length - 1) {
                         var demoState = new States.GameState(managers, 0, new Game.DemoController(managers.Streams.getRawArray('DEMO.REC')));
-                        managers.Frames.addState(new States.Fade(managers, 0.0, this, false));
+                        managers.Frames.addState(new States.Fade2D(managers, 0.0, this, false));
                         managers.Frames.addState(demoState);
-                        managers.Frames.addState(new States.Fade(managers, 0.0, demoState, true));
-                        managers.Frames.addState(new States.Fade(managers, 1.0, this, false));
+                        managers.Frames.addState(new States.Fade3D(managers, 0.0, demoState, true));
+                        managers.Frames.addState(new States.Fade2D(managers, 1.0, this, false));
                         this.frame = 0;
                         this.creditFrame.Alpha = 0.0;
                         this.updatePhysics(frameManager, frameTimeInfo);
@@ -4877,11 +4927,11 @@ var States;
 
             if (managers.Keyboard.isDown(68)) {
                 var demoState = new States.GameState(managers, 0, new Game.DemoController(managers.Streams.getRawArray('DEMO.REC')));
-                managers.Frames.addState(new States.Fade(managers, 0.0, this, false));
-                managers.Frames.addState(new States.Fade(managers, 1.0, demoState, false));
+                managers.Frames.addState(new States.Fade2D(managers, 0.0, this, false));
+                managers.Frames.addState(new States.Fade3D(managers, 1.0, demoState, false));
                 managers.Frames.addState(demoState);
-                managers.Frames.addState(new States.Fade(managers, 0.0, demoState, true));
-                managers.Frames.addState(new States.Fade(managers, 1.0, this, false));
+                managers.Frames.addState(new States.Fade3D(managers, 0.0, demoState, true));
+                managers.Frames.addState(new States.Fade2D(managers, 1.0, this, false));
             }
         };
 
@@ -4963,27 +5013,27 @@ var States;
             switch (this.menuPos) {
                 case 0:
                     var goState = new States.GoMenu(this.myManagers);
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 0.0, this, false));
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 1.0, goState, false));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 0.0, this, false));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 1.0, goState, false));
                     this.myManagers.Frames.addState(goState);
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 0.0, goState, true));
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 1.0, this, false));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 0.0, goState, true));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 1.0, this, false));
                     break;
                 case 1:
                     var configState = new States.ControlsMenu(this.myManagers);
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 0.0, this, false));
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 1.0, configState, false));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 0.0, this, false));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 1.0, configState, false));
                     this.myManagers.Frames.addState(configState);
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 0.0, configState, true));
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 1.0, this, false));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 0.0, configState, true));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 1.0, this, false));
                     break;
                 case 2:
                     var helpState = new States.Help(this.myManagers);
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 0.0, this, false));
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 1.0, helpState, false));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 0.0, this, false));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 1.0, helpState, false));
                     this.myManagers.Frames.addState(helpState);
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 0.0, helpState, true));
-                    this.myManagers.Frames.addState(new States.Fade(this.myManagers, 1.0, this, false));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 0.0, helpState, true));
+                    this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 1.0, this, false));
                     break;
             }
         };

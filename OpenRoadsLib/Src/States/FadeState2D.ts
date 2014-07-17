@@ -1,9 +1,5 @@
-﻿/* INTRO TODO:
-* Music
-* Demo level sequence
-*/
-module States {
-    export class Fade extends Engine.State2D implements Engine.GameState {
+﻿module States {
+    export class Fade2D extends Engine.State2D implements Engine.GameState {
         private myManagers: Managers.ManagerSet;
         private position: number;
         private direction: number;
@@ -11,8 +7,7 @@ module States {
         private back: Drawing.Sprite;
         private firstFrame: boolean;
 
-        //TODO:  We need to make this accept a State2D only, create a new fade for 3D stuff.
-        constructor(managers: Managers.ManagerSet, start: number, drawState: any, runPhysicsFirst: boolean) {
+        constructor(managers: Managers.ManagerSet, start: number, drawState: Engine.State2D, runPhysicsFirst: boolean) {
             super(managers);
             this.myManagers = managers;
             this.position = start;
@@ -60,9 +55,7 @@ module States {
         }
 
         drawFrame2D(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo, cam: Engine.CameraState): void {
-            if (this.drawState.drawFrame2D) {
-                this.drawState.drawFrame2D(gl, canvas, frameManager, frameTimeInfo, cam);
-            }
+            this.drawState.drawFrame2D(gl, canvas, frameManager, frameTimeInfo, cam);
             this.back.draw();
         }
     }

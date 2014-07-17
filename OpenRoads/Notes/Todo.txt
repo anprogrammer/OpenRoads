@@ -1,4 +1,5 @@
-﻿Fix FadeIn/Out for 3D
+﻿Refactoring gauges to draw one image rather than 30
+Reduce sprite-drawing overhead by merging multiple steps of sprites into single sprite.  Currently very slow.
 Improve loading performance.  Maybe use a web-worker to do in parallel?  We don't want this interfering with music
 Fix "Road Completed" text positioning
 
