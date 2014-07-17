@@ -57,8 +57,8 @@ function runGame() {
     ]).done(() => {
             var exe = new ExeData.ExeDataLoader(managers);
             exe.load();
-            var combine = new Images.GaugeCompressor();
-            combine.combineGauges(managers);
+            var combine = new Images.Preloader();
+            combine.preloadData(managers);
 
             document.getElementById('loading').style.display = 'none';
             var cvs = <HTMLCanvasElement>document.getElementById('cvs');

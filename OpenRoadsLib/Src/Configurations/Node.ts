@@ -52,8 +52,8 @@ module Configurations {
         ]).done(() => {
                 var exe = new ExeData.ExeDataLoader(managers);
                 exe.load();
-                var combine = new Images.GaugeCompressor();
-                combine.combineGauges(managers);
+                var combine = new Images.Preloader();
+                combine.preloadData(managers);
 
                 var doc = wgl.document();
                 var cvs = doc.createElement('canvas', 1280, 800, true);

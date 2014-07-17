@@ -610,8 +610,8 @@ declare module Game {
     }
 }
 declare module Images {
-    class GaugeCompressor {
-        public combineGauges(managers: Managers.ManagerSet): void;
+    class Preloader {
+        public preloadData(managers: Managers.ManagerSet): void;
         private compress(managers, name);
         private compressPart(managers, parts, upTo);
     }
@@ -1247,7 +1247,7 @@ declare module Vertices {
 declare module VR {
     class GLFW {
         public enableHMD(): boolean;
-        public getHMDTargetSize(): TSM.vec2;
+        public getHMDTargetSize(): number[];
         public getHMDFboId(gl: WebGLRenderingContext): number;
         public getEyeViewAdjust(n: number): number[];
         public getEyeViewport(n: number): number[];

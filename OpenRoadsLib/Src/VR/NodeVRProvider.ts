@@ -1,7 +1,7 @@
 ﻿module VR {
     export declare class GLFW {
         enableHMD(): boolean;
-        getHMDTargetSize(): TSM.vec2;
+        getHMDTargetSize(): number[];
         getHMDFboId(gl: WebGLRenderingContext): number;
         getEyeViewAdjust(n: number): number[];
         getEyeViewport(n: number): number[];
@@ -25,7 +25,7 @@
         }
 
         public getTargetResolution(): TSM.vec2 {
-            return this.glfw.getHMDTargetSize();
+            return new TSM.vec2(this.glfw.getHMDTargetSize());
         }
 
         public getTargetFboId(gl: WebGLRenderingContext): number {

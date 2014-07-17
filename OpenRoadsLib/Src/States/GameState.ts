@@ -23,17 +23,33 @@
 
         load(gl: WebGLRenderingContext): void {
             super.load(gl);
+            var dt = Date.now();
+            function clock(s: string) {
+                var dtn = Date.now();
+                console.log(s + ' took ' + (dtn - dt) + 'ms');
+                dt = dtn;
+            }
 
             var managers = this.myManagers;
             this.background = managers.Graphics.get3DSprite(gl, managers, managers.Textures.getTexture(gl, "WORLD" + Math.floor(Math.max(0, (this.levelNum - 1)) / 3) + ".LZS"));
+            clock('Load background');
             this.dash = new Game.Dashboard(gl, managers);
+            clock('Load dashboard');
             var ll = new Levels.MultiLevelLoader(managers.Streams.getStream("ROADS.LZS"));
+            clock('Load level');
             var level = ll.Levels[this.levelNum];
 
             this.game = new Game.StateManager(managers, level, this.controller);
+            clock('Create gamestate');
+
             var meshBuilder = new Levels.MeshBuilder();
-            this.mesh = managers.Graphics.getMesh(gl, managers, meshBuilder.buildMesh(level));
+            var meshVerts = meshBuilder.buildMesh(level);
+            clock('Generate mesh');
+            this.mesh = managers.Graphics.getMesh(gl, managers, meshVerts);
+            clock('Create mesh');
+
             this.carSprite = new Game.CarSprite(gl, managers);
+            clock('Create car');
             this.roadCompleted = new Drawing.TextHelper(managers).getSpriteFromText(gl, managers, "Road Completed", "16pt Arial", 24);
             this.roadCompleted.Position.x = 320 / 2 - this.roadCompleted.Size.x / 2;
             this.roadCompleted.Position.y = 200 / 2 - this.roadCompleted.Size.y / 2;

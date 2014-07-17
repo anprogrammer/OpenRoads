@@ -455,8 +455,8 @@ var Configurations;
         ]).done(function () {
             var exe = new ExeData.ExeDataLoader(managers);
             exe.load();
-            var combine = new Images.GaugeCompressor();
-            combine.combineGauges(managers);
+            var combine = new Images.Preloader();
+            combine.preloadData(managers);
 
             var doc = wgl.document();
             var cvs = doc.createElement('canvas', 1280, 800, true);
@@ -2419,17 +2419,19 @@ var Game;
 })(Game || (Game = {}));
 var Images;
 (function (Images) {
-    var GaugeCompressor = (function () {
-        function GaugeCompressor() {
+    var Preloader = (function () {
+        function Preloader() {
         }
-        GaugeCompressor.prototype.combineGauges = function (managers) {
+        Preloader.prototype.preloadData = function (managers) {
             this.compress(managers, 'OXY_DISP.DAT');
             this.compress(managers, 'FUL_DISP.DAT');
             this.compress(managers, 'SPEED.DAT');
             this.compress(managers, 'PROGRESS_INDICATOR');
+
+            managers.Sounds.getMultiEffect('SFX.SND');
         };
 
-        GaugeCompressor.prototype.compress = function (managers, name) {
+        Preloader.prototype.compress = function (managers, name) {
             var _this = this;
             var parts = managers.Textures.getImages(name);
             var combinedParts = parts.map(function (part, idx) {
@@ -2438,7 +2440,7 @@ var Images;
             managers.Textures.setImages(name, combinedParts);
         };
 
-        GaugeCompressor.prototype.compressPart = function (managers, parts, upTo) {
+        Preloader.prototype.compressPart = function (managers, parts, upTo) {
             var minX = Infinity, maxX = -Infinity;
             var minY = Infinity, maxY = -Infinity;
             for (var i = 0; i <= upTo; i++) {
@@ -2461,9 +2463,9 @@ var Images;
 
             return new Images.ImageFragment(cvs, parts[0].Palette, minX, minY);
         };
-        return GaugeCompressor;
+        return Preloader;
     })();
-    Images.GaugeCompressor = GaugeCompressor;
+    Images.Preloader = Preloader;
 })(Images || (Images = {}));
 var Images;
 (function (Images) {
@@ -4549,17 +4551,33 @@ var States;
         }
         GameState.prototype.load = function (gl) {
             _super.prototype.load.call(this, gl);
+            var dt = Date.now();
+            function clock(s) {
+                var dtn = Date.now();
+                console.log(s + ' took ' + (dtn - dt) + 'ms');
+                dt = dtn;
+            }
 
             var managers = this.myManagers;
             this.background = managers.Graphics.get3DSprite(gl, managers, managers.Textures.getTexture(gl, "WORLD" + Math.floor(Math.max(0, (this.levelNum - 1)) / 3) + ".LZS"));
+            clock('Load background');
             this.dash = new Game.Dashboard(gl, managers);
+            clock('Load dashboard');
             var ll = new Levels.MultiLevelLoader(managers.Streams.getStream("ROADS.LZS"));
+            clock('Load level');
             var level = ll.Levels[this.levelNum];
 
             this.game = new Game.StateManager(managers, level, this.controller);
+            clock('Create gamestate');
+
             var meshBuilder = new Levels.MeshBuilder();
-            this.mesh = managers.Graphics.getMesh(gl, managers, meshBuilder.buildMesh(level));
+            var meshVerts = meshBuilder.buildMesh(level);
+            clock('Generate mesh');
+            this.mesh = managers.Graphics.getMesh(gl, managers, meshVerts);
+            clock('Create mesh');
+
             this.carSprite = new Game.CarSprite(gl, managers);
+            clock('Create car');
             this.roadCompleted = new Drawing.TextHelper(managers).getSpriteFromText(gl, managers, "Road Completed", "16pt Arial", 24);
             this.roadCompleted.Position.x = 320 / 2 - this.roadCompleted.Size.x / 2;
             this.roadCompleted.Position.y = 200 / 2 - this.roadCompleted.Size.y / 2;
@@ -5782,7 +5800,7 @@ var VR;
         };
 
         NodeVRProvider.prototype.getTargetResolution = function () {
-            return this.glfw.getHMDTargetSize();
+            return new TSM.vec2(this.glfw.getHMDTargetSize());
         };
 
         NodeVRProvider.prototype.getTargetFboId = function (gl) {

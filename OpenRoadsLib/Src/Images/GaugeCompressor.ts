@@ -1,10 +1,12 @@
 ﻿module Images {
-    export class GaugeCompressor {
-        public combineGauges(managers: Managers.ManagerSet): void {
+    export class Preloader {
+        public preloadData(managers: Managers.ManagerSet): void {
             this.compress(managers, 'OXY_DISP.DAT');
             this.compress(managers, 'FUL_DISP.DAT');
             this.compress(managers, 'SPEED.DAT');
             this.compress(managers, 'PROGRESS_INDICATOR');
+
+            managers.Sounds.getMultiEffect('SFX.SND');
         }
 
         private compress(managers: Managers.ManagerSet, name: string) {
