@@ -1,4 +1,5 @@
-﻿Improve loading performance.  Maybe use a web-worker to do in parallel?  We don't want this interfering with music
+﻿Have level loading occur during black screen fade
+Fix sound envelope issue
 Fix "Road Completed" text positioning
 
 Add joystick support

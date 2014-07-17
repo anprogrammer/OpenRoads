@@ -8,12 +8,7 @@
 
         public load(filename: string, cb: (data: Uint8Array) => void): void {
             this.fs.readFile(filename, function (err: any, data: any) {
-                var ab = new ArrayBuffer(data.length);
-                var arr = new Uint8Array(ab);
-                for (var i = 0; i < data.length; i++) {
-                    arr[i] = data[i];
-                }
-                cb(arr);
+                cb(data);
             });
         }
     };

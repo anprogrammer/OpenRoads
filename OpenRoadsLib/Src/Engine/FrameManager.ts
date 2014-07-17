@@ -23,6 +23,9 @@
             this.document = document;
             this.canvas = canvas;
             this.ctx = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+            var preloader = new Images.Preloader();
+            preloader.preloadData(this.ctx, managers);
+
             this.addState(gs);
 
             this.clock = clock;
@@ -71,7 +74,6 @@
             }
 
             if (this.states[this.states.length - 1] === gs) {
-                gs.drawFrame(this.ctx, this.canvas, this, time, new CameraState(new TSM.vec3(), new TSM.quat(), new TSM.vec3(), new TSM.mat4()));
                 gs.drawFrame(this.ctx, this.canvas, this, time, new CameraState(new TSM.vec3(), new TSM.quat(), new TSM.vec3(), new TSM.mat4()));
             }
 

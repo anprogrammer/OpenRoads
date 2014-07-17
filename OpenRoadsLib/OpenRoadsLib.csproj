@@ -94,7 +94,7 @@
     <TypeScriptCompile Include="Src\Game\KeyboardController.ts" />
     <TypeScriptCompile Include="Src\Game\Ship.ts" />
     <TypeScriptCompile Include="Src\Game\StateManager.ts" />
-    <TypeScriptCompile Include="Src\Images\GaugeCompressor.ts" />
+    <TypeScriptCompile Include="Src\Images\Preloader.ts" />
     <TypeScriptCompile Include="Src\Images\Loader.ts" />
     <TypeScriptCompile Include="Src\Levels\Level.ts" />
     <TypeScriptCompile Include="Src\Levels\LevelToTableRenderer.ts" />

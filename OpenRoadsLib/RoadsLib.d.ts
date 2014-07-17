@@ -611,7 +611,7 @@ declare module Game {
 }
 declare module Images {
     class Preloader {
-        public preloadData(managers: Managers.ManagerSet): void;
+        public preloadData(gl: WebGLRenderingContext, managers: Managers.ManagerSet): void;
         private compress(managers, name);
         private compressPart(managers, parts, upTo);
     }
@@ -1058,9 +1058,12 @@ declare module States {
         private dash;
         private carSprite;
         private timeBeforeFade;
+        private resourcesLoaded;
+        private gl;
         private roadCompleted;
         constructor(managers: Managers.ManagerSet, levelNum: number, controller: Game.Controller);
         public load(gl: WebGLRenderingContext): void;
+        public loadResources(gl: WebGLRenderingContext): void;
         public unload(): void;
         public updatePhysics(frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo): void;
         public drawFrame3D(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo, cam: Engine.CameraState): void;

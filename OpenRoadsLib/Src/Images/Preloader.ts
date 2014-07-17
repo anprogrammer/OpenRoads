@@ -1,12 +1,15 @@
 ﻿module Images {
     export class Preloader {
-        public preloadData(managers: Managers.ManagerSet): void {
+        public preloadData(gl: WebGLRenderingContext, managers: Managers.ManagerSet): void {
             this.compress(managers, 'OXY_DISP.DAT');
             this.compress(managers, 'FUL_DISP.DAT');
             this.compress(managers, 'SPEED.DAT');
             this.compress(managers, 'PROGRESS_INDICATOR');
 
             managers.Sounds.getMultiEffect('SFX.SND');
+            ['CARS.LZS', 'DASHBRD.LZS', 'GOMENU.LZS', 'HELPMENU.LZS', 'INTRO.LZS', 'MAINMENU.LZS', 'SETMENU.LZS',
+                'WORLD0.LZS', 'WORLD1.LZS', 'WORLD2.LZS', 'WORLD3.LZS', 'WORLD4.LZS', 'WORLD5.LZS', 'WORLD6.LZS', 'WORLD7.LZS', 'WORLD8.LZS', 'WORLD9.LZS']
+                .map((fname) => managers.Textures.getTexture(gl, fname));
         }
 
         private compress(managers: Managers.ManagerSet, name: string) {

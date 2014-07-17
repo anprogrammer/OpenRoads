@@ -455,8 +455,6 @@ var Configurations;
         ]).done(function () {
             var exe = new ExeData.ExeDataLoader(managers);
             exe.load();
-            var combine = new Images.Preloader();
-            combine.preloadData(managers);
 
             var doc = wgl.document();
             var cvs = doc.createElement('canvas', 1280, 800, true);
@@ -1045,6 +1043,9 @@ var Engine;
             this.document = document;
             this.canvas = canvas;
             this.ctx = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
+            var preloader = new Images.Preloader();
+            preloader.preloadData(this.ctx, managers);
+
             this.addState(gs);
 
             this.clock = clock;
@@ -1097,7 +1098,6 @@ var Engine;
             }
 
             if (this.states[this.states.length - 1] === gs) {
-                gs.drawFrame(this.ctx, this.canvas, this, time, new Engine.CameraState(new TSM.vec3(), new TSM.quat(), new TSM.vec3(), new TSM.mat4()));
                 gs.drawFrame(this.ctx, this.canvas, this, time, new Engine.CameraState(new TSM.vec3(), new TSM.quat(), new TSM.vec3(), new TSM.mat4()));
             }
 
@@ -2422,13 +2422,18 @@ var Images;
     var Preloader = (function () {
         function Preloader() {
         }
-        Preloader.prototype.preloadData = function (managers) {
+        Preloader.prototype.preloadData = function (gl, managers) {
             this.compress(managers, 'OXY_DISP.DAT');
             this.compress(managers, 'FUL_DISP.DAT');
             this.compress(managers, 'SPEED.DAT');
             this.compress(managers, 'PROGRESS_INDICATOR');
 
             managers.Sounds.getMultiEffect('SFX.SND');
+            [
+                'CARS.LZS', 'DASHBRD.LZS', 'GOMENU.LZS', 'HELPMENU.LZS', 'INTRO.LZS', 'MAINMENU.LZS', 'SETMENU.LZS',
+                'WORLD0.LZS', 'WORLD1.LZS', 'WORLD2.LZS', 'WORLD3.LZS', 'WORLD4.LZS', 'WORLD5.LZS', 'WORLD6.LZS', 'WORLD7.LZS', 'WORLD8.LZS', 'WORLD9.LZS'].map(function (fname) {
+                return managers.Textures.getTexture(gl, fname);
+            });
         };
 
         Preloader.prototype.compress = function (managers, name) {
@@ -4544,6 +4549,7 @@ var States;
         function GameState(managers, levelNum, controller) {
             _super.call(this, managers);
             this.timeBeforeFade = 1.0;
+            this.resourcesLoaded = false;
             this.myManagers = managers;
             this.frame = 0;
             this.levelNum = levelNum;
@@ -4551,33 +4557,24 @@ var States;
         }
         GameState.prototype.load = function (gl) {
             _super.prototype.load.call(this, gl);
-            var dt = Date.now();
-            function clock(s) {
-                var dtn = Date.now();
-                console.log(s + ' took ' + (dtn - dt) + 'ms');
-                dt = dtn;
-            }
+            this.gl = gl; //TODO: Nasty hack to hold onto this just to load resources from physics step
+        };
 
+        GameState.prototype.loadResources = function (gl) {
             var managers = this.myManagers;
             this.background = managers.Graphics.get3DSprite(gl, managers, managers.Textures.getTexture(gl, "WORLD" + Math.floor(Math.max(0, (this.levelNum - 1)) / 3) + ".LZS"));
-            clock('Load background');
             this.dash = new Game.Dashboard(gl, managers);
-            clock('Load dashboard');
             var ll = new Levels.MultiLevelLoader(managers.Streams.getStream("ROADS.LZS"));
-            clock('Load level');
             var level = ll.Levels[this.levelNum];
 
             this.game = new Game.StateManager(managers, level, this.controller);
-            clock('Create gamestate');
 
             var meshBuilder = new Levels.MeshBuilder();
             var meshVerts = meshBuilder.buildMesh(level);
-            clock('Generate mesh');
             this.mesh = managers.Graphics.getMesh(gl, managers, meshVerts);
-            clock('Create mesh');
 
             this.carSprite = new Game.CarSprite(gl, managers);
-            clock('Create car');
+
             this.roadCompleted = new Drawing.TextHelper(managers).getSpriteFromText(gl, managers, "Road Completed", "16pt Arial", 24);
             this.roadCompleted.Position.x = 320 / 2 - this.roadCompleted.Size.x / 2;
             this.roadCompleted.Position.y = 200 / 2 - this.roadCompleted.Size.y / 2;
@@ -4587,6 +4584,10 @@ var States;
         };
 
         GameState.prototype.updatePhysics = function (frameManager, frameTimeInfo) {
+            if (!this.resourcesLoaded) {
+                this.loadResources(this.gl);
+                this.resourcesLoaded = true;
+            }
             var fps = frameTimeInfo.getFPS();
             this.frame++;
             this.game.runFrame();
@@ -4617,6 +4618,10 @@ var States;
         };
 
         GameState.prototype.drawFrame3D = function (gl, canvas, frameManager, frameTimeInfo, cam) {
+            if (!this.resourcesLoaded) {
+                this.loadResources(gl);
+                this.resourcesLoaded = true;
+            }
             var isVR = this.myManagers.VR !== null;
             var scaleXY = 6.5 / 46.0;
             var scaleZ = 26.0 / 46.0;
@@ -4997,7 +5002,6 @@ var States;
             if (managers.Keyboard.isDown(68)) {
                 var demoState = new States.GameState(managers, 0, new Game.DemoController(managers.Streams.getRawArray('DEMO.REC')));
                 managers.Frames.addState(new States.Fade2D(managers, 0.0, this, false));
-                managers.Frames.addState(new States.Fade3D(managers, 1.0, demoState, false));
                 managers.Frames.addState(demoState);
                 managers.Frames.addState(new States.Fade3D(managers, 0.0, demoState, true));
                 managers.Frames.addState(new States.Fade2D(managers, 1.0, this, false));
@@ -5183,12 +5187,7 @@ var Stores;
         }
         LocalFileProvider.prototype.load = function (filename, cb) {
             this.fs.readFile(filename, function (err, data) {
-                var ab = new ArrayBuffer(data.length);
-                var arr = new Uint8Array(ab);
-                for (var i = 0; i < data.length; i++) {
-                    arr[i] = data[i];
-                }
-                cb(arr);
+                cb(data);
             });
         };
         return LocalFileProvider;
