@@ -208,3 +208,4 @@ OpenRoads/Data.XMas
 OpenRoads/Src
 *.map
 RoadsLib.js
+*.js.map
