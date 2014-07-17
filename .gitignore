@@ -209,3 +209,4 @@ OpenRoads/Src
 *.map
 RoadsLib.js
 *.js.map
+RoadsLib.d.ts
