@@ -206,3 +206,5 @@ node_modules
 OpenRoads/Data
 OpenRoads/Data.XMas
 OpenRoads/Src
+*.map
+RoadsLib.js
