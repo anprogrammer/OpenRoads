@@ -1,6 +1,4 @@
-﻿Fix "Road Completed" text positioning
-
-Add joystick support
+﻿Add joystick support
 Add stars to background/world
 
 Refactor source code

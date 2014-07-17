@@ -80,17 +80,16 @@
                 this.buffer = new Float32Array(inBuf.length);
             }
 
-            var out = inBuf; //this.buffer;
+            var out = inBuf;
             var len = out.length;
             var gain = this.gain;
-            var buff = new Float32Array(len);
+            var buff = this.buffer;
             var players = this.players;
 
             for (var i = 0; i < len; i++) {
                 out[i] = 0;
             }
 
-            var min = Infinity, max = -Infinity;
             for (var i = 0; i < players.length; i++) {
                 var p = players[i];
                 if (!p.fillAudioBuffer(buff)) {
@@ -99,15 +98,8 @@
                 }
 
                 for (var j = 0; j < len; j++) {
-                    var v = buff[j] * this.gain;
-                    min = Math.min(v, min);
-                    max = Math.max(v, max);
-                    out[j] += v;
+                    out[j] += buff[j] * this.gain;
                 }
-            }
-
-            if (min < -1.0 || max > 1.0) {
-                console.log(min + ' < ' + max);
             }
 
             return out;
