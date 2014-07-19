@@ -31,3 +31,44 @@ xcopy OpenRoads\Node\node_modules\node-core-audio Node\Node\node_modules\node-co
 xcopy OpenRoads\Node\node_modules\node-core-audio\gyp Node\Node\node_modules\node-core-audio\gyp /E
 xcopy OpenRoads\Node\node_modules\node-core-audio\build Node\Node\node_modules\node-core-audio\build /E
 xcopy OpenRoads\Node\node_modules\node-core-audio\node_modules\fft Node\Node\node_modules\node-core-audio\node_modules\fft /E
+
+del Node\Data\settings.json
+del Node\Data.XMas\settings.json
+
+del Node\Node\node_modules\node-core-audio\build\* /Q
+del Node\Node\node_modules\node-core-audio\build\Release\*.pdb
+del Node\Node\node_modules\node-core-audio\build\Release\*.exp
+del Node\Node\node_modules\node-core-audio\build\Release\*.lib
+RMDIR Node\Node\node_modules\node-core-audio\build\Release\obj /S /Q
+RMDIR Node\Node\node_modules\node-core-audio\gyp /S /Q
+
+del Node\Node\node_modules\node-glfw\build\* /Q
+del Node\Node\node_modules\node-glfw\build\Release\*.pdb
+del Node\Node\node_modules\node-glfw\build\Release\*.exp
+del Node\Node\node_modules\node-glfw\build\Release\*.lib
+RMDIR Node\Node\node_modules\node-glfw\build\Release\obj /S /Q
+RMDIR Node\Node\node_modules\node-glfw\src /S /Q
+RMDIR Node\Node\node_modules\node-glfw\test /S /Q
+RMDIR Node\Node\node_modules\node-glfw\node_modules /S /Q
+
+
+del Node\Node\node_modules\node-webgl\build\* /Q
+del Node\Node\node_modules\node-webgl\build\Release\*.pdb
+del Node\Node\node_modules\node-webgl\build\Release\*.exp
+del Node\Node\node_modules\node-webgl\build\Release\*.lib
+RMDIR Node\Node\node_modules\node-webgl\build\Release\obj /S /Q
+
+RMDIR Node\Node\node_modules\node-webgl\doc /S /Q
+RMDIR Node\Node\node_modules\node-webgl\examples /S /Q
+RMDIR Node\Node\node_modules\node-webgl\src /S /Q
+RMDIR Node\Node\node_modules\node-webgl\test /S /Q
+RMDIR Node\Node\node_modules\node-webgl\tools /S /Q
+
+
+del Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\* /Q
+del Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\Release\*.pdb
+del Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\Release\*.exp
+del Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\Release\*.lib
+RMDIR Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\Release\obj /S /Q
+RMDIR Node\Node\node_modules\node-webgl\node_modules\node-glfw\src /S /Q
+RMDIR Node\Node\node_modules\node-webgl\node_modules\node-glfw\test /S /Q
