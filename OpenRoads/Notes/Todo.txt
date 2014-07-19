@@ -1,6 +1,7 @@
 ﻿Improve Website
 --Fix all links
 --Add Oculus information
+--Google Analytics
 
 Refactor source code
 Unlock FPS in drawFrame
