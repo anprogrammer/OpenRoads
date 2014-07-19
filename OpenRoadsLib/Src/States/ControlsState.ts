@@ -2,7 +2,7 @@
     export class ControlsMenu extends Engine.State2D implements Engine.GameState {
         private myManagers: Managers.ManagerSet;
         private menu: Drawing.Sprite[];
-        private watchers: Engine.KeyWatcher[] = [];
+        private watchers: Controls.ConditionWatcher[] = [];
 
         constructor(managers: Managers.ManagerSet) {
             super(managers);
@@ -13,9 +13,10 @@
             super.load(gl);
             var managers = this.myManagers;            
             this.menu = managers.Textures.getTextures(gl, "SETMENU.LZS").map((tf) => new Drawing.Sprite(gl, managers, tf));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 37, () => this.updateMenu(false)));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 39, () => this.updateMenu(true)));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 27, () => this.exitMenu()));
+            var controls = managers.Controls;
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getLeft(), () => this.updateMenu(false)));
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getRight(), () => this.updateMenu(true)));
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getExit(), () => this.exitMenu()));
             this.myManagers.Player.loadSong(1);
         }
 
@@ -31,7 +32,6 @@
         }
 
         updatePhysics(frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo): void {
-            var kbd = this.myManagers.Keyboard;
             for (var i = 0; i < this.watchers.length; i++) {
                 this.watchers[i].update(frameTimeInfo);
             }

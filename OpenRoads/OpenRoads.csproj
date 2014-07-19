@@ -21,6 +21,7 @@
     <Content Include="Data\INTRO.SND" />
     <Content Include="Data\SFX.SND" />
     <Content Include="Data\SKYROADS.EXE" />
+    <Content Include="xmas.html" />
     <Content Include="index.html" />
     <Content Include="JsLibs\tsm-node.js" />
     <Content Include="JsLibs\tsm-0.7.js" />
@@ -49,6 +50,8 @@
     <Content Include="Notes\MUZAX.LCS.txt" />
     <Content Include="Notes\INTOR.SND.txt" />
     <TypeScriptCompile Include="GameMain.ts" />
+    <TypeScriptCompile Include="GameMainXMas.ts" />
+    <TypeScriptCompile Include="Libs\GLFW.d.ts" />
     <TypeScriptCompile Include="Libs\tsm-0.7.d.ts" />
     <TypeScriptCompile Include="Libs\webaudio.d.ts" />
     <TypeScriptCompile Include="NodeMain.ts" />

@@ -30,7 +30,8 @@
 
         loadResources(gl: WebGLRenderingContext): void {
             var managers = this.myManagers;
-            this.background = managers.Graphics.get3DSprite(gl, managers, managers.Textures.getTexture(gl, "WORLD" + Math.floor(Math.max(0, (this.levelNum - 1)) / 3) + ".LZS"));
+            var backgroundName = "WORLD" + Math.floor(Math.max(0, (this.levelNum - 1)) / 3) + ".LZS";
+            this.background = managers.Graphics.get3DSprite(gl, managers, managers.Textures.getTexture(gl, backgroundName));
             this.dash = new Game.Dashboard(gl, managers);
             var ll = new Levels.MultiLevelLoader(managers.Streams.getStream("ROADS.LZS"));
             var level = ll.Levels[this.levelNum];
@@ -38,7 +39,7 @@
             this.game = new Game.StateManager(managers, level, this.controller);
 
             var meshBuilder = new Levels.MeshBuilder();
-            var meshVerts = meshBuilder.buildMesh(level);
+            var meshVerts = meshBuilder.buildMesh(level, managers.VR !== null, managers.Textures.getImage(backgroundName));
             this.mesh = managers.Graphics.getMesh(gl, managers, meshVerts);
 
             this.carSprite = new Game.CarSprite(gl, managers);
@@ -59,7 +60,7 @@
             var fps = frameTimeInfo.getFPS();
             this.frame++;
             this.game.runFrame();
-            if (this.game.currentZPosition >= this.game.level.length() || this.myManagers.Keyboard.isDown(27)) {
+            if (this.game.currentZPosition >= this.game.level.length() || this.myManagers.Controls.getExit()) {
                 this.myManagers.Frames.popState();
                 this.myManagers.Frames.addState(new Fade3D(this.myManagers, 1.0, this, false));
 

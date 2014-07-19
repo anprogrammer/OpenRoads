@@ -56,7 +56,12 @@ module Configurations {
                 var doc = wgl.document();
                 var cvs = doc.createElement('canvas', 1280, 800, true);
                 cvs.setTitle('SkyRoads VR');
-                managers.Keyboard = new Engine.KeyboardManager(<any>doc);
+
+                var controls = new Controls.CombinedControlSource();
+                controls.addSource(new Controls.KeyboardControlsource(new Engine.KeyboardManager(<any>doc)));
+                controls.addSource(new Controls.JoystickControlSource(new Controls.GLFWJoystick(doc)));
+                managers.Controls = controls;
+
                 var opl = new Music.OPL(managers);
                 var player = new Music.Player(opl, managers);
                 opl.setSource(player);

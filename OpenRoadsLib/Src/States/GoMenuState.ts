@@ -6,7 +6,7 @@
         private selRect: Drawing.Sprite;
         private selLevel: number;
 
-        private watchers: Engine.KeyWatcher[] = [];
+        private watchers: Controls.ConditionWatcher[] = [];
 
         constructor(managers: Managers.ManagerSet) {
             super(managers);
@@ -38,14 +38,14 @@
             var selFrag = new Drawing.TextureFragment(selTex, 0, 0, selCvs.width, selCvs.height);
             this.selRect = new Drawing.Sprite(gl, managers, selFrag);
 
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 37, () => this.updateLevel(-15)));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 38, () => this.updateLevel(-1)));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 40, () => this.updateLevel(1)));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 39, () => this.updateLevel(15)));
+            var controls = managers.Controls;
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getLeft(), () => this.updateLevel(-15)));
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getUp(), () => this.updateLevel(-1)));
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getDown(), () => this.updateLevel(1)));
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getRight(), () => this.updateLevel(15)));
 
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 13, () => this.enterLevel()));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 32, () => this.enterLevel()));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 27, () => managers.Frames.popState()));
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getEnter(), () => this.enterLevel()));
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getExit(), () => managers.Frames.popState()));
 
             this.myManagers.Player.loadSong(1);
         }
@@ -58,7 +58,7 @@
         }
 
         private enterLevel() {
-            var gameState = new GameState(this.myManagers, this.selLevel, new Game.KeyboardController(this.myManagers.Keyboard));
+            var gameState = new GameState(this.myManagers, this.selLevel, new Game.ControlSourceController(this.myManagers.Controls));
             this.myManagers.Frames.addState(new Fade2D(this.myManagers, 0.0, this, false));
             this.myManagers.Frames.addState(gameState);
             this.myManagers.Frames.addState(new Fade3D(this.myManagers, 0.0, gameState, true));
@@ -67,7 +67,6 @@
         }
 
         updatePhysics(frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo): void {
-            var kbd = this.myManagers.Keyboard;
             for (var i = 0; i < this.watchers.length; i++) {
                 this.watchers[i].update(frameTimeInfo);
             }

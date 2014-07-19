@@ -1,22 +1,7 @@
 ﻿module VR {
-    export declare class GLFW {
-        enableHMD(): boolean;
-        getHMDTargetSize(): number[];
-        getHMDFboId(gl: WebGLRenderingContext): number;
-        getEyeViewAdjust(n: number): number[];
-        getEyeViewport(n: number): number[];
-        getHeadPosition(n: number): number[];
-        getHeadOrientation(n: number): number[];
-        getProjectionMatrix(n: number): number[];
-        getJoystickAxes(): string;
-        getJoystickButtons(): string;
-        startVREye(n: number): void;
-        endVREye(n: number): void;
-    }
-
     export class NodeVRProvider implements VRProvider {
-        private glfw: GLFW;
-        constructor(glfw: GLFW) {
+        private glfw: GLFW.GLFW;
+        constructor(glfw: GLFW.GLFW) {
             this.glfw = glfw;
         }
 
@@ -35,13 +20,14 @@
         public getHeadCameraState(eyeNum: number): Engine.CameraState {
             var headPosition: TSM.vec3 = new TSM.vec3();
             var vs = this.getJoystickValues();
-            var offset = new TSM.vec3([-vs[0], -vs[2], -vs[1]]).scale(0.5);
-            headPosition.add(offset);
+            //var offset = new TSM.vec3([-vs[0], -vs[2], -vs[1]]).scale(0.5);
+            //headPosition.add(offset);
 
             var ry = TSM.quat.fromAxis(new TSM.vec3([0.0, 1.0, 0.0]), vs[4]);
             var rx = TSM.quat.fromAxis(new TSM.vec3([1.0, 0.0, 0.0]), vs[3]);
             var rz = new TSM.quat().setIdentity();
             var rotation = rx.multiply(ry).multiply(rz);
+            rotation.setIdentity();
 
             return new Engine.CameraState(this.getHeadPosition(eyeNum).add(headPosition), this.getHeadOrientation(eyeNum).multiply(rotation), this.getEyeViewAdjust(eyeNum), this.getEyeProjectionMatrix(eyeNum));
         }

@@ -1,12 +1,13 @@
-﻿Add joystick support
-Add stars to background/world
-
-Refactor source code
-
-Tight node deployment
-Improve Website
+﻿Improve Website
 --Fix all links
 --Add Oculus information
+
+Refactor source code
+Unlock FPS in drawFrame
+Add "Proper perspective" mode for normal game-play as option
+
+
+Tight node deployment
 
 Weird fades from "Demo" with ESC and Winning
 

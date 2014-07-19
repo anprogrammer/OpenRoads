@@ -2,7 +2,7 @@
     export class Help extends Engine.State2D  implements Engine.GameState {
         private myManagers: Managers.ManagerSet;
         private frames: Drawing.Sprite[];
-        private watchers: Engine.KeyWatcher[] = [];
+        private watchers: Controls.ConditionWatcher[] = [];
         private frameNum: number = 0;
         private fadeDir: number = 0;
 
@@ -16,8 +16,9 @@
             var managers = this.myManagers;
             this.frames = managers.Textures.getTextures(gl, "HELPMENU.LZS").map((tf) => new Drawing.Sprite(gl, managers, tf));
 
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 27, () => this.exit()));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 32, () => this.next()));
+            var controls = this.myManagers.Controls;
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getExit(), () => this.exit()));
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getEnter(), () => this.next()));
         }
 
         unload(): void {
@@ -36,7 +37,6 @@
         }
 
         updatePhysics(frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo): void {
-            var kbd = this.myManagers.Keyboard;
             for (var i = 0; i < this.watchers.length; i++) {
                 this.watchers[i].update(frameTimeInfo);
             }

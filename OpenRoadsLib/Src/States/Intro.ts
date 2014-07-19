@@ -56,8 +56,7 @@ module States {
             var managers = this.myManagers;
 
             var fps = frameTimeInfo.getFPS();
-            var kbd = managers.Keyboard;
-            if (kbd.isDown(32) || kbd.isDown(13) || kbd.isDown(27)) {
+            if (managers.Controls.getEnter() || managers.Controls.getExit()) {
                 var menuState = new MainMenu(managers);
                 managers.Frames.addState(menuState);
             }
@@ -109,7 +108,7 @@ module States {
                 }
             }
 
-            if (managers.Keyboard.isDown(68)) {
+            if (managers.Controls.getRight()) {
                 var demoState = new GameState(managers, 0, new Game.DemoController(managers.Streams.getRawArray('DEMO.REC')));
                 managers.Frames.addState(new Fade2D(managers, 0.0, this, false));
                 managers.Frames.addState(demoState);

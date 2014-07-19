@@ -8,7 +8,7 @@
         private menuPos: number = 0;
         private menuAlpha: number = 0;
 
-        private watchers: Engine.KeyWatcher[] = [];
+        private watchers: Controls.ConditionWatcher[] = [];
 
         constructor(managers: Managers.ManagerSet) {
             super(managers);
@@ -24,10 +24,13 @@
             this.background = intro[0];
             this.title = new Drawing.Sprite(gl, managers, introParts[1]);
             this.menu = managers.Textures.getTextures(gl, "MAINMENU.LZS").map((tf) => new Drawing.Sprite(gl, managers, tf));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 38, () => this.updateMenu(-1)));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 40, () => this.updateMenu(1)));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 13, () => this.enterMenu()));
-            this.watchers.push(new Engine.KeyWatcher(managers.Keyboard, 32, () => this.enterMenu()));
+
+            var controls = managers.Controls;
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getUp(), () => this.updateMenu(-1)));
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getDown(), () => this.updateMenu(1)));
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getEnter(), () => this.enterMenu()));
+            //TODO: Way to exit NodeJS app
+
             this.myManagers.Player.loadSong(1);
         }
 
@@ -71,7 +74,6 @@
         }
 
         updatePhysics(frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo): void {
-            var kbd = this.myManagers.Keyboard;
             for (var i = 0; i < this.watchers.length; i++) {
                 this.watchers[i].update(frameTimeInfo);
             }

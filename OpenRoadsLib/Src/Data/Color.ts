@@ -13,6 +13,10 @@
             return new Color(255 - this.R, 255 - this.G, 255 - this.B);
         }
 
+        scale(n: number): Color {
+            return new Color(Math.floor(this.R * n), Math.floor(this.G * n), Math.floor(this.B * n));
+        }
+
         toCss(): string {
             return 'rgb(' + this.R + ',' + this.G + ',' + this.B + ')';
         }

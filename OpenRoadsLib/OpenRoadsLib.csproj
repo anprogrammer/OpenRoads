@@ -56,10 +56,19 @@
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
   </PropertyGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Libs\GLFW.d.ts" />
     <TypeScriptCompile Include="Libs\Promise.ts" />
     <TypeScriptCompile Include="Libs\tsm-0.7.d.ts" />
     <TypeScriptCompile Include="Libs\webaudio.d.ts" />
     <TypeScriptCompile Include="Src\Configurations\Node.ts" />
+    <TypeScriptCompile Include="Src\Controls\CombinedControlSource.ts" />
+    <TypeScriptCompile Include="Src\Controls\ConditionWatcher.ts" />
+    <TypeScriptCompile Include="Src\Controls\ControlSource.ts" />
+    <TypeScriptCompile Include="Src\Controls\GLFWJoystick.ts" />
+    <TypeScriptCompile Include="Src\Controls\Joystick.ts" />
+    <TypeScriptCompile Include="Src\Controls\JoystickControlSource.ts" />
+    <TypeScriptCompile Include="Src\Controls\KeyboardControlSource.ts" />
+    <TypeScriptCompile Include="Src\Controls\NavigatorJoystick.ts" />
     <TypeScriptCompile Include="Src\Data\ArrayBitStream.ts" />
     <TypeScriptCompile Include="Src\Data\BinaryReader.ts" />
     <TypeScriptCompile Include="Src\Data\BitStream.ts" />

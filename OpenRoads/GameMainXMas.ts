@@ -1,9 +1,9 @@
 ﻿/// <reference path="RoadsLib.d.ts" />
 window.onload = () => {
-    runGame();
+    runGameXMas();
 };
 
-function runGame() {
+function runGameXMas() {
     var actx: AudioContext = null;
     try {
         actx = new webkitAudioContext()
@@ -13,16 +13,10 @@ function runGame() {
         actx = new AudioContext();
     } catch (e) {
     }
-
-    
-    var manager = new Managers.StreamManager(new Stores.AJAXFileProvider()), shaderManager = new Managers.ShaderManager(manager);
+    var manager = new Managers.StreamManager(new Stores.AJAXFileProvider(), 'Data.XMas/'), shaderManager = new Managers.ShaderManager(manager);
     var managers = new Managers.ManagerSet(manager, shaderManager);
     managers.Sounds = new Managers.SoundManager(managers);
-
-    var src = new Controls.CombinedControlSource();
-    src.addSource(new Controls.KeyboardControlsource(new Engine.KeyboardManager(document.body)));
-    src.addSource(new Controls.JoystickControlSource(new Controls.NavigatorJoystick(<any>navigator)));
-    managers.Controls = src;
+    managers.Controls = new Controls.KeyboardControlsource(new Engine.KeyboardManager(document.body));
     managers.Settings = new Managers.SettingsManager(new Stores.LocalStorageStore());
     managers.Graphics = new Shaders.ClassicShaderProvider();
     managers.Textures = new Managers.TextureManager(managers);

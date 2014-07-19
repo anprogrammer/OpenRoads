@@ -5,8 +5,9 @@
         private basePath: string = 'Data/';
         private provider: Stores.FileProvider;
 
-        constructor(provider: Stores.FileProvider) {
+        constructor(provider: Stores.FileProvider, basePath: string = 'Data/') {
             this.provider = provider;
+            this.basePath = basePath;
         }
 
         load(filename: string): P.Promise<Uint8Array> {

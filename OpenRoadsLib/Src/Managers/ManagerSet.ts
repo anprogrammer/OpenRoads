@@ -6,7 +6,7 @@
         public Sounds: SoundManager;
         public Player: Music.Player;
         public Frames: Engine.FrameManager;
-        public Keyboard: Engine.KeyboardManager;
+        public Controls: Controls.ControlSource;
         public Settings: Managers.SettingsManager;
         public Graphics: Shaders.ShaderProvider;
         public Canvas: Drawing.CanvasProvider;

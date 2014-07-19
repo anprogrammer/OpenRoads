@@ -62,6 +62,8 @@
 
         private onFrame(): void {
             var gs = this.states[this.states.length - 1];
+
+            this.managers.Controls.update();
             var time = this.clock.nextFrame();
             var physStep = time.getPhysicsStep();
             this.physicsTime += time.getFrameTime();

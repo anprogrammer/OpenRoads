@@ -2,8 +2,6 @@
     export class EmptyState implements Engine.GameState {
         private managers: Managers.ManagerSet;
 
-        private watchers: Engine.KeyWatcher[] = [];
-
         constructor(managers: Managers.ManagerSet) {
             this.managers = managers;
         }

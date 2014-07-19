@@ -58,19 +58,45 @@ span {
 	margin: 0;
 }
 
-div#info {
+div#links {
 	position: absolute;
 	bottom: 0;
 	right: 0;
+	border-bottom: none;
+	border-right: none;
+}
+
+div#vr {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-top: none;
+	border-left: none;
+}
+
+div.info_pane {
 	color: #FFFFFF;
 	padding: 5px;
 	z-index: 5;
 	font-size: 8pt;
 	text-align: left;
+	background-color: #000000;
+	border: 1px solid #7777FF;
+	border-left: 1px solid #7777FF;
+}
+
+img#oc_logo {
+	display: block;
+	margin: 0 auto;
+	padding-top:3px;
 }
 
 a {
 	color: #7777FF;
 	font-weight: bold;
 	text-decoration: none;
+}
+
+a.closediv {
+	color: #FF7777;
 }

@@ -2,7 +2,7 @@
     export class MeshBuilder {
         public CellLength: number = 46;
         public CellWidth: number = 46;
-        buildMesh(level: Level): Vertices.Vertex3DC[]{
+        buildMesh(level: Level, includeStars: boolean, back: Images.ImageFragment): Vertices.Vertex3DC[]{
             var verts: Vertices.Vertex3DC[] = [];
 
             var addQuad = (color: Data.Color, p1: TSM.vec3, p2: TSM.vec3, p3: TSM.vec3, p4: TSM.vec3): void => {
@@ -128,6 +128,27 @@
                         //addTunnel(c.Tunnel, xLeft, xRight, 0x2800 / 0x80, zStart, zEnd);
                         addCubeTunnel(c.Tunnel, c.Cube, xLeft, xRight, 0x2800 / 0x80, zStart, zEnd, drawLeft, drawRight);
                     }
+                }
+            }
+
+            if (includeStars) {
+                var cvs = back.Canvas;
+                var ctx = cvs.getContext('2d');
+
+                var colorData = ctx.getImageData(0, 0, cvs.width, cvs.height).data;
+                for (var i = 0; i < level.getLength() * 0.5; i++) {
+                    var xp = (Math.random() < 0.5 ? -1.0 : 1.0) * (Math.random() * 0.5 + 0.5) * 0.5 + 0.5;
+                    var yp = Math.random();
+                    var zp = Math.random();
+                    var posX = (2.0 * xp - 1.0) * 10.0 * this.CellWidth;
+                    var posY = yp * (150 - 50) + 50;
+                    var posZ = -zp * level.getLength() * this.CellLength;
+                    var w = (Math.random() + 1) * this.CellWidth, h = (Math.random()  + 1) * 20, l = (Math.random() * 2 + 1) * this.CellLength;
+
+                    var idx = (Math.floor(xp * cvs.width) + Math.floor(yp * cvs.height) * cvs.width) * 4;
+                    var color = new Data.Color(colorData[idx + 0], colorData[idx + 1], colorData[idx + 2]);
+                        
+                    addCube(new Levels.CubeColors(color.scale(0.8), color.scale(0.9), color.scale(0.6), color), posX, posX + w, posY, posY + h, posZ, posZ - l, true, true, true);
                 }
             }
 

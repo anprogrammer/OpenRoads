@@ -14,7 +14,6 @@
             
         var managers = new Managers.ManagerSet(manager, shaderManager);
         managers.Sounds = new Managers.SoundManager(managers);
-        managers.Keyboard = new Engine.KeyboardManager(document.body);
         managers.Settings = new Managers.SettingsManager(new Stores.LocalStorageStore());
         managers.Graphics = new Shaders.ClassicShaderProvider();
         managers.Textures = new Managers.TextureManager(managers);

@@ -23,7 +23,7 @@
         public update(state: StateManager): void {
             this.sprite.Position.x = state.currentXPosition - 95 - this.sprite.Size.x / 2;
             this.sprite.Position.y = 102 - (state.currentYPosition - 80) - this.sprite.Texture.Width;
-            this.sprite.Position.z = -(state.currentZPosition) * 46.0; //TODO: Take viewMatrix and such into account in Sprite2D
+            this.sprite.Position.z = -(state.currentZPosition) * 46.0 + 1.0;
 
             var minX = 95, maxX = 417;
             var xp = (state.currentXPosition - minX) / (maxX - minX);

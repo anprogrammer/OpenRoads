@@ -2,6 +2,8 @@
     export class Shader {
         private gl: WebGLRenderingContext;
         private program: WebGLProgram;
+        private attributes: { [name: string]: VertexAttribute } = {};
+        private uniforms: { [name: string]: ShaderUniform } = {};
 
         constructor(gl: WebGLRenderingContext, vertexSource: string, fragmentSource: string) {
             function getShader(src: string, type: number): WebGLShader {
@@ -43,17 +45,23 @@
         }
 
         public getVertexAttribute(name: string): VertexAttribute {
-            var gl = this.gl;
-            this.use();
-            var attrib = gl.getAttribLocation(this.program, name);
-            return attrib !== -1 ? new VertexAttribute(gl, attrib) : null;
+            if (!(name in this.attributes)) {
+                var gl = this.gl;
+                this.use();
+                var attrib = gl.getAttribLocation(this.program, name);
+                this.attributes[name] = attrib !== -1 ? new VertexAttribute(gl, attrib) : null;
+            }
+            return this.attributes[name];
         }
 
         public getUniform(name: string): ShaderUniform {
-            var gl = this.gl;
-            this.use();
-            var loc = gl.getUniformLocation(this.program, name);
-            return loc !== null ? new ShaderUniform(gl, loc) : null;
+            if (!(name in this.uniforms)) {
+                var gl = this.gl;
+                this.use();
+                var loc = gl.getUniformLocation(this.program, name);
+                this.uniforms[name] = loc !== null ? new ShaderUniform(gl, loc) : null;
+            }
+            return this.uniforms[name];
         }
     }
 } 
