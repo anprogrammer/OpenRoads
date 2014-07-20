@@ -1,8 +1,4 @@
-﻿Re-do Oculus logo
-Split XMas and Normal to have separate saves
---Node
---Website
-Improve Website
+﻿Improve Website
 --Fix all links
 --Make Christmas share single HTML file
 --Add Oculus information

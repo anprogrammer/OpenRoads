@@ -14,7 +14,7 @@
             
         var managers = new Managers.ManagerSet(manager, shaderManager);
         managers.Sounds = new Managers.SoundManager(managers);
-        managers.Settings = new Managers.SettingsManager(new Stores.LocalStorageStore());
+        managers.Settings = new Managers.SettingsManager(new Stores.LocalStorageStore('music'));
         managers.Graphics = new Shaders.ClassicShaderProvider();
         managers.Textures = new Managers.TextureManager(managers);
         managers.Audio = new Sounds.WebAPIAudioProvider(actx);

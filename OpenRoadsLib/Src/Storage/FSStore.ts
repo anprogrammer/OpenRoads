@@ -1,9 +1,10 @@
 ﻿module Stores {
     export class FSStore implements KVStore {
-        private filename: string = 'Data/settings.json';
+        private filename: string;
         private fs: any;
         private opts: { [s: string]: string } = {};
-        constructor() {
+        constructor(prefix: string) {
+            this.filename = 'Data/settings-' + prefix + '.json';
             this.fs = require('fs');
             try {
             this.opts = JSON.parse(this.fs.readFileSync(this.filename, 'utf-8'));

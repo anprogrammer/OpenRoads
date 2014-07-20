@@ -14,8 +14,10 @@ function runGame() {
     } catch (e) {
     }
 
+    var isXMas = window.location.search.indexOf('xmas=1') >= 0;
+
     
-    var manager = new Managers.StreamManager(new Stores.AJAXFileProvider()), shaderManager = new Managers.ShaderManager(manager);
+    var manager = new Managers.StreamManager(new Stores.AJAXFileProvider(), isXMas ? 'Data.XMas/' : 'Data/'), shaderManager = new Managers.ShaderManager(manager);
     var managers = new Managers.ManagerSet(manager, shaderManager);
     managers.Sounds = new Managers.SoundManager(managers);
 
@@ -23,7 +25,7 @@ function runGame() {
     src.addSource(new Controls.KeyboardControlsource(new Engine.KeyboardManager(document.body)));
     src.addSource(new Controls.JoystickControlSource(new Controls.NavigatorJoystick(<any>navigator)));
     managers.Controls = src;
-    managers.Settings = new Managers.SettingsManager(new Stores.LocalStorageStore());
+    managers.Settings = new Managers.SettingsManager(new Stores.LocalStorageStore(isXMas ? 'xmas' : 'classic'));
     managers.Graphics = new Shaders.ClassicShaderProvider();
     managers.Textures = new Managers.TextureManager(managers);
     managers.Canvas = new Drawing.HTMLCanvasProvider();

@@ -1,6 +1,6 @@
 ﻿declare function require(s: string): any;
 module Configurations {
-    export function runNode(): void {
+    export function runNode(mode: string): void {
         try {
             var agentLib = require('webkit-devtools-agent');
             var agent = new agentLib();
@@ -10,10 +10,16 @@ module Configurations {
 
         var wgl = require('./Node/node_modules/node-webgl');
 
-        var manager = new Managers.StreamManager(new Stores.LocalFileProvider()), shaderManager = new Managers.ShaderManager(manager);
+        var basePath = 'Data/', savePath = 'classic';
+        if (mode === 'xmas') {
+            basePath = 'Data.XMas/';
+            savePath = 'xmas';
+        }
+
+        var manager = new Managers.StreamManager(new Stores.LocalFileProvider(), basePath), shaderManager = new Managers.ShaderManager(manager);
         var managers = new Managers.ManagerSet(manager, shaderManager);
         managers.Sounds = new Managers.SoundManager(managers);
-        managers.Settings = new Managers.SettingsManager(new Stores.FSStore());
+        managers.Settings = new Managers.SettingsManager(new Stores.FSStore(savePath));
         managers.Textures = new Managers.TextureManager(managers);
         managers.Canvas = new Drawing.NodeCanvasProvider();
         managers.Audio = new Sounds.PortAudioAudioProvider();
