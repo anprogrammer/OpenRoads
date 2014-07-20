@@ -60,7 +60,7 @@
             var fps = frameTimeInfo.getFPS();
             this.frame++;
             this.game.runFrame();
-            if (this.game.currentZPosition >= this.game.level.length() || this.myManagers.Controls.getExit()) {
+            if ((this.game.currentZPosition >= this.game.level.length() && this.game.didWin) || this.myManagers.Controls.getExit()) {
                 this.myManagers.Frames.popState();
                 this.myManagers.Frames.addState(new Fade3D(this.myManagers, 1.0, this, false));
 
@@ -71,7 +71,7 @@
             this.dash.update(this.game);
             this.carSprite.update(this.game);
 
-            if (this.carSprite.hasAnimationFinished() || this.game.currentYPosition < -10) {
+            if (this.carSprite.hasAnimationFinished() || this.game.currentYPosition < -10 || (this.game.currentZPosition >= this.game.level.length() && !this.game.didWin)) {
                 this.timeBeforeFade = 0;
             } else if (this.game.craftState === 4 || this.game.craftState === 5) {
                 this.timeBeforeFade -= frameTimeInfo.getPhysicsStep();

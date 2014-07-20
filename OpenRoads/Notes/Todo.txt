@@ -1,6 +1,4 @@
-﻿Fix Christmas edition
-Sends player back to main menu if they reach end of level without winning
-Re-do Oculus logo
+﻿Re-do Oculus logo
 Split XMas and Normal to have separate saves
 --Node
 --Website
