@@ -137,13 +137,13 @@ module Levels {
             this.Colors = colors;
         }
 
-        public getCell(pos: Game.Position): Cell {
-            var x = pos.getXPosition() - 95;
+        public getCell(xPos: number, yPos: number, zPos: number): Cell {
+            var x = xPos - 95;
             if (x > 322 || x < 0) {
                 return Cell.getEmpty();
             }
 
-            var z = Math.floor(Math.floor(pos.getZPosition() * 8.0) / 8);
+            var z = Math.floor(Math.floor(zPos * 8.0) / 8);
             x /= 0x2E;
             x = Math.floor(x);
 
@@ -180,6 +180,120 @@ module Levels {
 
         public getLength(): number {
             return this.Cells[0].length;
+        }
+
+        public getGravityAcceleration(): number {
+            return -Math.floor(this.Gravity * 0x1680 / 0x190) / 0x80
+        }
+
+        private isInsideTileY(yPos: number, distFromCenter: number, cell: Levels.Cell): boolean {
+            distFromCenter = Math.round(distFromCenter);
+            if (distFromCenter > 37) {
+                return false;
+            }
+
+            var tunCeils = [
+                0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+                0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+                0x20, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1E, 0x1E,
+                0x1E, 0x1D, 0x1D, 0x1D, 0x1C, 0x1B, 0x1A, 0x19,
+                0x18, 0x16, 0x14, 0x12, 0x11, 0xE];
+            var tunLows = [
+                0x10, 0x10, 0x10, 0x10, 0x0F, 0x0E, 0x0D, 0x0B,
+                0x08, 0x07, 0x06, 0x05, 0x03, 0x03, 0x03, 0x03,
+                0x03, 0x03, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+
+            var y2 = yPos - 68;
+            if (cell.Tunnel != null && cell.Cube == null) {
+                return y2 > tunLows[distFromCenter] && y2 < tunCeils[distFromCenter];
+            } else if (cell.Tunnel == null && cell.Cube != null) {
+                return yPos < cell.Cube.Height;
+            } else if (cell.Tunnel != null && cell.Cube != null) {
+                return y2 > tunLows[distFromCenter] && yPos < cell.Cube.Height;
+            } else {
+                return false;
+            }
+        }
+
+        public isInsideTunnel(xPos: number, yPos: number, zPos: number): boolean {
+            var leftTile = this.getCell(xPos - 14, yPos, zPos);
+            var rightTile = this.getCell(xPos + 14, yPos, zPos);
+
+            if (!leftTile.isEmpty() || !rightTile.isEmpty()) {
+                var centerTile = this.getCell(xPos, yPos, zPos);
+                var distanceFromCenter = 23 - (xPos - 49) % 46;
+                var var_A = -46;
+                if (distanceFromCenter < 0) {
+                    distanceFromCenter = 1 - distanceFromCenter;
+                    var_A = -var_A;
+                }
+
+                if (this.isInsideTunnelY(yPos, distanceFromCenter, centerTile)) {
+                    return true;
+                }
+
+                centerTile = this.getCell(xPos + var_A, yPos, zPos);
+                if (this.isInsideTunnelY(yPos, 47 - distanceFromCenter, centerTile)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private isInsideTunnelY(yPos: number, distFromCenter: number, cell: Levels.Cell): boolean {
+            distFromCenter = Math.round(distFromCenter);
+            if (distFromCenter > 37) {
+                return false;
+            }
+
+            var tunCeils = [
+                0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+                0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+                0x20, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1E, 0x1E,
+                0x1E, 0x1D, 0x1D, 0x1D, 0x1C, 0x1B, 0x1A, 0x19,
+                0x18, 0x16, 0x14, 0x12, 0x11, 0xE];
+            var tunLows = [
+                0x10, 0x10, 0x10, 0x10, 0x0F, 0x0E, 0x0D, 0x0B,
+                0x08, 0x07, 0x06, 0x05, 0x03, 0x03, 0x03, 0x03,
+                0x03, 0x03, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+
+            var y2 = yPos - 68;
+            return cell.Tunnel != null && cell.Tile != null && y2 < tunLows[distFromCenter] && yPos >= 80;
+        }
+
+        public isInsideTile(xPos: number, yPos: number, zPos: number): boolean {
+            var leftTile = this.getCell(xPos - 14, yPos, zPos);
+            var rightTile = this.getCell(xPos + 14, yPos, zPos);
+
+            if (!leftTile.isEmpty() || !rightTile.isEmpty()) {
+                if (yPos < 80 && yPos > 0x1e80 / 0x80) {
+                    return true;
+                }
+
+                if (yPos < 0x2180 / 0x80) {
+                    return false;
+                }
+
+                var centerTile = this.getCell(xPos, yPos, zPos);
+                var distanceFromCenter = 23 - (xPos - 49) % 46;
+                var var_A = -46;
+                if (distanceFromCenter < 0) {
+                    distanceFromCenter = 1 - distanceFromCenter;
+                    var_A = -var_A;
+                }
+
+                if (this.isInsideTileY(yPos, distanceFromCenter, centerTile)) {
+                    return true;
+                }
+
+                centerTile = this.getCell(xPos + var_A, yPos, zPos);
+                if (this.isInsideTileY(yPos, 47 - distanceFromCenter, centerTile)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 } 

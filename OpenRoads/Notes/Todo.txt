@@ -1,19 +1,19 @@
-﻿Improve Website
---Fix all links
---Make Christmas share single HTML file
---Add Oculus information
----Screnshot, video,  download
---Faq
----Jump-o-master
+﻿-Scan notes for idb and anything else which shouldn't be there, delete permanently
+--Copyrighted content
+
+Improve Website
 --Google Analytics
 
-Refactor source code
+Place music in web-worker?
+
+Add instructions screen
 Unlock FPS in drawFrame
+
+
+Replace video with actual video
 Add "Proper perspective" mode for normal game-play as option
 
 
-
-Have message when WebAudioAPI or WebGL not found
 Fix music performance in Firefox!
  --Lots of room in OPL.ts:processOsc
  ---Get rid of inline arrays (kslm, freqStart, freqSteps, )

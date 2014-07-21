@@ -18,7 +18,7 @@
 
         private gravity: number = 0.0;
         private jumpMasterInUse: boolean = false;
-        private craftState: number = 0;
+        private craftState: ShipState = 0;
         private frame: number = 0;
 
         private zPosition: number = 0.0;
@@ -57,15 +57,15 @@
             this.back = managers.Graphics.get3DSprite(gl, managers, blackFrag);
         }
 
-        update(state: StateManager) {
-            this.oxyAmt = state.oxygenRemaining / 0x7530;
-            this.fuelAmt = state.fuelRemaining / 0x7530;
-            this.speedAmt = (state.zVelocity + state.jumpOMasterVelocityDelta) / (0x2AAA / 0x10000);
-            this.gravity = state.level.Gravity;
-            this.jumpMasterInUse = state.jumpOMasterInUse;
-            this.zPosition = state.currentZPosition;
-            this.zLevelLength = state.level.getLength();
-            this.craftState = state.craftState;
+        update(snap: GameSnapshot, level: Levels.Level) {
+            this.oxyAmt = snap.OxygenPercent;
+            this.fuelAmt = snap.FuelPercent;
+            this.speedAmt = (snap.Velocity.z) / (0x2AAA / 0x10000);
+            this.gravity = level.Gravity;
+            this.jumpMasterInUse = snap.JumpOMasterInUse;
+            this.zPosition = snap.Position.z;
+            this.zLevelLength = level.getLength();
+            this.craftState = snap.CraftState;
 
             this.frame++;
         }
@@ -93,7 +93,9 @@
             configAndDrawSprite(this.back);
             configAndDrawSprite(this.dash);
             var drawGauge = (gs: Drawing.Sprite[], amt: number) => {
-                configAndDrawSprite(gs[Math.floor(Math.min(1.0, amt) * (gs.length - 1))]);
+                var n = Math.round(Math.min(1.0, amt) * gs.length) - 1;
+                if (n >= 0)
+                    configAndDrawSprite(gs[n]);
             };
 
             drawGauge(this.oxyGauge, this.oxyAmt);
@@ -107,11 +109,11 @@
                 configAndDrawSprite(this.jumpMasterOn);
             }
 
-            if (this.craftState === 5 && this.frame%4 < 2) {
+            if (this.craftState === ShipState.OutOfOxygen && this.frame%4 < 2) {
                 configAndDrawSprite(this.oxyEmpty);
             }
 
-            if (this.craftState === 4 && this.frame % 4 < 2) {
+            if (this.craftState === ShipState.OutOfFuel && this.frame % 4 < 2) {
                 configAndDrawSprite(this.fuelEmpty);
             }
 

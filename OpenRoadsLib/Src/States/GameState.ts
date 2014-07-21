@@ -12,6 +12,9 @@
         private timeBeforeFade: number = 1.0;
         private resourcesLoaded: boolean = false;
         private gl: WebGLRenderingContext;
+        private snapshot: Game.GameSnapshot;
+        private eventBus: Events.EventBus;
+
 
         private roadCompleted: Drawing.Sprite;
 
@@ -36,7 +39,15 @@
             var ll = new Levels.MultiLevelLoader(managers.Streams.getStream("ROADS.LZS"));
             var level = ll.Levels[this.levelNum];
 
+            var sounds = managers.Sounds.getMultiEffect('SFX.SND');
+            this.eventBus = new Events.EventBus();
+            this.eventBus.register(new Game.ShipEvents.ShipBumpedWallEvent(), (evt) => sounds[2].play());
+            this.eventBus.register(new Game.ShipEvents.ShipExplodedEvent(), (evt) => sounds[0].play());
+            this.eventBus.register(new Game.ShipEvents.ShipBouncedEvent(), (evt) => sounds[1].play());
+            this.eventBus.register(new Game.ShipEvents.ShipRefilledEvent(), (evt) => sounds[4].play());
+
             this.game = new Game.StateManager(managers, level, this.controller);
+            this.snapshot = this.game.runFrame(this.eventBus);
 
             var meshBuilder = new Levels.MeshBuilder();
             var meshVerts = meshBuilder.buildMesh(level, managers.VR !== null, managers.Textures.getImage(backgroundName));
@@ -59,8 +70,10 @@
             }
             var fps = frameTimeInfo.getFPS();
             this.frame++;
-            this.game.runFrame();
-            if ((this.game.currentZPosition >= this.game.level.length() && this.game.didWin) || this.myManagers.Controls.getExit()) {
+            var level = this.game.getLevel();
+            var snap = this.game.runFrame(this.eventBus);
+            this.snapshot = snap;
+            if ((snap.Position.z >= level.length() && this.game.didWin) || this.myManagers.Controls.getExit()) {
                 this.myManagers.Frames.popState();
                 this.myManagers.Frames.addState(new Fade3D(this.myManagers, 1.0, this, false));
 
@@ -68,12 +81,12 @@
                     this.myManagers.Settings.incrementWonLevelCount(this.levelNum);
                 }
             }
-            this.dash.update(this.game);
-            this.carSprite.update(this.game);
+            this.dash.update(snap, level);
+            this.carSprite.update(snap, level);
 
-            if (this.carSprite.hasAnimationFinished() || this.game.currentYPosition < -10 || (this.game.currentZPosition >= this.game.level.length() && !this.game.didWin)) {
+            if (this.carSprite.hasAnimationFinished() || snap.Position.y < -10 || (snap.Position.z >= level.length() && !this.game.didWin)) {
                 this.timeBeforeFade = 0;
-            } else if (this.game.craftState === 4 || this.game.craftState === 5) {
+            } else if (snap.CraftState === Game.ShipState.OutOfFuel || snap.CraftState === Game.ShipState.OutOfOxygen) {
                 this.timeBeforeFade -= frameTimeInfo.getPhysicsStep();
             }
 
@@ -116,7 +129,7 @@
             gl.clear(gl.DEPTH_BUFFER_BIT);
 
             var headPos = cam.HeadPosition.copy();
-            headPos.add(new TSM.vec3([0.0, 130.0, -(this.game.currentZPosition - (isVR ? 1 : 3)) * 46.0]).multiply(scaleVec));
+            headPos.add(new TSM.vec3([0.0, 130.0, -(this.snapshot.Position.z - (isVR ? 1 : 3)) * 46.0]).multiply(scaleVec));
             this.mesh.ViewMatrix.setIdentity();
             this.mesh.ViewMatrix.multiply(cam.HeadOrientation.toMat4());
             this.mesh.ViewMatrix.translate(headPos.scale(-1.0));

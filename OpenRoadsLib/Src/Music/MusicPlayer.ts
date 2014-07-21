@@ -16,7 +16,6 @@
         }
 
         public loadSong(n: number) {
-            //return;
             if (n === this.currentSong) {
                 return;
             }

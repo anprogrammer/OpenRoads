@@ -19,8 +19,8 @@
         private document: DocumentProvider;
         private managers: Managers.ManagerSet;
 
-        constructor(document: DocumentProvider, canvas: HTMLCanvasElement, managers: Managers.ManagerSet, gs: GameState, clock: Clock) {
-            this.document = document;
+        constructor(documentProvider: DocumentProvider, canvas: HTMLCanvasElement, managers: Managers.ManagerSet, gs: GameState, clock: Clock) {
+            this.document = documentProvider;
             this.canvas = canvas;
             this.ctx = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
             var preloader = new Images.Preloader();
@@ -33,7 +33,7 @@
             
             this.maintainCanvasSize(this.document.getSize());
             this.managers = managers;
-            document.requestAnimationFrame(() => this.onFrame());
+            documentProvider.requestAnimationFrame(() => this.onFrame());
         }
 
         public getCanvas(): HTMLCanvasElement {
@@ -69,6 +69,10 @@
             this.physicsTime += time.getFrameTime();
 
             this.managers.Audio.setGain(this.managers.Settings.getMuted() ? 0.0 : this.managers.Settings.getVolume());
+
+            if (this.physicsTime >= physStep * 3) {
+                this.physicsTime = 0;
+            }
 
             while (this.physicsTime >= physStep && this.states[this.states.length - 1] === gs) {
                 gs.updatePhysics(this, time);

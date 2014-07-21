@@ -94,12 +94,19 @@
     <TypeScriptCompile Include="Src\Engine\State3D.ts" />
     <TypeScriptCompile Include="Src\Engine\VRState2DDrawer.ts" />
     <TypeScriptCompile Include="Src\Engine\VRState3DDrawer.ts" />
+    <TypeScriptCompile Include="Src\Events\EventBus.ts" />
     <TypeScriptCompile Include="Src\ExeData\ExeDataManager.ts" />
     <TypeScriptCompile Include="Src\ExeData\ExeReader.ts" />
     <TypeScriptCompile Include="Src\Game\CarSprite.ts" />
     <TypeScriptCompile Include="Src\Game\Controller.ts" />
     <TypeScriptCompile Include="Src\Game\Dashboard.ts" />
     <TypeScriptCompile Include="Src\Game\DemoController.ts" />
+    <TypeScriptCompile Include="Src\Game\Events\ShipBouncedEvent.ts" />
+    <TypeScriptCompile Include="Src\Game\Events\ShipBumpedWallEvent.ts" />
+    <TypeScriptCompile Include="Src\Game\Events\ShipExplodedEvent.ts" />
+    <TypeScriptCompile Include="Src\Game\Events\ShipRefilledEvent.ts" />
+    <TypeScriptCompile Include="Src\Game\FPMath.ts" />
+    <TypeScriptCompile Include="Src\Game\GameSnapshot.ts" />
     <TypeScriptCompile Include="Src\Game\KeyboardController.ts" />
     <TypeScriptCompile Include="Src\Game\Ship.ts" />
     <TypeScriptCompile Include="Src\Game\StateManager.ts" />
@@ -118,6 +125,8 @@
     <TypeScriptCompile Include="Src\Music\MusicPlayer.ts" />
     <TypeScriptCompile Include="Src\Music\OPL.ts" />
     <TypeScriptCompile Include="Src\Music\OPLConstants.ts" />
+    <TypeScriptCompile Include="Src\RefPhysics\RefShip.ts" />
+    <TypeScriptCompile Include="Src\RefPhysics\RefStateManager.ts" />
     <TypeScriptCompile Include="Src\Shaders\ClassicShaderProvider.ts" />
     <TypeScriptCompile Include="Src\Shaders\ShaderProvider.ts" />
     <TypeScriptCompile Include="Src\Shaders\VRShaderProvider.ts" />
@@ -146,7 +155,6 @@
     <TypeScriptCompile Include="Src\TestRuns\TestImages.ts" />
     <TypeScriptCompile Include="Src\TestRuns\TestLevels.ts" />
     <TypeScriptCompile Include="Src\TestRuns\TestMusic.ts" />
-    <TypeScriptCompile Include="Src\TestRuns\TestPhysics.ts" />
     <TypeScriptCompile Include="Src\TestRuns\TestSounds.ts" />
     <TypeScriptCompile Include="Src\TestRuns\TestTrakDat.ts" />
     <TypeScriptCompile Include="Src\Vertices\Vertex2D.ts" />

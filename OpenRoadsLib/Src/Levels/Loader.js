@@ -1,6 +1,4 @@
-﻿/// <reference path="../Data/BitStream.ts" />
-/// <reference path="../Data/BinaryReader.ts" />
-var Levels;
+﻿var Levels;
 (function (Levels) {
     var LevelLoader = (function () {
         function LevelLoader(levelNumber, levelStartByte, levelSize) {
@@ -26,22 +24,37 @@ var Levels;
                 bytes.push(stream2.getUint8());
             }
 
-            return new Levels.Level(gravity, fuel, oxygen, colors, bytes);
+            var levelWidth = 7, levelLength = bytes.length / 2 / levelWidth;
+
+            var level = new Levels.Level(this.levelNumber > 0 ? 'Level ' + this.levelNumber : 'Demo Level', gravity, fuel, oxygen, colors);
+            var cells = [];
+            for (var x = 0; x < levelWidth; x++) {
+                var col = [];
+                cells.push(col);
+                for (var y = 0; y < levelLength; y++) {
+                    var idx = x * 2 + y * 14;
+                    var colorLow = bytes[idx] & 0xF, colorHigh = bytes[idx] >> 4, color = colorLow || colorHigh;
+                    col.push(new Levels.Cell(level, colorLow, colorHigh, bytes[idx], bytes[idx + 1]));
+                }
+            }
+            level.Cells = cells;
+            return level;
         };
         return LevelLoader;
     })();
     Levels.LevelLoader = LevelLoader;
+
     var MultiLevelLoader = (function () {
         function MultiLevelLoader(stream) {
             this.Levels = [];
             var reader = new Data.BinaryReader(stream);
             var l1Start = reader.getUint16(), l1Size = reader.getUint16();
-            var additionalLevelCount = l1Start * 8;
+            var level1StartBit = l1Start * 8;
 
             var levels = [];
-            levels.push(new LevelLoader(1, l1Start, l1Size));
-            for (var i = 0; i < additionalLevelCount; i++) {
-                levels.push(new LevelLoader(i + 2, l1Start, l1Size));
+            levels.push(new LevelLoader(0, l1Start, l1Size));
+            for (var i = 0; stream.getPosition() < level1StartBit; i++) {
+                levels.push(new LevelLoader(i + 1, reader.getUint16(), reader.getUint16()));
             }
 
             for (var i = 0; i < levels.length; i++) {
@@ -52,4 +65,3 @@ var Levels;
     })();
     Levels.MultiLevelLoader = MultiLevelLoader;
 })(Levels || (Levels = {}));
-//# sourceMappingURL=Loader.js.map

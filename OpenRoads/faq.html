@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>OpenRoads</title>
+	<link rel="stylesheet" href="app.css" type="text/css" />
+</head>
+<body style="text-align: center;">
+	<div id="vr" class="info_pane">
+		<a class="closediv" href="#">(X)</a><br />
+		<a href="index.html">Back to the Game</a>
+	</div>
+	<h1>F.A.Q.</h1>
+	<div class="qa">
+		<div class="question">
+			<p><span>Q: </span>What is the Jump-o Master?</p>
+		</div>
+		<div class="answer">
+			<p>
+				<span>A: </span>The Jump-o Master is a simple AI, part of your ship, which assists you on your mission.  If it detects that you are going to fall into nothingness, it can instantly alter your speed
+				so that you don't undershoot or overshoot your landing.
+			</p>
+			<p>
+				It has limitations in how much it can alter your speed, and also won't save you from crashing into a block or tunnel.
+			</p>
+		</div>
+	</div>
+	<div class="qa">
+		<div class="question">
+			<p><span>Q: </span>Why won't my X-Box 360 controller work?</p>
+		</div>
+		<div class="answer">
+			<p>
+				<span>A: </span>As a security feature, some browsers won't allow us to use your X-Box 360 controller until you press the &quot;A&quot; button to enable it.
+			</p>
+		</div>
+	</div>
+	<div class="qa">
+		<div class="question">
+			<p><span>Q: </span>I found a bug.  How do I report it?</p>
+		</div>
+		<div class="answer">
+			<p>
+				<span>A: </span>Feel free to log an issue on <a href="https://github.com/anprogrammer/OpenRoads/issues">the OpenRoads GitHub.</a>
+				I will do my best to address it.
+			</p>
+			<p>
+				Keep in mind that OpenRoads is open source, so if you are an included developer you can always fix the bug and submit a pull request.
+			</p>
+		</div>
+	</div>
+	<script type="text/javascript">
+	var xs = document.getElementsByClassName('closediv');
+	for (var i = 0; i < xs.length; i++) {
+		xs[i].onclick = function () {
+			this.parentNode.parentNode.removeChild(this.parentNode);
+		};
+	}
+	</script>
+</body>
+</html>

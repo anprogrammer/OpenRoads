@@ -1,9 +1,9 @@
 ﻿/// <reference path="RoadsLib.d.ts" />
 window.onload = function () {
-    runGame();
+    runPhysTest();
 };
 
-function runGame() {
+function runPhysTest() {
     var cvs = document.getElementById('cvs');
     var gl = cvs.getContext('webgl') || cvs.getContext('experimental-webgl');
     if (!gl) {
@@ -89,11 +89,51 @@ function runGame() {
         managers.Player = player;
 
         var demoCon = new Game.DemoController(manager.getRawArray('DEMO.REC'));
-        var state = new States.Intro(managers);
+        var ll = new Levels.MultiLevelLoader(managers.Streams.getStream("ROADS.LZS"));
+        var level = ll.Levels[0];
+        var newState = new Game.StateManager(managers, level, demoCon);
+        var originalState = new RefPhysics.StateManager(managers, level, demoCon);
 
-        //var state = new States.GoMenu(managers);
-        //var state = new States.MainMenu(managers);
-        managers.Frames = new Engine.FrameManager(new Engine.BrowserDocumentProvider(), cvs, managers, state, new Engine.Clock());
+        var correctFrames = 0;
+        var bus = new Events.EventBus();
+        while (!newState.didWin) {
+            var snap = newState.runFrame(bus);
+            originalState.runFrame();
+            snap.Velocity.z = snap.Velocity.z - snap.JumpOMasterVelocityDelta;
+            if (snap.Position.x !== originalState.currentXPosition || snap.Position.y !== originalState.currentYPosition || snap.Position.z !== originalState.currentZPosition || snap.Velocity.z !== originalState.zVelocity || snap.JumpOMasterVelocityDelta !== originalState.jumpOMasterVelocityDelta || snap.JumpOMasterInUse !== originalState.jumpOMasterInUse) {
+                console.log(snap.Position.x + ' <> ' + originalState.currentXPosition);
+                console.log(snap.Position.y + ' <> ' + originalState.currentYPosition);
+                console.log(snap.Position.z + ' <> ' + originalState.currentZPosition);
+
+                console.log(snap.Velocity.z + ' <> ' + originalState.zVelocity);
+                console.log(snap.JumpOMasterInUse + ' <> ' + originalState.jumpOMasterInUse);
+                console.log(snap.JumpOMasterVelocityDelta + ' <> ' + originalState.jumpOMasterVelocityDelta);
+
+                break;
+            }
+            correctFrames++;
+            if (correctFrames > 60 * 30) {
+                console.log('Too long!');
+                debugger;
+                break;
+            }
+        }
+
+        if (!newState.didWin) {
+            debugger;
+            var newState = new Game.StateManager(managers, level, demoCon);
+            var originalState = new RefPhysics.StateManager(managers, level, demoCon);
+            var lastSnap;
+            for (var i = 0; i < correctFrames; i++) {
+                lastSnap = newState.runFrame(bus);
+                originalState.runFrame();
+            }
+            debugger;
+            newState.runFrame(bus);
+            originalState.runFrame();
+        } else {
+            console.log('Test passed!');
+        }
     });
 }
-//# sourceMappingURL=GameMain.js.map
+//# sourceMappingURL=PhysicsTestMain.js.map

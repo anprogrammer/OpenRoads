@@ -57,7 +57,7 @@
         constructor() {
             var audio = <CoreAudio>require('./Node/node_modules/node-core-audio');
             this.engine = audio.createNewAudioEngine();
-            this.engine.setOptions({ inputChannels: 1, outputChannels: 1, interleaved: true, numSamples: 1024, numBuffers: 11, useMicrophone: false });
+            this.engine.setOptions({ inputChannels: 1, outputChannels: 1, interleaved: true, numSamples: 1024, numBuffers: 4, useMicrophone: false });
             this.engine.addAudioCallback((chans) => {
                 return this.fillBuffer(chans);
             });

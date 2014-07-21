@@ -32,8 +32,7 @@ xcopy OpenRoads\Node\node_modules\node-core-audio\gyp Node\Node\node_modules\nod
 xcopy OpenRoads\Node\node_modules\node-core-audio\build Node\Node\node_modules\node-core-audio\build /E
 xcopy OpenRoads\Node\node_modules\node-core-audio\node_modules\fft Node\Node\node_modules\node-core-audio\node_modules\fft /E
 
-del Node\Data\settings.json
-del Node\Data.XMas\settings.json
+del Node\Data\settings*.json
 
 del Node\Node\node_modules\node-core-audio\build\* /Q
 del Node\Node\node_modules\node-core-audio\build\Release\*.pdb
@@ -72,3 +71,15 @@ del Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\Release\*.lib
 RMDIR Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\Release\obj /S /Q
 RMDIR Node\Node\node_modules\node-webgl\node_modules\node-glfw\src /S /Q
 RMDIR Node\Node\node_modules\node-webgl\node_modules\node-glfw\test /S /Q
+
+
+copy NodeParts\node.exe Node\
+
+RMDIR SkyRoadsVR /S /Q
+mkdir SkyRoadsVR
+move Node SkyRoadsVR
+copy "Release Classic\ExeRunner.exe" "SkyRoadsVR\SkyRoads VR.exe"
+copy "Release XMas\ExeRunner.exe" "SkyRoadsVR\Skyroads XMas VR.exe"
+7z.exe a -tzip skyroads_vr.zip SkyRoadsVR
+copy skyroads_vr.zip Website
+

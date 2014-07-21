@@ -1,6 +1,4 @@
-﻿/// <reference path="BitStream.ts" />
-/// <reference path="ArrayBitStream.ts" />
-var Data;
+﻿var Data;
 (function (Data) {
     var CompressedByteStream = (function () {
         function CompressedByteStream(stream) {
@@ -48,4 +46,3 @@ var Data;
     })();
     Data.CompressedByteStream = CompressedByteStream;
 })(Data || (Data = {}));
-//# sourceMappingURL=CompressedByteStream.js.map

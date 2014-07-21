@@ -74,6 +74,16 @@ div#vr {
 	border-left: none;
 }
 
+div.error {
+	position: absolute;
+	width: 400px;
+	left: 50%;
+	margin: 0 -200px;
+	top: 0;
+	border: 1px solid #FF7777;
+	color: #FF7777;
+}
+
 div.info_pane {
 	color: #FFFFFF;
 	padding: 5px;
@@ -95,8 +105,46 @@ a {
 	color: #7777FF;
 	font-weight: bold;
 	text-decoration: none;
+	border-style: none;
 }
+
+	a:hover {
+		color: #FFFFFF;
+	}
 
 a.closediv {
 	color: #FF7777;
+}
+
+h1, h2, li {
+	color: #FFFFFF;
+}
+
+p {
+	color: #FFFFFF;
+}
+
+ol {
+	display: inline-block;
+	text-align: left;
+}
+
+div.qa {
+	text-align: left;
+	width: 800px;
+	margin: 5px auto;
+	border: 1px solid #777777;
+	padding: 5px;
+}
+
+div.qa span {
+	font-weight: bold;
+}
+
+div.qa div.question, div.qa div.question p {
+	color: #FF7777;
+}
+
+div.qa div.answer, div.qa div.answer p {
+	color: #7777FF;
 }

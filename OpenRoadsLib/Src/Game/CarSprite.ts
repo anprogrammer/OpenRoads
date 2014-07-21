@@ -20,22 +20,23 @@
             this.finishedDeath = false;
         }
 
-        public update(state: StateManager): void {
-            this.sprite.Position.x = state.currentXPosition - 95 - this.sprite.Size.x / 2;
-            this.sprite.Position.y = 102 - (state.currentYPosition - 80) - this.sprite.Texture.Width;
-            this.sprite.Position.z = -(state.currentZPosition) * 46.0 + 1.0;
+        public update(snap: GameSnapshot, level: Levels.Level): void {
+            this.sprite.Position.x = snap.Position.x - 95 - this.sprite.Size.x / 2;
+            this.sprite.Position.y = 102 - (snap.Position.y - 80) - this.sprite.Texture.Width;
+            this.sprite.Position.z = -(snap.Position.z) * 46.0 + 1.0;
 
             var minX = 95, maxX = 417;
-            var xp = (state.currentXPosition - minX) / (maxX - minX);
+            var xp = (snap.Position.x - minX) / (maxX - minX);
             var idx = 14 + Math.floor(xp * 7) * 9 + this.frame % 3;
 
-            if (state.yVelocity > -state.gravityAcceleration * 4) {
+            var gravityAccel = level.getGravityAcceleration();
+            if (snap.Velocity.y > -gravityAccel * 4) {
                 idx += 3;
-            } else if (state.yVelocity < state.gravityAcceleration * 4) {
+            } else if (snap.Velocity.y < gravityAccel * 4) {
                 idx += 6;
             }
 
-            if (state.isDead) {
+            if (snap.CraftState === ShipState.Exploded) {
                 if (!this.playedDeath) {
                     this.playedDeath = true;
                     this.frame = 0;

@@ -21,6 +21,8 @@
     <Content Include="Data\INTRO.SND" />
     <Content Include="Data\SFX.SND" />
     <Content Include="Data\SKYROADS.EXE" />
+    <Content Include="faq.html" />
+    <Content Include="physics_test.html" />
     <Content Include="index.html" />
     <Content Include="JsLibs\tsm-node.js" />
     <Content Include="JsLibs\tsm-0.7.js" />
@@ -43,11 +45,13 @@
     <Content Include="Shaders\color_3d.fs" />
     <Content Include="Shaders\sprite_3d.fs" />
     <Content Include="Shaders\texture_p3d.fs" />
+    <Content Include="vr.html" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Notes\MUZAX.LCS.txt" />
     <Content Include="Notes\INTOR.SND.txt" />
+    <TypeScriptCompile Include="PhysicsTestMain.ts" />
     <TypeScriptCompile Include="GameMain.ts" />
     <TypeScriptCompile Include="Libs\GLFW.d.ts" />
     <TypeScriptCompile Include="Libs\tsm-0.7.d.ts" />

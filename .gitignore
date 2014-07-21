@@ -202,6 +202,10 @@ node_modules
 # Users Environment Variables
 .lock-wscript
 
+#Visual C++
+*.filters
+*.tlog
+
 #Skyroads files
 OpenRoads/Data
 OpenRoads/Data.XMas
@@ -212,4 +216,9 @@ RoadsLib.js
 RoadsLib.d.ts
 Node
 Website
-
+Release XMas
+Release Classic
+skyroads_vr.zip
+*.exe
+OpenRoadsLib/*/*.js
+OpenRoadsLib/*/*/*.js

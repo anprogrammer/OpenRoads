@@ -1,5 +1,4 @@
-﻿/// <reference path="BitStream.ts"  />
-var Data;
+﻿var Data;
 (function (Data) {
     var BinaryReader = (function () {
         function BinaryReader(stream) {
@@ -12,7 +11,7 @@ var Data;
         BinaryReader.prototype.getBits = function (n) {
             var byte = 0;
             for (var i = 0; i < n; i++) {
-                byte |= this.getBit() * (1 << i);
+                byte |= this.getBit() * (1 << (n - i - 1));
             }
             return byte;
         };
@@ -29,6 +28,14 @@ var Data;
             return this.getUint16() | (this.getUint16() << 16);
         };
 
+        BinaryReader.prototype.getFixedLengthString = function (len) {
+            var s = '';
+            for (var i = 0; i < len; i++) {
+                s += String.fromCharCode(this.getUint8());
+            }
+            return s;
+        };
+
         BinaryReader.prototype.eof = function () {
             return this.stream.eof();
         };
@@ -36,4 +43,3 @@ var Data;
     })();
     Data.BinaryReader = BinaryReader;
 })(Data || (Data = {}));
-//# sourceMappingURL=BinaryReader.js.map
