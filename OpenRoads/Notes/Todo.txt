@@ -1,7 +1,4 @@
-﻿-Scan notes for idb and anything else which shouldn't be there, delete permanently
---Copyrighted content
-
-Improve Website
+﻿Improve Website
 --Google Analytics
 
 Place music in web-worker?
