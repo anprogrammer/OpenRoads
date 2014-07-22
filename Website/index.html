@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>OpenRoads</title>
+	<link rel="stylesheet" href="app.css" type="text/css" />
+	<script src="JsLibs/tsm-0.7.js"></script>
+	<script src="RoadsLib.js"></script>
+	<script src="GameMain.js"></script>
+</head>
+<body>
+	<div id="loading">Loading</div>
+	<canvas id="cvs" style="display: none;"></canvas>
+	<div id="vr" class="info_pane">
+		<a class="closediv" href="#">(X)</a><br />
+		Need more challenge?<br />
+		<a href="index.html?xmas=1">SkyRoads XMas Edition</a>
+		<br /><br />
+		Have a question?<br />
+		<a href="faq.html">Check Out our F.A.Q.</a>
+		<br /><br />
+		Have a DK1 or DK2?<br />
+		<a href="vr.html">
+			Play in VR with <em>Oculus Rift</em><br />
+			<img src="Images/oculus.png" id="oc_logo" />
+		</a>
+	</div>
+	<div id="error_webgl" class="info_pane error" style="display: none;">
+		<a class="closediv" href="#">(X)</a><br />
+		Your browser does not appear to support WebGL.<br />
+		We recommend using the latest version of <a href="https://www.google.com/intl/en_us/chrome/browser/">Google Chrome</a> or
+		<a href="https://www.mozilla.org/en-US/firefox/new/">Mozilla Firefox</a> to play.<br />
+		Also, make sure your video drivers are up to date.
+	</div>
+	<div id="error_webaudio" class="info_pane error" style="display: none;">
+		<a class="closediv" href="#">(X)</a><br />
+		Your browser does not appear to support the Web Audio API.<br />
+		You can still play SkyRoads but neither sound nor music will function.
+		We recommend using the latest version of <a href="https://www.google.com/intl/en_us/chrome/browser/">Google Chrome</a> or
+		<a href="https://www.mozilla.org/en-US/firefox/new/">Mozilla Firefox</a> for the best experience.
+	</div>
+	<div id="links" class="info_pane">
+		<a class="closediv" href="#">(X)</a><br />
+		<a href="http://www.bluemoon.ee/history/skyroads/">Bluemoon Interactive's<br /><em>SkyRoads</em></a><br />
+
+		<br />Brought to HTML5 by<br />
+		<a href="https://github.com/anprogrammer">Daniel Church</a><br />
+		<a href="http://www.andplus.com/">AndPlus LLC</a><br />
+
+		<br />Hosted on<br />
+		<a href="https://github.com/anprogrammer/OpenRoads">GitHub (MIT)</a><br />
+		<br />Technologies<br />
+		<a href="http://www.typescriptlang.org/">TypeScript</a><br />
+		<a href="http://www.khronos.org/webgl/">WebGL</a><br />
+		<a href="http://webaudio.github.io/web-audio-api/">Web Audio API</a><br />
+		<a href="http://http://nodejs.org/NodeJS">NodeJS</a>
+	</div>
+	<script type="text/javascript">
+		var xs = document.getElementsByClassName('closediv');
+		for (var i = 0; i < xs.length; i++) {
+			xs[i].onclick = function () {
+				this.parentNode.parentNode.removeChild(this.parentNode);
+			};
+		}
+	</script>
+</body>
+</html>
