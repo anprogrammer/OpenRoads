@@ -1,7 +1,8 @@
 RMDIR Website /S /Q
 MKDIR Website
 xcopy OpenRoads\index.html Website
-xcopy OpenRoads\xmas.html Website
+xcopy OpenRoads\vr.html Website
+xcopy OpenRoads\faq.html Website
 xcopy OpenRoads\GameMain.js Website
 xcopy OpenRoads\GameMainXMas.js Website
 xcopy OpenRoads\RoadsLib.js Website
