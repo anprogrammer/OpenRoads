@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>OpenRoads</title>
+	<link rel="stylesheet" href="app.css" type="text/css" />
+</head>
+<body style="text-align: center;">
+	<div id="vr" class="info_pane">
+		<a class="closediv" href="#">(X)</a><br />
+		<a href="index.html">Back to the Game</a>
+	</div>
+	<h1>Play SkyRoads in Virtual Reality</h1>
+	<p>
+		OpenRoads supports the Oculus Rift DK2 and DK1 using NodeJS.  Download the premade bundle for Windows (32-bit and 64-bit) to try it out.
+		Linux and OSX support are planned.  You can always try building and installing yourself, pull requests are welcome.
+	</p>
+	<iframe width="560" height="315" src="//www.youtube.com/embed/PKoSALEaV28" frameborder="0" allowfullscreen></iframe>
+	<br />
+	<a href="skyroads_vr.zip">Click Here to Download SkyRoads VR</a>
+	<h2>How to Play</h2>
+	<ol>
+		<li>Download <a href="skyroads_vr.zip">SkyRoads VR</a></li>
+		<li>Extract the ZIP Archive</li>
+		<li>Install the <a href="http://www.microsoft.com/en-us/download/details.aspx?id=40784">Visual C++ Redistributable Packages for Visual Studio 2013</a> if you do not have them already.</li>
+		<li>Inside your freshly extracted SkyRoadsVR folder, run either Skyroads VR or Skyroads XMas VR</li>
+		<li>Enjoy!</li>
+	</ol>
+	<script type="text/javascript">
+	var xs = document.getElementsByClassName('closediv');
+	for (var i = 0; i < xs.length; i++) {
+		xs[i].onclick = function () {
+			this.parentNode.parentNode.removeChild(this.parentNode);
+		};
+	}
+	</script>
+</body>
+</html>
