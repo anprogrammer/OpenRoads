@@ -8,6 +8,11 @@ module Configurations {
         } catch (e) {
         }
 
+        var n = Math.random(); //It takes node like 0.5 seconds on the first Math.random() call for some reason on certain platforms.  Maybe it's a secure RNG in node?
+
+        var child_process = require('child_process');
+        var audioProc = child_process.fork('./NodeAudioProcess.js');
+
         var wgl = require('./Node/node_modules/node-webgl');
 
         var basePath = 'Data/', savePath = 'classic';
@@ -22,7 +27,7 @@ module Configurations {
         managers.Settings = new Managers.SettingsManager(new Stores.FSStore(savePath));
         managers.Textures = new Managers.TextureManager(managers);
         managers.Canvas = new Drawing.NodeCanvasProvider();
-        managers.Audio = new Sounds.PortAudioAudioProvider();
+        managers.Audio = new Sounds.ChildProcessAudioProvider(audioProc);
         managers.Graphics = new Shaders.VRShaderProvider();
 
         manager.loadMultiple(["Shaders/basic_2d.fs", "Shaders/basic_2d.vs", 'Shaders/title_2d.fs', 'Shaders/title_2d.vs', 'Shaders/color_3d.vs', 'Shaders/color_3d.fs',
@@ -68,12 +73,6 @@ module Configurations {
                 controls.addSource(new Controls.JoystickControlSource(new Controls.GLFWJoystick(doc)));
                 managers.Controls = controls;
 
-                var opl = new Music.OPL(managers);
-                var player = new Music.Player(opl, managers);
-                opl.setSource(player);
-
-                managers.Player = player;
-
                 managers.VR = new VR.NodeVRProvider(doc);
                 managers.VR.enable();
 
@@ -81,14 +80,8 @@ module Configurations {
                 //var state = new States.GoMenu(managers);
                 //var state = new States.MainMenu(managers);
                 //var state = new States.GameState(managers, 0, new Game.DemoController(managers.Streams.getRawArray('DEMO.REC')));
+
                 managers.Frames = new Engine.FrameManager(new Engine.NodeDocumentProvider(doc, cvs), cvs, managers, state, new Engine.Clock());
             });
     }
-}
-
-declare var exports: any;
-if (typeof exports !== 'undefined') {
-    exports.Configurations = {
-        runNode: Configurations.runNode
-    };
 }

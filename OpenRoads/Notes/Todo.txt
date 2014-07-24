@@ -1,14 +1,10 @@
-﻿Improve Website
---Google Analytics
-
-Place music in web-worker?
-
+﻿Unlock FPS in drawFrame
 Add instructions screen
-Unlock FPS in drawFrame
+Include server-side logging for fun stats
 
-
+Off a pixel on ship
+Monitor selection or SDK improvements
 Replace video with actual video
-Add "Proper perspective" mode for normal game-play as option
 
 
 Fix music performance in Firefox!

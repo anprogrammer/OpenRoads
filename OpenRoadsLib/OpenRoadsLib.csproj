@@ -61,6 +61,7 @@
     <TypeScriptCompile Include="Libs\tsm-0.7.d.ts" />
     <TypeScriptCompile Include="Libs\webaudio.d.ts" />
     <TypeScriptCompile Include="Src\Configurations\Node.ts" />
+    <TypeScriptCompile Include="Src\Configurations\NodeAudio.ts" />
     <TypeScriptCompile Include="Src\Controls\CombinedControlSource.ts" />
     <TypeScriptCompile Include="Src\Controls\ConditionWatcher.ts" />
     <TypeScriptCompile Include="Src\Controls\ControlSource.ts" />
@@ -131,9 +132,13 @@
     <TypeScriptCompile Include="Src\Shaders\ShaderProvider.ts" />
     <TypeScriptCompile Include="Src\Shaders\VRShaderProvider.ts" />
     <TypeScriptCompile Include="Src\Sounds\AudioProvider.ts" />
+    <TypeScriptCompile Include="Src\Sounds\InThreadAudioProvider.ts" />
+    <TypeScriptCompile Include="Src\Sounds\LowLevelAudioProvider.ts" />
     <TypeScriptCompile Include="Src\Sounds\PortAudioAudioProvider.ts" />
     <TypeScriptCompile Include="Src\Sounds\Sound.ts" />
     <TypeScriptCompile Include="Src\Sounds\WebAPIAudioProvider.ts" />
+    <TypeScriptCompile Include="Src\Sounds\ChildProcessAudioServer.ts" />
+    <TypeScriptCompile Include="Src\Sounds\ChildProcessAudioProvider.ts" />
     <TypeScriptCompile Include="Src\States\ControlsState.ts" />
     <TypeScriptCompile Include="Src\States\EmptyState.ts" />
     <TypeScriptCompile Include="Src\States\FadeState2D.ts" />
@@ -154,7 +159,6 @@
     <TypeScriptCompile Include="Src\TestRuns\TestDats.ts" />
     <TypeScriptCompile Include="Src\TestRuns\TestImages.ts" />
     <TypeScriptCompile Include="Src\TestRuns\TestLevels.ts" />
-    <TypeScriptCompile Include="Src\TestRuns\TestMusic.ts" />
     <TypeScriptCompile Include="Src\TestRuns\TestSounds.ts" />
     <TypeScriptCompile Include="Src\TestRuns\TestTrakDat.ts" />
     <TypeScriptCompile Include="Src\Vertices\Vertex2D.ts" />

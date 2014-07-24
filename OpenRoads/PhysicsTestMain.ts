@@ -40,7 +40,6 @@ function runPhysTest() {
     managers.Graphics = new Shaders.ClassicShaderProvider();
     managers.Textures = new Managers.TextureManager(managers);
     managers.Canvas = new Drawing.HTMLCanvasProvider();
-    managers.Audio = new Sounds.WebAPIAudioProvider(actx);
     managers.VR = null;
     //managers.Graphics = new Shaders.VRShaderProvider();
 
@@ -79,14 +78,6 @@ function runPhysTest() {
 
             document.getElementById('loading').style.display = 'none';
             cvs.style.display = 'block';
-            var opl = new Music.OPL(managers);
-            var player = new Music.Player(opl, managers);
-            opl.setSource(player);
-            var w = <any>window;
-            w.opl = opl;
-            w.settings = managers.Settings;
-
-            managers.Player = player;
 
             var demoCon = new Game.DemoController(manager.getRawArray('DEMO.REC'));
             var ll = new Levels.MultiLevelLoader(managers.Streams.getStream("ROADS.LZS"));

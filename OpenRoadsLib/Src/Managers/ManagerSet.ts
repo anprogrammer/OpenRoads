@@ -4,7 +4,6 @@
         public Shaders: ShaderManager;
         public Textures: TextureManager;
         public Sounds: SoundManager;
-        public Player: Music.Player;
         public Frames: Engine.FrameManager;
         public Controls: Controls.ControlSource;
         public Settings: Managers.SettingsManager;

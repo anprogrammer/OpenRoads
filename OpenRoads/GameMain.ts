@@ -5,7 +5,7 @@ window.onload = () => {
 
 function runGame() {
     var cvs = <HTMLCanvasElement>document.getElementById('cvs');
-   var gl = cvs.getContext('webgl') || cvs.getContext('experimental-webgl');
+    var gl = cvs.getContext('webgl') || cvs.getContext('experimental-webgl');
     if (!gl) {
         document.getElementById('error_webgl').style.display = '';
         return;
@@ -27,7 +27,7 @@ function runGame() {
 
     var isXMas = window.location.search.indexOf('xmas=1') >= 0;
 
-    
+
     var manager = new Managers.StreamManager(new Stores.AJAXFileProvider(), isXMas ? 'Data.XMas/' : 'Data/'), shaderManager = new Managers.ShaderManager(manager);
     var managers = new Managers.ManagerSet(manager, shaderManager);
     managers.Sounds = new Managers.SoundManager(managers);
@@ -40,7 +40,6 @@ function runGame() {
     managers.Graphics = new Shaders.ClassicShaderProvider();
     managers.Textures = new Managers.TextureManager(managers);
     managers.Canvas = new Drawing.HTMLCanvasProvider();
-    managers.Audio = new Sounds.WebAPIAudioProvider(actx);
     managers.VR = null;
     //managers.Graphics = new Shaders.VRShaderProvider();
 
@@ -77,16 +76,15 @@ function runGame() {
             var exe = new ExeData.ExeDataLoader(managers);
             exe.load();
 
-            document.getElementById('loading').style.display = 'none';
-            cvs.style.display = 'block';
-            var opl = new Music.OPL(managers);
+            var audioProvider = new Sounds.WebAPIAudioProvider(actx);
+            var opl = new Music.OPL(audioProvider);
             var player = new Music.Player(opl, managers);
             opl.setSource(player);
-            var w = <any>window;
-            w.opl = opl;
-            w.settings = managers.Settings;
 
-            managers.Player = player;
+            managers.Audio = new Sounds.InThreadAudioProvider(audioProvider, player);
+
+            document.getElementById('loading').style.display = 'none';
+            cvs.style.display = 'block';
 
             var demoCon = new Game.DemoController(manager.getRawArray('DEMO.REC'));
             var state = new States.Intro(managers);

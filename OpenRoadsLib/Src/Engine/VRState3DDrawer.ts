@@ -15,19 +15,6 @@
             var me = this;
             function getCam(eyeNum: number): Engine.CameraState {
                 var base = me.managers.VR.getHeadCameraState(eyeNum);
-                //
-                //var vwTransform = new TSM.mat4().setIdentity();
-                //vwTransform.multiply(base.ViewTransform);
-                //vwTransform.scale(new TSM.vec3([scale, scale, scale]));
-                //
-                //var eyeTransform = new TSM.mat4().setIdentity();
-                //eyeTransform.multiply(base.EyeTransform);
-                //eyeTransform.translate(new TSM.vec3([46.0 / scale, 0.0, 0.0]));
-                //eyeTransform.multiply(base.EyeTransform);
-
-                //cam.rotate(-Math.PI / 2.5, new TSM.vec3([1.0, 0.0, 0.0]));
-                //cam.translate(new TSM.vec3([0.0, -180.0, 0.0]));
-                //cam.translate(offset.scale(1.0 / scale));
                 return base;
             }
 

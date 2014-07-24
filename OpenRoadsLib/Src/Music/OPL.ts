@@ -77,12 +77,10 @@
         private VMin: number = -96.0;
         private VMax: number = 0.0;
         private node: ScriptProcessorNode;
-        private managers: Managers.ManagerSet;
         private waves: number[][] = [];
         private sampleCount: number = 1024;
 
-        constructor(managers: Managers.ManagerSet) {
-            this.managers = managers;
+        constructor(llap: Sounds.LowLevelAudioProvider) {
             this.channels = [];
 
             var waveSin: number[] = [];
@@ -121,7 +119,7 @@
             }
 
             this.sampleRate = 44100;
-            managers.Audio.runPlayer(this);
+            llap.runPlayer(this);
         }
 
         public setSource(mp: Player) {
@@ -198,7 +196,7 @@
         public fillAudioBuffer(buffer: Float32Array): boolean {
             var synthOut = 0.0;
             
-            if (this.src == null || !this.managers.Settings.PlayMusic) {
+            if (this.src == null) {
                 for (var i = 0; i < buffer.length; i++) {
                     buffer[i] = 0;
                 }

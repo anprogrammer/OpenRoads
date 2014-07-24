@@ -51,6 +51,7 @@
   <ItemGroup>
     <Content Include="Notes\MUZAX.LCS.txt" />
     <Content Include="Notes\INTOR.SND.txt" />
+    <TypeScriptCompile Include="NodeAudioProcess.ts" />
     <TypeScriptCompile Include="PhysicsTestMain.ts" />
     <TypeScriptCompile Include="GameMain.ts" />
     <TypeScriptCompile Include="Libs\GLFW.d.ts" />

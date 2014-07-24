@@ -25,7 +25,7 @@
         }
     }
 
-    export class WebAPIAudioProvider implements AudioProvider {
+    export class WebAPIAudioProvider implements LowLevelAudioProvider {
         private ctx: AudioContext;
         private dest: GainNode;
         private players: PlayerAudioSource[] = [];

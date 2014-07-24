@@ -48,7 +48,7 @@
             new PortAudioPlayer(this.audio, this.buffer);
         }
     }
-    export class PortAudioAudioProvider implements AudioProvider {
+    export class PortAudioAudioProvider implements LowLevelAudioProvider {
         private players: PlayerAudioSource[] = [];
         private gain: number = 0;
         private engine: CoreAudioEngine;

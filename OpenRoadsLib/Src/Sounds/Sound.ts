@@ -6,9 +6,10 @@
 
             this.managers = managers;
 
-            var numBytes = (end || stream.getLength()) - start;
+            var numBytes = (end || stream.getLength() / 8) - start;
             stream.setPosition(start * 8);
             var reader = new Data.BinaryReader(stream);
+
 
             var scaledLength = Math.floor(numBytes * 44100 / 8000);
 

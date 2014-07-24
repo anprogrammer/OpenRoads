@@ -17,7 +17,7 @@
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getLeft(), () => this.updateMenu(false)));
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getRight(), () => this.updateMenu(true)));
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getExit(), () => this.exitMenu()));
-            this.myManagers.Player.loadSong(1);
+            this.myManagers.Audio.playSong(1);
         }
 
         unload(): void {

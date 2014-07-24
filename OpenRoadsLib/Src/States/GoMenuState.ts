@@ -47,7 +47,7 @@
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getEnter(), () => this.enterLevel()));
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getExit(), () => managers.Frames.popState()));
 
-            this.myManagers.Player.loadSong(1);
+            this.myManagers.Audio.playSong(1);
         }
 
         unload(): void {
@@ -63,7 +63,7 @@
             this.myManagers.Frames.addState(gameState);
             this.myManagers.Frames.addState(new Fade3D(this.myManagers, 0.0, gameState, true));
             this.myManagers.Frames.addState(new Fade2D(this.myManagers, 1.0, this, false));
-            this.myManagers.Player.loadSong(Math.floor(Math.random() * 11) + 2);
+            this.myManagers.Audio.playSong(Math.floor(Math.random() * 11) + 2);
         }
 
         updatePhysics(frameManager: Engine.FrameManager, frameTimeInfo: Engine.FrameTimeInfo): void {

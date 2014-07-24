@@ -29,7 +29,7 @@
                 var reader = new Data.BinaryReader(data);
                 var sfx: Sounds.SoundEffect[] = [];
                 var starts = [reader.getUint16()];
-                for (var i = 0; i < starts[0]; i += 2) {
+                for (var i = 4; i < starts[0]; i += 2) {
                     starts.push(reader.getUint16());
                 }
 

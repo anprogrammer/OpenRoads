@@ -31,7 +31,7 @@
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getEnter(), () => this.enterMenu()));
             //TODO: Way to exit NodeJS app
 
-            this.myManagers.Player.loadSong(1);
+            this.myManagers.Audio.playSong(1);
         }
 
         unload(): void {

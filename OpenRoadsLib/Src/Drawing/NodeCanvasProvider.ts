@@ -1,6 +1,6 @@
 ﻿module Drawing {
     var canvas: any = null;
-    if (typeof document === 'undefined') {
+    if (typeof document === 'undefined' && typeof require !== 'undefined') {
         canvas = require('./Node/node_modules/node-canvas');
     }
 

@@ -46,7 +46,7 @@ module States {
             this.animFrame = null;
             this.creditFrame = null;
 
-            managers.Player.loadSong(0);
+            managers.Audio.playSong(0);
         }
 
         unload(): void {
