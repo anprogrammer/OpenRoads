@@ -410,7 +410,12 @@ var Configurations;
         } catch (e) {
         }
 
-        var wgl = require('./Node/node_modules/node-webgl');
+        var n = Math.random();
+
+        var child_process = require('child_process');
+        var audioProc = child_process.fork('./NodeAudioProcess.js');
+
+        var wgl = require('./Node/node_modules/node-webgl-ovr');
 
         var basePath = 'Data/', savePath = 'classic';
         if (mode === 'xmas') {
@@ -424,7 +429,7 @@ var Configurations;
         managers.Settings = new Managers.SettingsManager(new Stores.FSStore(savePath));
         managers.Textures = new Managers.TextureManager(managers);
         managers.Canvas = new Drawing.NodeCanvasProvider();
-        managers.Audio = new Sounds.PortAudioAudioProvider();
+        managers.Audio = new Sounds.ChildProcessAudioProvider(audioProc);
         managers.Graphics = new Shaders.VRShaderProvider();
 
         manager.loadMultiple([
@@ -471,12 +476,6 @@ var Configurations;
             controls.addSource(new Controls.JoystickControlSource(new Controls.GLFWJoystick(doc)));
             managers.Controls = controls;
 
-            var opl = new Music.OPL(managers);
-            var player = new Music.Player(opl, managers);
-            opl.setSource(player);
-
-            managers.Player = player;
-
             managers.VR = new VR.NodeVRProvider(doc);
             managers.VR.enable();
 
@@ -490,10 +489,28 @@ var Configurations;
     }
     Configurations.runNode = runNode;
 })(Configurations || (Configurations = {}));
+var Configurations;
+(function (Configurations) {
+    function runNodeAudio() {
+        var manager = new Managers.StreamManager(new Stores.LocalFileProvider(), 'Data/');
+        var managers = new Managers.ManagerSet(manager, null);
+
+        manager.loadMultiple(['Data/MUZAX.LZS']).done(function () {
+            var audioProvider = new Sounds.PortAudioAudioProvider();
+            var opl = new Music.OPL(audioProvider);
+            var player = new Music.Player(opl, managers);
+            opl.setSource(player);
+
+            var server = new Sounds.ChildProcessAudioServer(audioProvider, player);
+        });
+    }
+    Configurations.runNodeAudio = runNodeAudio;
+})(Configurations || (Configurations = {}));
 
 if (typeof exports !== 'undefined') {
     exports.Configurations = {
-        runNode: Configurations.runNode
+        runNode: Configurations.runNode,
+        runNodeAudio: Configurations.runNodeAudio
     };
 }
 var Controls;
@@ -1187,7 +1204,7 @@ var Drawing;
 var Drawing;
 (function (Drawing) {
     var canvas = null;
-    if (typeof document === 'undefined') {
+    if (typeof document === 'undefined' && typeof require !== 'undefined') {
         canvas = require('./Node/node_modules/node-canvas');
     }
 
@@ -1441,6 +1458,8 @@ var Engine;
             this.timeLast = Date.now();
             this.lastWidth = 0;
             this.lastHeight = 0;
+            this.frame = 0;
+            this.hasRunPhysics = false;
             this.document = documentProvider;
             this.canvas = canvas;
             this.ctx = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
@@ -1466,6 +1485,7 @@ var Engine;
 
         FrameManager.prototype.addState = function (gs) {
             this.states.push(gs);
+            this.hasRunPhysics = false;
             gs.load(this.ctx);
         };
 
@@ -1493,11 +1513,19 @@ var Engine;
             var physStep = time.getPhysicsStep();
             this.physicsTime += time.getFrameTime();
 
-            this.managers.Audio.setGain(this.managers.Settings.getMuted() ? 0.0 : this.managers.Settings.getVolume());
+            if (this.frame % 30 === 0) {
+                this.managers.Audio.setGain(this.managers.Settings.getMuted() ? 0.0 : this.managers.Settings.getVolume());
+            }
+            this.frame++;
 
             if (this.physicsTime >= physStep * 3) {
-                this.physicsTime = 0;
+                this.physicsTime = physStep;
             }
+
+            if (this.physicsTime < physStep && !this.hasRunPhysics) {
+                this.physicsTime = physStep;
+            }
+            this.hasRunPhysics = true;
 
             while (this.physicsTime >= physStep && this.states[this.states.length - 1] === gs) {
                 gs.updatePhysics(this, time);
@@ -1521,6 +1549,7 @@ var Engine;
         };
 
         FrameManager.prototype.popState = function () {
+            this.hasRunPhysics = false;
             this.states[this.states.length - 1].unload();
             this.states.pop();
         };
@@ -1724,19 +1753,6 @@ var Engine;
             var me = this;
             function getCam(eyeNum) {
                 var base = me.managers.VR.getHeadCameraState(eyeNum);
-
-                //
-                //var vwTransform = new TSM.mat4().setIdentity();
-                //vwTransform.multiply(base.ViewTransform);
-                //vwTransform.scale(new TSM.vec3([scale, scale, scale]));
-                //
-                //var eyeTransform = new TSM.mat4().setIdentity();
-                //eyeTransform.multiply(base.EyeTransform);
-                //eyeTransform.translate(new TSM.vec3([46.0 / scale, 0.0, 0.0]));
-                //eyeTransform.multiply(base.EyeTransform);
-                //cam.rotate(-Math.PI / 2.5, new TSM.vec3([1.0, 0.0, 0.0]));
-                //cam.translate(new TSM.vec3([0.0, -180.0, 0.0]));
-                //cam.translate(offset.scale(1.0 / scale));
                 return base;
             }
 
@@ -3796,7 +3812,7 @@ var Managers;
                 var reader = new Data.BinaryReader(data);
                 var sfx = [];
                 var starts = [reader.getUint16()];
-                for (var i = 0; i < starts[0]; i += 2) {
+                for (var i = 4; i < starts[0]; i += 2) {
                     starts.push(reader.getUint16());
                 }
 
@@ -4203,7 +4219,7 @@ var Music;
     })();
 
     var OPL = (function () {
-        function OPL(managers) {
+        function OPL(llap) {
             this.sampleRate = 44100;
             this.src = null;
             this.timeSinceNote = 0;
@@ -4215,7 +4231,6 @@ var Music;
             this.VMax = 0.0;
             this.waves = [];
             this.sampleCount = 1024;
-            this.managers = managers;
             this.channels = [];
 
             var waveSin = [];
@@ -4254,7 +4269,7 @@ var Music;
             }
 
             this.sampleRate = 44100;
-            managers.Audio.runPlayer(this);
+            llap.runPlayer(this);
         }
         OPL.prototype.setSource = function (mp) {
             this.src = mp;
@@ -4328,7 +4343,7 @@ var Music;
         OPL.prototype.fillAudioBuffer = function (buffer) {
             var synthOut = 0.0;
 
-            if (this.src == null || !this.managers.Settings.PlayMusic) {
+            if (this.src == null) {
                 for (var i = 0; i < buffer.length; i++) {
                     buffer[i] = 0;
                 }
@@ -5360,6 +5375,28 @@ var Shaders;
 })(Shaders || (Shaders = {}));
 var Sounds;
 (function (Sounds) {
+    var InThreadAudioProvider = (function () {
+        function InThreadAudioProvider(base, player) {
+            this.base = base;
+            this.player = player;
+        }
+        InThreadAudioProvider.prototype.createPlayable = function (buffer) {
+            return this.base.createPlayable(buffer);
+        };
+
+        InThreadAudioProvider.prototype.playSong = function (n) {
+            this.player.loadSong(n);
+        };
+
+        InThreadAudioProvider.prototype.setGain = function (gain) {
+            this.base.setGain(gain);
+        };
+        return InThreadAudioProvider;
+    })();
+    Sounds.InThreadAudioProvider = InThreadAudioProvider;
+})(Sounds || (Sounds = {}));
+var Sounds;
+(function (Sounds) {
     var PortAudioPlayer = (function () {
         function PortAudioPlayer(audio, buffer) {
             this.position = 0;
@@ -5462,7 +5499,7 @@ var Sounds;
             if (typeof end === "undefined") { end = 0; }
             this.managers = managers;
 
-            var numBytes = (end || stream.getLength()) - start;
+            var numBytes = (end || stream.getLength() / 8) - start;
             stream.setPosition(start * 8);
             var reader = new Data.BinaryReader(stream);
 
@@ -5548,6 +5585,123 @@ var Sounds;
     Sounds.WebAPIAudioProvider = WebAPIAudioProvider;
     ;
 })(Sounds || (Sounds = {}));
+var Sounds;
+(function (Sounds) {
+    var playSongCommand = 'PlaySong';
+    var createPlayableCommand = 'CreatePlayable';
+    var playPlayableCommand = 'PlayPlayable';
+    var setGainCommand = 'SetGain';
+
+    var SetGainCommand = (function () {
+        function SetGainCommand(gain) {
+            this.Command = setGainCommand;
+            this.Gain = gain;
+        }
+        return SetGainCommand;
+    })();
+    Sounds.SetGainCommand = SetGainCommand;
+
+    var PlaySongCommand = (function () {
+        function PlaySongCommand(songNumber) {
+            this.Command = playSongCommand;
+            this.SongNumber = 0;
+            this.SongNumber = songNumber;
+        }
+        return PlaySongCommand;
+    })();
+    Sounds.PlaySongCommand = PlaySongCommand;
+
+    var CreatePlayableCommand = (function () {
+        function CreatePlayableCommand(id, buffer) {
+            this.Command = createPlayableCommand;
+            this.Id = id;
+            this.Buffer = buffer;
+        }
+        return CreatePlayableCommand;
+    })();
+    Sounds.CreatePlayableCommand = CreatePlayableCommand;
+
+    var PlayPlayableCommand = (function () {
+        function PlayPlayableCommand(id) {
+            this.Command = playPlayableCommand;
+            this.Id = id;
+        }
+        return PlayPlayableCommand;
+    })();
+    Sounds.PlayPlayableCommand = PlayPlayableCommand;
+
+    var ChildProcessAudioServer = (function () {
+        function ChildProcessAudioServer(baseProvider, musicPlayer) {
+            var _this = this;
+            this.playables = {};
+            this.provider = baseProvider;
+            this.musicPlayer = musicPlayer;
+
+            process.on('message', function (evt) {
+                switch (evt.Command) {
+                    case playSongCommand:
+                        var psEvt = evt;
+                        _this.musicPlayer.loadSong(psEvt.SongNumber);
+                        break;
+                    case createPlayableCommand:
+                        var cpEvt = evt;
+                        var p = _this.provider.createPlayable(cpEvt.Buffer);
+                        _this.playables[cpEvt.Id] = p;
+                        break;
+                    case playPlayableCommand:
+                        var ppEvt = evt;
+                        if (ppEvt.Id in _this.playables) {
+                            _this.playables[ppEvt.Id].play();
+                        }
+                        break;
+                    case setGainCommand:
+                        var sgEvt = evt;
+                        _this.provider.setGain(sgEvt.Gain);
+                }
+            });
+        }
+        return ChildProcessAudioServer;
+    })();
+    Sounds.ChildProcessAudioServer = ChildProcessAudioServer;
+})(Sounds || (Sounds = {}));
+var Sounds;
+(function (Sounds) {
+    var ChildProcessPlayable = (function () {
+        function ChildProcessPlayable(id, worker) {
+            this.id = id;
+            this.worker = worker;
+        }
+        ChildProcessPlayable.prototype.play = function () {
+            this.worker.send(new Sounds.PlayPlayableCommand(this.id));
+        };
+        return ChildProcessPlayable;
+    })();
+
+    var ChildProcessAudioProvider = (function () {
+        function ChildProcessAudioProvider(worker) {
+            this.worker = worker;
+        }
+        ChildProcessAudioProvider.prototype.createPlayable = function (buffer) {
+            var id = ChildProcessAudioProvider.pId;
+            ChildProcessAudioProvider.pId++;
+
+            var playable = new ChildProcessPlayable(id, this.worker);
+            this.worker.send(new Sounds.CreatePlayableCommand(id, buffer));
+            return playable;
+        };
+
+        ChildProcessAudioProvider.prototype.playSong = function (n) {
+            this.worker.send(new Sounds.PlaySongCommand(n));
+        };
+
+        ChildProcessAudioProvider.prototype.setGain = function (gain) {
+            this.worker.send(new Sounds.SetGainCommand(gain));
+        };
+        ChildProcessAudioProvider.pId = 0;
+        return ChildProcessAudioProvider;
+    })();
+    Sounds.ChildProcessAudioProvider = ChildProcessAudioProvider;
+})(Sounds || (Sounds = {}));
 var States;
 (function (States) {
     var ControlsMenu = (function (_super) {
@@ -5580,7 +5734,7 @@ var States;
             }, function () {
                 return _this.exitMenu();
             }));
-            this.myManagers.Player.loadSong(1);
+            this.myManagers.Audio.playSong(1);
         };
 
         ControlsMenu.prototype.unload = function () {
@@ -6008,7 +6162,7 @@ var States;
                 return managers.Frames.popState();
             }));
 
-            this.myManagers.Player.loadSong(1);
+            this.myManagers.Audio.playSong(1);
         };
 
         GoMenu.prototype.unload = function () {
@@ -6024,7 +6178,7 @@ var States;
             this.myManagers.Frames.addState(gameState);
             this.myManagers.Frames.addState(new States.Fade3D(this.myManagers, 0.0, gameState, true));
             this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 1.0, this, false));
-            this.myManagers.Player.loadSong(Math.floor(Math.random() * 11) + 2);
+            this.myManagers.Audio.playSong(Math.floor(Math.random() * 11) + 2);
         };
 
         GoMenu.prototype.updatePhysics = function (frameManager, frameTimeInfo) {
@@ -6145,6 +6299,7 @@ var States;
         __extends(Intro, _super);
         function Intro(managers) {
             _super.call(this, managers);
+            this.hasPlayedSong = false;
             this.myManagers = managers;
             this.totalTime = 0.0;
             this.frame = 0;
@@ -6175,8 +6330,6 @@ var States;
             this.frames = intro.slice(2);
             this.animFrame = null;
             this.creditFrame = null;
-
-            managers.Player.loadSong(0);
         };
 
         Intro.prototype.unload = function () {
@@ -6186,7 +6339,14 @@ var States;
             var managers = this.myManagers;
 
             var fps = frameTimeInfo.getFPS();
-            if (managers.Controls.getEnter() || managers.Controls.getExit()) {
+            this.enabled = this.myManagers.VR === null || !this.myManagers.VR.isVRSafetyWarningVisible();
+
+            if (this.enabled && !this.hasPlayedSong) {
+                managers.Audio.playSong(0);
+                this.hasPlayedSong = true;
+            }
+
+            if (this.enabled && this.frame >= fps / 2 && (managers.Controls.getEnter() || managers.Controls.getExit())) {
                 var menuState = new States.MainMenu(managers);
                 managers.Frames.addState(menuState);
             }
@@ -6194,7 +6354,11 @@ var States;
             if (this.frame == fps / 2) {
                 this.introSound.play();
             }
-            this.frame++;
+
+            if (this.enabled) {
+                this.frame++;
+            }
+
             this.background.Brightness = this.frame < fps ? this.frame / fps : 1.0;
 
             var animStartFrame = fps * 2, titleStartFrame = animStartFrame + this.anim.length, creditsStartFrame = titleStartFrame + fps * 4;
@@ -6235,14 +6399,6 @@ var States;
                 } else {
                     this.creditFrame.Alpha = 1.0;
                 }
-            }
-
-            if (managers.Controls.getRight()) {
-                var demoState = new States.GameState(managers, 0, new Game.DemoController(managers.Streams.getRawArray('DEMO.REC')));
-                managers.Frames.addState(new States.Fade2D(managers, 0.0, this, false));
-                managers.Frames.addState(demoState);
-                managers.Frames.addState(new States.Fade3D(managers, 0.0, demoState, true));
-                managers.Frames.addState(new States.Fade2D(managers, 1.0, this, false));
             }
         };
 
@@ -6312,9 +6468,16 @@ var States;
             }, function () {
                 return _this.enterMenu();
             }));
+            if (managers.VR !== null) {
+                this.watchers.push(new Controls.ConditionWatcher(function () {
+                    return controls.getExit();
+                }, function () {
+                    return managers.VR.exit();
+                }));
+            }
 
             //TODO: Way to exit NodeJS app
-            this.myManagers.Player.loadSong(1);
+            this.myManagers.Audio.playSong(1);
         };
 
         MainMenu.prototype.unload = function () {
@@ -6645,44 +6808,6 @@ var TestRuns;
 })(TestRuns || (TestRuns = {}));
 var TestRuns;
 (function (TestRuns) {
-    function TestMusic() {
-        var actx = null;
-        try  {
-            actx = new webkitAudioContext();
-        } catch (e) {
-        }
-        try  {
-            actx = new AudioContext();
-        } catch (e) {
-        }
-
-        var manager = new Managers.StreamManager(new Stores.AJAXFileProvider()), shaderManager = new Managers.ShaderManager(manager);
-
-        var managers = new Managers.ManagerSet(manager, shaderManager);
-        managers.Sounds = new Managers.SoundManager(managers);
-        managers.Settings = new Managers.SettingsManager(new Stores.LocalStorageStore('music'));
-        managers.Graphics = new Shaders.ClassicShaderProvider();
-        managers.Textures = new Managers.TextureManager(managers);
-        managers.Audio = new Sounds.WebAPIAudioProvider(actx);
-        manager.loadMultiple([
-            "Data/MUZAX.LZS"
-        ]).done(function () {
-            var opl = new Music.OPL(managers);
-            var player = new Music.Player(opl, managers);
-            opl.setSource(player);
-            var w = window;
-            w.opl = opl;
-            w.settings = managers.Settings;
-            w.player = player;
-
-            managers.Player = player;
-            player.loadSong(0); //Song 6 has lots of drums
-        });
-    }
-    TestRuns.TestMusic = TestMusic;
-})(TestRuns || (TestRuns = {}));
-var TestRuns;
-(function (TestRuns) {
     function TestSounds() {
         var manager = new Managers.StreamManager(new Stores.AJAXFileProvider()), shaderManager = new Managers.ShaderManager(manager);
         var managers = new Managers.ManagerSet(manager, shaderManager);
@@ -6962,8 +7087,16 @@ var VR;
             this.glfw.startVREye(eyeNum);
         };
 
+        //Went away with Oculus SDK 0.4 but may come back...
         NodeVRProvider.prototype.endEye = function (eyeNum) {
-            this.glfw.endVREye(eyeNum);
+        };
+
+        NodeVRProvider.prototype.isVRSafetyWarningVisible = function () {
+            return this.glfw.isVRSafetyWarningVisible();
+        };
+
+        NodeVRProvider.prototype.exit = function () {
+            process.exit();
         };
 
         NodeVRProvider.prototype.getEyeViewAdjust = function (n) {
