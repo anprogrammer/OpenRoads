@@ -29,6 +29,9 @@
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getUp(), () => this.updateMenu(-1)));
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getDown(), () => this.updateMenu(1)));
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getEnter(), () => this.enterMenu()));
+            if (managers.VR !== null) {
+                this.watchers.push(new Controls.ConditionWatcher(() => controls.getExit(), () => managers.VR.exit()));
+            }
             //TODO: Way to exit NodeJS app
 
             this.myManagers.Audio.playSong(1);

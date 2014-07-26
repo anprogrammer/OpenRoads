@@ -1,4 +1,10 @@
 ﻿module VR {
+    declare class Process {
+        exit(): void;
+    }
+
+    declare var process: Process;
+
     export class NodeVRProvider implements VRProvider {
         private glfw: GLFW.GLFW;
         constructor(glfw: GLFW.GLFW) {
@@ -46,6 +52,10 @@
 
         public isVRSafetyWarningVisible(): boolean {
             return this.glfw.isVRSafetyWarningVisible();
+        }
+
+        public exit() {
+            process.exit();
         }
 
         private getEyeViewAdjust(n: number): TSM.vec3 {

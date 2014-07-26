@@ -9,5 +9,7 @@
 
         startEye(eyeNum: number): void;
         endEye(eyeNum: number): void;
+
+        exit(): void;
     }
 } 
