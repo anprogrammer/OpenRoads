@@ -1,6 +1,7 @@
 RMDIR Node /S /Q
 MKDIR Node
 xcopy OpenRoads\NodeMain.js Node
+xcopy OpenRoads\NodeAudioProcess.js Node
 xcopy OpenRoads\RoadsLib.js Node
 
 mkdir Node\Data
@@ -11,8 +12,8 @@ mkdir Node\Images
 mkdir Node\Node
 mkdir Node\Node\node_modules
 mkdir Node\Node\node_modules\node-canvas
-mkdir Node\Node\node_modules\node-glfw
-mkdir Node\Node\node_modules\node-webgl
+mkdir Node\Node\node_modules\node-glfw-ovr
+mkdir Node\Node\node_modules\node-webgl-ovr
 mkdir Node\Node\node_modules\node-core-audio
 mkdir Node\Node\node_modules\node-core-audio\gyp
 mkdir Node\Node\node_modules\node-core-audio\build
@@ -25,8 +26,8 @@ xcopy OpenRoads\Images Node\Images /E
 xcopy OpenRoads\JsLibs Node\JsLibs /E
 xcopy OpenRoads\Shaders Node\Shaders /E
 xcopy OpenRoads\Node\node_modules\node-canvas Node\Node\node_modules\node-canvas /E
-xcopy OpenRoads\Node\node_modules\node-glfw Node\Node\node_modules\node-glfw /E
-xcopy OpenRoads\Node\node_modules\node-webgl Node\Node\node_modules\node-webgl /E
+xcopy OpenRoads\Node\node_modules\node-glfw-ovr Node\Node\node_modules\node-glfw-ovr /E
+xcopy OpenRoads\Node\node_modules\node-webgl-ovr Node\Node\node_modules\node-webgl-ovr /E
 xcopy OpenRoads\Node\node_modules\node-core-audio Node\Node\node_modules\node-core-audio
 xcopy OpenRoads\Node\node_modules\node-core-audio\gyp Node\Node\node_modules\node-core-audio\gyp /E
 xcopy OpenRoads\Node\node_modules\node-core-audio\build Node\Node\node_modules\node-core-audio\build /E
@@ -41,36 +42,36 @@ del Node\Node\node_modules\node-core-audio\build\Release\*.lib
 RMDIR Node\Node\node_modules\node-core-audio\build\Release\obj /S /Q
 RMDIR Node\Node\node_modules\node-core-audio\gyp /S /Q
 
-del Node\Node\node_modules\node-glfw\build\* /Q
-del Node\Node\node_modules\node-glfw\build\Release\*.pdb
-del Node\Node\node_modules\node-glfw\build\Release\*.exp
-del Node\Node\node_modules\node-glfw\build\Release\*.lib
-RMDIR Node\Node\node_modules\node-glfw\build\Release\obj /S /Q
-RMDIR Node\Node\node_modules\node-glfw\src /S /Q
-RMDIR Node\Node\node_modules\node-glfw\test /S /Q
-RMDIR Node\Node\node_modules\node-glfw\node_modules /S /Q
+del Node\Node\node_modules\node-glfw-ovr\build\* /Q
+del Node\Node\node_modules\node-glfw-ovr\build\Release\*.pdb
+del Node\Node\node_modules\node-glfw-ovr\build\Release\*.exp
+del Node\Node\node_modules\node-glfw-ovr\build\Release\*.lib
+RMDIR Node\Node\node_modules\node-glfw-ovr\build\Release\obj /S /Q
+RMDIR Node\Node\node_modules\node-glfw-ovr\src /S /Q
+RMDIR Node\Node\node_modules\node-glfw-ovr\test /S /Q
+RMDIR Node\Node\node_modules\node-glfw-ovr\node_modules /S /Q
 
 
-del Node\Node\node_modules\node-webgl\build\* /Q
-del Node\Node\node_modules\node-webgl\build\Release\*.pdb
-del Node\Node\node_modules\node-webgl\build\Release\*.exp
-del Node\Node\node_modules\node-webgl\build\Release\*.lib
-RMDIR Node\Node\node_modules\node-webgl\build\Release\obj /S /Q
+del Node\Node\node_modules\node-webgl-ovr\build\* /Q
+del Node\Node\node_modules\node-webgl-ovr\build\Release\*.pdb
+del Node\Node\node_modules\node-webgl-ovr\build\Release\*.exp
+del Node\Node\node_modules\node-webgl-ovr\build\Release\*.lib
+RMDIR Node\Node\node_modules\node-webgl-ovr\build\Release\obj /S /Q
 
-RMDIR Node\Node\node_modules\node-webgl\doc /S /Q
-RMDIR Node\Node\node_modules\node-webgl\examples /S /Q
-RMDIR Node\Node\node_modules\node-webgl\src /S /Q
-RMDIR Node\Node\node_modules\node-webgl\test /S /Q
-RMDIR Node\Node\node_modules\node-webgl\tools /S /Q
+RMDIR Node\Node\node_modules\node-webgl-ovr\doc /S /Q
+RMDIR Node\Node\node_modules\node-webgl-ovr\examples /S /Q
+RMDIR Node\Node\node_modules\node-webgl-ovr\src /S /Q
+RMDIR Node\Node\node_modules\node-webgl-ovr\test /S /Q
+RMDIR Node\Node\node_modules\node-webgl-ovr\tools /S /Q
 
 
-del Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\* /Q
-del Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\Release\*.pdb
-del Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\Release\*.exp
-del Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\Release\*.lib
-RMDIR Node\Node\node_modules\node-webgl\node_modules\node-glfw\build\Release\obj /S /Q
-RMDIR Node\Node\node_modules\node-webgl\node_modules\node-glfw\src /S /Q
-RMDIR Node\Node\node_modules\node-webgl\node_modules\node-glfw\test /S /Q
+del Node\Node\node_modules\node-webgl-ovr\node_modules\node-glfw-ovr\build\* /Q
+del Node\Node\node_modules\node-webgl-ovr\node_modules\node-glfw-ovr\build\Release\*.pdb
+del Node\Node\node_modules\node-webgl-ovr\node_modules\node-glfw-ovr\build\Release\*.exp
+del Node\Node\node_modules\node-webgl-ovr\node_modules\node-glfw-ovr\build\Release\*.lib
+RMDIR Node\Node\node_modules\node-webgl-ovr\node_modules\node-glfw-ovr\build\Release\obj /S /Q
+RMDIR Node\Node\node_modules\node-webgl-ovr\node_modules\node-glfw-ovr\src /S /Q
+RMDIR Node\Node\node_modules\node-webgl-ovr\node_modules\node-glfw-ovr\test /S /Q
 
 
 copy NodeParts\node.exe Node\

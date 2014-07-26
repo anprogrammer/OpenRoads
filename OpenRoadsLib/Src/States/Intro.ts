@@ -17,6 +17,7 @@ module States {
         private frame: number
         private titleProgress: number;
         private enabled: boolean;
+        private hasPlayedSong: boolean = false;
 
         constructor(managers: Managers.ManagerSet) {
             super(managers);
@@ -45,8 +46,6 @@ module States {
             this.frames = intro.slice(2);
             this.animFrame = null;
             this.creditFrame = null;
-
-            managers.Audio.playSong(0);
         }
 
         unload(): void {
@@ -57,6 +56,11 @@ module States {
 
             var fps = frameTimeInfo.getFPS();
             this.enabled = this.myManagers.VR === null || !this.myManagers.VR.isVRSafetyWarningVisible();
+
+            if (this.enabled && !this.hasPlayedSong) {
+                managers.Audio.playSong(0);
+                this.hasPlayedSong = true;
+            }
 
             if (this.enabled && (managers.Controls.getEnter() || managers.Controls.getExit())) {
                 var menuState = new MainMenu(managers);
