@@ -40,8 +40,12 @@
             this.glfw.startVREye(eyeNum);
         }
 
+        //Went away with Oculus SDK 0.4 but may come back...
         public endEye(eyeNum: number): void {
-            this.glfw.endVREye(eyeNum);
+        }
+
+        public isVRSafetyWarningVisible(): boolean {
+            return this.glfw.isVRSafetyWarningVisible();
         }
 
         private getEyeViewAdjust(n: number): TSM.vec3 {

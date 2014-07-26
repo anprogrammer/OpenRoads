@@ -14,9 +14,9 @@ module States {
         private creditFrame: Drawing.Sprite;
         private totalTime: number;
         private introSound: Sounds.SoundEffect;
-        private frame: number;
-
+        private frame: number
         private titleProgress: number;
+        private enabled: boolean;
 
         constructor(managers: Managers.ManagerSet) {
             super(managers);
@@ -56,7 +56,9 @@ module States {
             var managers = this.myManagers;
 
             var fps = frameTimeInfo.getFPS();
-            if (managers.Controls.getEnter() || managers.Controls.getExit()) {
+            this.enabled = this.myManagers.VR === null || !this.myManagers.VR.isVRSafetyWarningVisible();
+
+            if (this.enabled && (managers.Controls.getEnter() || managers.Controls.getExit())) {
                 var menuState = new MainMenu(managers);
                 managers.Frames.addState(menuState);
             }
@@ -64,7 +66,11 @@ module States {
             if (this.frame == fps / 2) {
                 this.introSound.play();
             }
-            this.frame++;
+
+            if (this.enabled) {
+                this.frame++;
+            }
+
             this.background.Brightness = this.frame < fps ? this.frame / fps : 1.0;
 
             var animStartFrame = fps * 2, titleStartFrame = animStartFrame + this.anim.length,
@@ -106,14 +112,6 @@ module States {
                 } else {
                     this.creditFrame.Alpha = 1.0;
                 }
-            }
-
-            if (managers.Controls.getRight()) {
-                var demoState = new GameState(managers, 0, new Game.DemoController(managers.Streams.getRawArray('DEMO.REC')));
-                managers.Frames.addState(new Fade2D(managers, 0.0, this, false));
-                managers.Frames.addState(demoState);
-                managers.Frames.addState(new Fade3D(managers, 0.0, demoState, true));
-                managers.Frames.addState(new Fade2D(managers, 1.0, this, false));
             }
         }
 

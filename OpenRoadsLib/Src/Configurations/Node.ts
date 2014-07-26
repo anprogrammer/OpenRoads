@@ -13,7 +13,7 @@ module Configurations {
         var child_process = require('child_process');
         var audioProc = child_process.fork('./NodeAudioProcess.js');
 
-        var wgl = require('./Node/node_modules/node-webgl');
+        var wgl = require('./Node/node_modules/node-webgl-ovr');
 
         var basePath = 'Data/', savePath = 'classic';
         if (mode === 'xmas') {

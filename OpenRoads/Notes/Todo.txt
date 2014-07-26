@@ -1,4 +1,10 @@
-﻿Unlock FPS in drawFrame
+﻿Be sure to call StartVRFrame
+Integrate libOVR 0.4
+Provide option to exit game
+Fix crackling on Node version of music
+Program Icon
+
+Unlock FPS in drawFrame
 Add instructions screen
 Include server-side logging for fun stats
 

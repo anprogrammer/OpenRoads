@@ -12,5 +12,6 @@
         getJoystickButtons(): string;
         startVREye(n: number): void;
         endVREye(n: number): void;
+        isVRSafetyWarningVisible(): boolean;
     }
 }
