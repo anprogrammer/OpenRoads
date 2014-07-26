@@ -62,7 +62,7 @@ module States {
                 this.hasPlayedSong = true;
             }
 
-            if (this.enabled && (managers.Controls.getEnter() || managers.Controls.getExit())) {
+            if (this.enabled && this.frame >= fps / 2 && (managers.Controls.getEnter() || managers.Controls.getExit())) {
                 var menuState = new MainMenu(managers);
                 managers.Frames.addState(menuState);
             }
