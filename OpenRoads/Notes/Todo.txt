@@ -1,4 +1,5 @@
-﻿Fix crackling on Node version of music
+﻿Make sure frame-rate is not locked
+Fix crackling on Node version of music
 Program Icon
 
 Unlock FPS in drawFrame
