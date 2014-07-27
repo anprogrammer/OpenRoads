@@ -13,5 +13,7 @@
 
         getEnter(): boolean;
         getExit(): boolean;
+
+        getResetOrientation(): boolean;
     }
 }

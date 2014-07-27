@@ -41,6 +41,7 @@
     <Content Include="Notes\RenderingPts.txt" />
     <Content Include="Notes\sound.txt" />
     <Content Include="Notes\Todo.txt" />
+    <Content Include="Instructions.txt" />
     <Content Include="Shaders\basic_2d.fs" />
     <Content Include="Shaders\color_3d.fs" />
     <Content Include="Shaders\sprite_3d.fs" />

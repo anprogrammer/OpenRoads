@@ -13,5 +13,6 @@
         startVREye(n: number): void;
         endVREye(n: number): void;
         isVRSafetyWarningVisible(): boolean;
+        resetVROrientation(): void;
     }
 }

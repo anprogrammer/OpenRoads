@@ -84,5 +84,9 @@
         public getExit(): boolean {
             return this.getValuesFromChannelsAndButtons([], [], this.joystick.getExitButtons()) > 0.5;
         }
+
+        public getResetOrientation(): boolean {
+            return this.getValuesFromChannelsAndButtons([], [], this.joystick.getResetOrientationButtons()) > 0.5;
+        }
     }
 }

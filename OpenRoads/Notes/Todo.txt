@@ -1,9 +1,6 @@
 ﻿Provide way to reset orientation
 Program Icon
 Unlock FPS in drawFrame
-
-
-Fix crackling on Node version of music
 Add instructions screen
 Include server-side logging for fun stats
 

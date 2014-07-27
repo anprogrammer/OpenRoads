@@ -15,5 +15,7 @@
         getJumpButtons(): number[];
         getEnterButtons(): number[];
         getExitButtons(): number[];
+
+        getResetOrientationButtons(): number[];
     }
 } 

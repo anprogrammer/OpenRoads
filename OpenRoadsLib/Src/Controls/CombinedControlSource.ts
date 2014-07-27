@@ -55,5 +55,9 @@
         getExit(): boolean {
             return this.foldVal((src) => src.getExit());
         }
+
+        getResetOrientation(): boolean {
+            return this.foldVal((src) => src.getResetOrientation());
+        }
     }
 } 

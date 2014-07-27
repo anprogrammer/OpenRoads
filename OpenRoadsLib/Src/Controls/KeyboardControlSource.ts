@@ -53,5 +53,9 @@
         public getExit(): boolean {
             return this.kbd.isDown(27);
         }
+
+        getResetOrientation(): boolean {
+            return this.kbd.isDown(82);
+        }
     }
 } 

@@ -56,5 +56,9 @@
         getExitButtons(): number[] {
             return [1, 6];
         }
+
+        getResetOrientationButtons(): number[] {
+            return [2];
+        }
     }
 } 

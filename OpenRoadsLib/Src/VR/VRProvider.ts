@@ -10,6 +10,8 @@
         startEye(eyeNum: number): void;
         endEye(eyeNum: number): void;
 
+        resetOrientation(): void;
+
         exit(): void;
     }
 } 

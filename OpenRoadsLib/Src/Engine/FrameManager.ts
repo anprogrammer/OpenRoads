@@ -71,6 +71,10 @@
             var physStep = time.getPhysicsStep();
             this.physicsTime += time.getFrameTime();
 
+            if (this.managers.Controls.getResetOrientation() && this.managers.VR !== null) {
+                this.managers.VR.resetOrientation();
+            }
+
             if (this.frame % 30 === 0) {
                 this.managers.Audio.setGain(this.managers.Settings.getMuted() ? 0.0 : this.managers.Settings.getVolume());
             }

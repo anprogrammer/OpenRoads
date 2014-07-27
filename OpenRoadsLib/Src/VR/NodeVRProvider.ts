@@ -58,6 +58,10 @@
             process.exit();
         }
 
+        public resetOrientation() {
+            this.glfw.resetVROrientation();
+        }
+
         private getEyeViewAdjust(n: number): TSM.vec3 {
             var upIdx = 12, rightIdx = 13, downIdx = 14, leftIdx = 15;
             return new TSM.vec3(this.glfw.getEyeViewAdjust(n));
