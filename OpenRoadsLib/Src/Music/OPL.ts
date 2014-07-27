@@ -223,7 +223,7 @@
                     this.synthTime -= OPLConstants.SampleTime;
                 }
 
-                buffer[i] = synthOut;
+                buffer[i] = synthOut / 2.0;
             }
 
             return true;

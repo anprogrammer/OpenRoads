@@ -98,7 +98,7 @@
                 }
 
                 for (var j = 0; j < len; j++) {
-                    out[j] += buff[j] * this.gain;
+                    out[j] += Math.max(-1.0, Math.min(1.0, buff[j] * this.gain));
                 }
             }
 

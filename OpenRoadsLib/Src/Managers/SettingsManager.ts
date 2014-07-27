@@ -2,7 +2,7 @@
     export class SettingsManager {
         public PlayMusic: boolean = true;
         private Muted: boolean = true;
-        private volume: number = 0.25;
+        private volume: number = 0.2;
         private store: Stores.KVStore;
 
         constructor(store: Stores.KVStore) {
