@@ -16,7 +16,7 @@
                 verts.push(new Vertices.Vertex3DC(p1, c));
             };
 
-            var addCube = (colors: CubeColors, xLeft: number, xRight: number, yBottom: number, yTop: number, zStart: number, zEnd: number, drawFront: boolean, drawLeft: boolean, drawRight: boolean): void => {
+            var addCube = (colors: CubeColors, xLeft: number, xRight: number, yBottom: number, yTop: number, zStart: number, zEnd: number, drawFront: boolean, drawLeft: boolean, drawRight: boolean, drawBack: boolean = false, drawBottom: boolean = false): void => {
                 var ltf = new TSM.vec3([xLeft,  yTop,    zStart]);
                 var rtf = new TSM.vec3([xRight, yTop,    zStart]);
                 var lbf = new TSM.vec3([xLeft,  yBottom, zStart]);
@@ -37,6 +37,11 @@
                 if (drawRight) {
                     addQuad(colors.Right, rtf, rbf, rbb, rtb);
                 }
+
+                if (drawBottom) {
+                    addQuad(colors.Top, lbf, rbf, rbb, lbb);
+                }
+
                 addQuad(colors.Top, ltf, rtf, rtb, ltb);
             };
 
@@ -148,7 +153,7 @@
                     var idx = (Math.floor(xp * cvs.width) + Math.floor(yp * cvs.height) * cvs.width) * 4;
                     var color = new Data.Color(colorData[idx + 0], colorData[idx + 1], colorData[idx + 2]);
                         
-                    addCube(new Levels.CubeColors(color.scale(0.8), color.scale(0.9), color.scale(0.6), color), posX, posX + w, posY, posY + h, posZ, posZ - l, true, true, true);
+                    addCube(new Levels.CubeColors(color.scale(0.8), color.scale(0.9), color.scale(0.6), color), posX, posX + w, posY, posY + h, posZ, posZ - l, true, true, true, true, true);
                 }
             }
 

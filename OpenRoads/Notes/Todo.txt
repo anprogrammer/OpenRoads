@@ -1,10 +1,9 @@
-﻿Fix missing sides of "cubes"
-Make sure frame-rate is not locked
-Fix crackling on Node version of music
-Provide way to reset orientation
+﻿Provide way to reset orientation
 Program Icon
-
 Unlock FPS in drawFrame
+
+
+Fix crackling on Node version of music
 Add instructions screen
 Include server-side logging for fun stats
 
