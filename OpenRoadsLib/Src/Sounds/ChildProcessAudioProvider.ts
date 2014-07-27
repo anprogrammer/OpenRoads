@@ -13,7 +13,17 @@
         }
 
         play(): void {
-            this.worker.send(new PlayPlayableCommand(this.id));
+            try {
+                this.worker.send(new PlayPlayableCommand(this.id));
+            } catch (ex) {
+                console.log('Audio exception on play');
+                console.log(ex);
+            }
+        }
+    }
+
+    class ChildProcessDummyPlayable implements Playable {
+        play(): void {
         }
     }
 
@@ -29,17 +39,33 @@
             var id = ChildProcessAudioProvider.pId;
             ChildProcessAudioProvider.pId++;
 
-            var playable = new ChildProcessPlayable(id, this.worker);
-            this.worker.send(new CreatePlayableCommand(id, buffer));
-            return playable;
+            try {
+                var playable = new ChildProcessPlayable(id, this.worker);
+                this.worker.send(new CreatePlayableCommand(id, buffer));
+                return playable;
+            } catch (ex) {
+                console.log('Audio exception on  createPlayable');
+                console.log(ex);
+                return new ChildProcessDummyPlayable();
+            }
         }
 
         playSong(n: number): void {
-            this.worker.send(new PlaySongCommand(n));
+            try {
+                this.worker.send(new PlaySongCommand(n));
+            } catch (ex) {
+                console.log('Audio exception on playSong');
+                console.log(n);
+            }
         }
 
         setGain(gain: number): void {
-            this.worker.send(new SetGainCommand(gain));
+            try {
+                this.worker.send(new SetGainCommand(gain));
+            } catch (ex) {
+                console.log('Audio exception on setGain');
+                console.log(ex);
+            }
         }
     }
 }
