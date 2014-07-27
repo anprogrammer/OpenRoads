@@ -29,9 +29,7 @@
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getUp(), () => this.updateMenu(-1)));
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getDown(), () => this.updateMenu(1)));
             this.watchers.push(new Controls.ConditionWatcher(() => controls.getEnter(), () => this.enterMenu()));
-            if (managers.VR !== null) {
-                this.watchers.push(new Controls.ConditionWatcher(() => controls.getExit(), () => managers.VR.exit()));
-            }
+            this.watchers.push(new Controls.ConditionWatcher(() => controls.getExit(), () => this.exit()));
             //TODO: Way to exit NodeJS app
 
             this.myManagers.Audio.playSong(1);
@@ -42,6 +40,12 @@
 
         private updateMenu(dir: number) {
             this.menuPos = Math.max(0, Math.min(2, this.menuPos + dir));
+        }
+
+        private exit(): void {
+            if (this.myManagers.VR !== null && this.menuAlpha >= 1.0) {
+                this.myManagers.VR.exit()
+            }
         }
 
         private enterMenu() {

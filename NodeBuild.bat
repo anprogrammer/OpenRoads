@@ -81,6 +81,7 @@ mkdir SkyRoadsVR
 move Node SkyRoadsVR
 copy "Release Classic\ExeRunner.exe" "SkyRoadsVR\SkyRoads VR.exe"
 copy "Release XMas\ExeRunner.exe" "SkyRoadsVR\Skyroads XMas VR.exe"
+del skyroads_vr.zip
 7z.exe a -tzip skyroads_vr.zip SkyRoadsVR
 copy skyroads_vr.zip Website\skyroads_vr.zip
 
