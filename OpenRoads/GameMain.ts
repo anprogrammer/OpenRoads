@@ -41,6 +41,8 @@ function runGame() {
     managers.Textures = new Managers.TextureManager(managers);
     managers.Canvas = new Drawing.HTMLCanvasProvider();
     managers.VR = null;
+    managers.SnapshotProvider = new Game.FixedRateSnapshotProvider();
+
     //managers.Graphics = new Shaders.VRShaderProvider();
 
     manager.loadMultiple(["Shaders/basic_2d.fs", "Shaders/basic_2d.vs", 'Shaders/title_2d.fs', 'Shaders/title_2d.vs', 'Shaders/color_3d.vs', 'Shaders/color_3d.fs',

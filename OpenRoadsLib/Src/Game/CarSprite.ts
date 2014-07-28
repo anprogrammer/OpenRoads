@@ -20,14 +20,20 @@
             this.finishedDeath = false;
         }
 
-        public update(snap: GameSnapshot, level: Levels.Level): void {
+        public updateAnimation(snap: GameSnapshot, level: Levels.Level): void {
+            this.frame++;
+        }
+
+        public updatePosition(snap: GameSnapshot, level: Levels.Level): void {
+            var frame = Math.max(0, this.frame - 1);
+
             this.sprite.Position.x = snap.Position.x - 95 - this.sprite.Size.x / 2;
             this.sprite.Position.y = 102 - (snap.Position.y - 80) - this.sprite.Texture.Width;
             this.sprite.Position.z = -(snap.Position.z) * 46.0 + 1.0;
 
             var minX = 95, maxX = 417;
             var xp = (snap.Position.x - minX) / (maxX - minX);
-            var idx = 14 + Math.floor(xp * 7) * 9 + this.frame % 3;
+            var idx = 14 + Math.floor(xp * 7) * 9 + frame % 3;
 
             var gravityAccel = level.getGravityAcceleration();
             if (snap.Velocity.y > -gravityAccel * 4) {
@@ -40,10 +46,11 @@
                 if (!this.playedDeath) {
                     this.playedDeath = true;
                     this.frame = 0;
+                    frame = 0;
                 }
 
                 var deathFNum = 14;
-                idx = Math.min(deathFNum, Math.floor(this.frame / 2.0));
+                idx = Math.min(deathFNum, Math.floor(frame / 2.0));
                 if (idx === deathFNum) {
                     this.finishedDeath = true;
                 }
@@ -51,8 +58,6 @@
 
             this.sprite.ULow.y = idx * 30 / this.sprite.Texture.Height;
             this.sprite.UHigh.y = (idx + 1) * 30 / this.sprite.Texture.Height;
-
-            this.frame++;
         }
 
         public draw(view: TSM.mat4, cam: Engine.CameraState): void {

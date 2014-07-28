@@ -55,9 +55,9 @@
             function runPass(eyeNum: number) {
                 var base = me.managers.VR.getHeadCameraState(eyeNum);
                 VRState2DDrawer.screenMesh.ViewMatrix.setIdentity();
+                VRState2DDrawer.screenMesh.ViewMatrix.translate(base.EyeOffset);
                 VRState2DDrawer.screenMesh.ViewMatrix.multiply(base.HeadOrientation.inverse().toMat4());
                 VRState2DDrawer.screenMesh.ViewMatrix.translate(base.HeadPosition.scale(-1));
-                VRState2DDrawer.screenMesh.ViewMatrix.translate(base.EyeOffset);
                
                 VRState2DDrawer.screenMesh.ProjectionMatrix = base.ProjectionMatrix;
                 VRState2DDrawer.screenMesh.draw();

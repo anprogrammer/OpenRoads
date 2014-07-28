@@ -106,8 +106,11 @@
     <TypeScriptCompile Include="Src\Game\Events\ShipBumpedWallEvent.ts" />
     <TypeScriptCompile Include="Src\Game\Events\ShipExplodedEvent.ts" />
     <TypeScriptCompile Include="Src\Game\Events\ShipRefilledEvent.ts" />
+    <TypeScriptCompile Include="Src\Game\FixedRateSnapshotProvider.ts" />
     <TypeScriptCompile Include="Src\Game\FPMath.ts" />
     <TypeScriptCompile Include="Src\Game\GameSnapshot.ts" />
+    <TypeScriptCompile Include="Src\Game\GameSnapshotProvider.ts" />
+    <TypeScriptCompile Include="Src\Game\InterpolatingSnapshotProvider.ts" />
     <TypeScriptCompile Include="Src\Game\KeyboardController.ts" />
     <TypeScriptCompile Include="Src\Game\Ship.ts" />
     <TypeScriptCompile Include="Src\Game\StateManager.ts" />

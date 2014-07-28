@@ -1,18 +1,19 @@
-﻿Provide way to reset orientation
+﻿Add instructions screen
 Program Icon
-Unlock FPS in drawFrame
-Add instructions screen
 Include server-side logging for fun stats
+
+Add a settings screen:
+-Uses old control screen faded out as background
+-Sound Volume Slider
+-Music Volume slider
+-World Scale slider
+-Selection between SnapshotProvider's
+-Option for in-process audio (may cause lag)
+-Background scale slider
 
 Off a pixel on ship
 Monitor selection or SDK improvements
 Replace video with actual video
-
-
-Fix music performance in Firefox!
- --Lots of room in OPL.ts:processOsc
- ---Get rid of inline arrays (kslm, freqStart, freqSteps, )
- ---Precalculate more things.  Sin waves, step counts, vibrato, tremolo
 
 GO LIVE VERSION!
 

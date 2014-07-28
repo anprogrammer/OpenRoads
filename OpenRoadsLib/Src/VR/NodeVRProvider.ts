@@ -24,18 +24,7 @@
         }
 
         public getHeadCameraState(eyeNum: number): Engine.CameraState {
-            var headPosition: TSM.vec3 = new TSM.vec3();
-            var vs = this.getJoystickValues();
-            //var offset = new TSM.vec3([-vs[0], -vs[2], -vs[1]]).scale(0.5);
-            //headPosition.add(offset);
-
-            var ry = TSM.quat.fromAxis(new TSM.vec3([0.0, 1.0, 0.0]), vs[4]);
-            var rx = TSM.quat.fromAxis(new TSM.vec3([1.0, 0.0, 0.0]), vs[3]);
-            var rz = new TSM.quat().setIdentity();
-            var rotation = rx.multiply(ry).multiply(rz);
-            rotation.setIdentity();
-
-            return new Engine.CameraState(this.getHeadPosition(eyeNum).add(headPosition), this.getHeadOrientation(eyeNum).multiply(rotation), this.getEyeViewAdjust(eyeNum), this.getEyeProjectionMatrix(eyeNum));
+            return new Engine.CameraState(this.getHeadPosition(eyeNum), this.getHeadOrientation(eyeNum), this.getEyeViewAdjust(eyeNum), this.getEyeProjectionMatrix(eyeNum));
         }
 
         public getEyeViewport(eyeNum: number): TSM.vec4 {
@@ -63,7 +52,6 @@
         }
 
         private getEyeViewAdjust(n: number): TSM.vec3 {
-            var upIdx = 12, rightIdx = 13, downIdx = 14, leftIdx = 15;
             return new TSM.vec3(this.glfw.getEyeViewAdjust(n));
         }
 
@@ -73,10 +61,15 @@
 
         private getHeadPosition(n: number): TSM.vec3 {
             return new TSM.vec3(this.glfw.getHeadPosition(n));
+            //var stick = this.getJoystickValues();
+            //return new TSM.vec3([stick[4] * 6, stick[2] * 6, stick[3] * 6]);
         }
 
         private getHeadOrientation(n: number): TSM.quat {
             return new TSM.quat(this.glfw.getHeadOrientation(n));
+            //var stick = this.getJoystickValues();
+            //return TSM.quat.fromAxis(new TSM.vec3([0.0, 1.0, 0.0]), stick[0] * 0.5)
+            //    .multiply(TSM.quat.fromAxis(new TSM.vec3([0.0, 0.0, 1.0]), stick[1] * 1.5));
         }
 
         private getJoystickValues(): number[]{

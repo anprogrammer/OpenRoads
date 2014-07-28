@@ -12,7 +12,6 @@
         private timeBeforeFade: number = 1.0;
         private resourcesLoaded: boolean = false;
         private gl: WebGLRenderingContext;
-        private snapshot: Game.GameSnapshot;
         private eventBus: Events.EventBus;
 
 
@@ -47,7 +46,8 @@
             this.eventBus.register(new Game.ShipEvents.ShipRefilledEvent(), (evt) => sounds[4].play());
 
             this.game = new Game.StateManager(managers, level, this.controller);
-            this.snapshot = this.game.runFrame(this.eventBus);
+            managers.SnapshotProvider.reset();
+            managers.SnapshotProvider.pushSnapshot(this.game.runFrame(this.eventBus));
 
             var meshBuilder = new Levels.MeshBuilder();
             var meshVerts = meshBuilder.buildMesh(level, managers.VR !== null, managers.Textures.getImage(backgroundName));
@@ -72,7 +72,7 @@
             this.frame++;
             var level = this.game.getLevel();
             var snap = this.game.runFrame(this.eventBus);
-            this.snapshot = snap;
+            this.myManagers.SnapshotProvider.pushSnapshot(snap);
             if ((snap.Position.z >= level.length() && this.game.didWin) || this.myManagers.Controls.getExit()) {
                 this.myManagers.Frames.popState();
                 this.myManagers.Frames.addState(new Fade3D(this.myManagers, 1.0, this, false));
@@ -81,8 +81,9 @@
                     this.myManagers.Settings.incrementWonLevelCount(this.levelNum);
                 }
             }
+
+            this.carSprite.updateAnimation(snap, level);
             this.dash.update(snap, level);
-            this.carSprite.update(snap, level);
 
             if (this.carSprite.hasAnimationFinished() || snap.Position.y < -10 || (snap.Position.z >= level.length() && !this.game.didWin)) {
                 this.timeBeforeFade = 0;
@@ -104,6 +105,11 @@
                 this.loadResources(gl);
                 this.resourcesLoaded = true;
             }
+
+            var snap = this.myManagers.SnapshotProvider.getSnapshot();
+            var level = this.game.getLevel();
+            this.carSprite.updatePosition(snap, level);
+
             var isVR = this.myManagers.VR !== null;
             var scaleXY = 6.5 / 46.0; //Assume each tile is about as wide as an a-wing.  Don't judge me.
             var scaleZ = 26.0 / 46.0;
@@ -114,9 +120,9 @@
             var scaleVec = new TSM.vec3([scaleXY, scaleXY, scaleZ]);
             this.background.ModelMatrix.setIdentity();
             if (this.myManagers.VR !== null) {
-                this.background.Size.x = 1280.0;
-                this.background.Size.y = 800;
-                this.background.ModelMatrix.translate(new TSM.vec3([-450, 200.0, -1200.0]));
+                this.background.Size.x = 1920.0;
+                this.background.Size.y = 1200.0;
+                this.background.ModelMatrix.translate(new TSM.vec3([-450, 800.0 * 200.0 / this.background.Size.y, 1280.0 * -1200.0 / this.background.Size.x]));
             }
 
             cam.HeadOrientation.inverse();
@@ -129,12 +135,12 @@
             gl.clear(gl.DEPTH_BUFFER_BIT);
 
             var headPos = cam.HeadPosition.copy();
-            headPos.add(new TSM.vec3([0.0, 130.0, -(this.snapshot.Position.z - (isVR ? 1 : 3)) * 46.0]).multiply(scaleVec));
+            headPos.add(new TSM.vec3([0.0, 130.0, -(snap.Position.z - (isVR ? 1 : 3)) * 46.0]).multiply(scaleVec));
             this.mesh.ViewMatrix.setIdentity();
+            this.mesh.ViewMatrix.translate(cam.EyeOffset);
             this.mesh.ViewMatrix.multiply(cam.HeadOrientation.toMat4());
             this.mesh.ViewMatrix.translate(headPos.scale(-1.0));
             this.mesh.ViewMatrix.scale(scaleVec);
-            this.mesh.ViewMatrix.translate(cam.EyeOffset.divide(scaleVec));
 
             this.mesh.ProjectionMatrix = cam.ProjectionMatrix;
             this.mesh.draw();

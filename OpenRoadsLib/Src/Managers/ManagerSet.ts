@@ -11,6 +11,7 @@
         public Canvas: Drawing.CanvasProvider;
         public Audio: Sounds.AudioProvider;
         public VR: VR.VRProvider;
+        public SnapshotProvider: Game.GameSnapshotProvider;
 
         constructor(streams: StreamManager, shaders: ShaderManager) {
             this.Streams = streams;

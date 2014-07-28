@@ -29,6 +29,7 @@ module Configurations {
         managers.Canvas = new Drawing.NodeCanvasProvider();
         managers.Audio = new Sounds.ChildProcessAudioProvider(audioProc);
         managers.Graphics = new Shaders.VRShaderProvider();
+        managers.SnapshotProvider = new Game.InterpolatingSnapshoptProvider();
 
         manager.loadMultiple(["Shaders/basic_2d.fs", "Shaders/basic_2d.vs", 'Shaders/title_2d.fs', 'Shaders/title_2d.vs', 'Shaders/color_3d.vs', 'Shaders/color_3d.fs',
             'Shaders/texture_p3d.vs', 'Shaders/texture_p3d.fs', 'Shaders/sprite_3d.vs', 'Shaders/sprite_3d.fs',
