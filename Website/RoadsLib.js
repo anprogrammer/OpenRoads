@@ -431,6 +431,7 @@ var Configurations;
         managers.Canvas = new Drawing.NodeCanvasProvider();
         managers.Audio = new Sounds.ChildProcessAudioProvider(audioProc);
         managers.Graphics = new Shaders.VRShaderProvider();
+        managers.SnapshotProvider = new Game.InterpolatingSnapshoptProvider();
 
         manager.loadMultiple([
             "Shaders/basic_2d.fs", "Shaders/basic_2d.vs", 'Shaders/title_2d.fs', 'Shaders/title_2d.vs', 'Shaders/color_3d.vs', 'Shaders/color_3d.fs',
@@ -590,6 +591,12 @@ var Controls;
                 return src.getExit();
             });
         };
+
+        CombinedControlSource.prototype.getResetOrientation = function () {
+            return this.foldVal(function (src) {
+                return src.getResetOrientation();
+            });
+        };
         return CombinedControlSource;
     })();
     Controls.CombinedControlSource = CombinedControlSource;
@@ -685,6 +692,10 @@ var Controls;
         GLFWJoystick.prototype.getExitButtons = function () {
             return [1, 6];
         };
+
+        GLFWJoystick.prototype.getResetOrientationButtons = function () {
+            return [2];
+        };
         return GLFWJoystick;
     })();
     Controls.GLFWJoystick = GLFWJoystick;
@@ -773,6 +784,10 @@ var Controls;
         JoystickControlSource.prototype.getExit = function () {
             return this.getValuesFromChannelsAndButtons([], [], this.joystick.getExitButtons()) > 0.5;
         };
+
+        JoystickControlSource.prototype.getResetOrientation = function () {
+            return this.getValuesFromChannelsAndButtons([], [], this.joystick.getResetOrientationButtons()) > 0.5;
+        };
         return JoystickControlSource;
     })();
     Controls.JoystickControlSource = JoystickControlSource;
@@ -831,6 +846,10 @@ var Controls;
 
         KeyboardControlsource.prototype.getExit = function () {
             return this.kbd.isDown(27);
+        };
+
+        KeyboardControlsource.prototype.getResetOrientation = function () {
+            return this.kbd.isDown(82);
         };
         return KeyboardControlsource;
     })();
@@ -894,6 +913,10 @@ var Controls;
 
         NavigatorJoystick.prototype.getExitButtons = function () {
             return [1, 8];
+        };
+
+        NavigatorJoystick.prototype.getResetOrientationButtons = function () {
+            return [2];
         };
         return NavigatorJoystick;
     })();
@@ -1513,6 +1536,10 @@ var Engine;
             var physStep = time.getPhysicsStep();
             this.physicsTime += time.getFrameTime();
 
+            if (this.managers.Controls.getResetOrientation() && this.managers.VR !== null) {
+                this.managers.VR.resetOrientation();
+            }
+
             if (this.frame % 30 === 0) {
                 this.managers.Audio.setGain(this.managers.Settings.getMuted() ? 0.0 : this.managers.Settings.getVolume());
             }
@@ -1717,9 +1744,9 @@ var Engine;
             function runPass(eyeNum) {
                 var base = me.managers.VR.getHeadCameraState(eyeNum);
                 VRState2DDrawer.screenMesh.ViewMatrix.setIdentity();
+                VRState2DDrawer.screenMesh.ViewMatrix.translate(base.EyeOffset);
                 VRState2DDrawer.screenMesh.ViewMatrix.multiply(base.HeadOrientation.inverse().toMat4());
                 VRState2DDrawer.screenMesh.ViewMatrix.translate(base.HeadPosition.scale(-1));
-                VRState2DDrawer.screenMesh.ViewMatrix.translate(base.EyeOffset);
 
                 VRState2DDrawer.screenMesh.ProjectionMatrix = base.ProjectionMatrix;
                 VRState2DDrawer.screenMesh.draw();
@@ -1944,14 +1971,20 @@ var Game;
             this.playedDeath = false;
             this.finishedDeath = false;
         }
-        CarSprite.prototype.update = function (snap, level) {
+        CarSprite.prototype.updateAnimation = function (snap, level) {
+            this.frame++;
+        };
+
+        CarSprite.prototype.updatePosition = function (snap, level) {
+            var frame = Math.max(0, this.frame - 1);
+
             this.sprite.Position.x = snap.Position.x - 95 - this.sprite.Size.x / 2;
             this.sprite.Position.y = 102 - (snap.Position.y - 80) - this.sprite.Texture.Width;
             this.sprite.Position.z = -(snap.Position.z) * 46.0 + 1.0;
 
             var minX = 95, maxX = 417;
             var xp = (snap.Position.x - minX) / (maxX - minX);
-            var idx = 14 + Math.floor(xp * 7) * 9 + this.frame % 3;
+            var idx = 14 + Math.floor(xp * 7) * 9 + frame % 3;
 
             var gravityAccel = level.getGravityAcceleration();
             if (snap.Velocity.y > -gravityAccel * 4) {
@@ -1964,10 +1997,11 @@ var Game;
                 if (!this.playedDeath) {
                     this.playedDeath = true;
                     this.frame = 0;
+                    frame = 0;
                 }
 
                 var deathFNum = 14;
-                idx = Math.min(deathFNum, Math.floor(this.frame / 2.0));
+                idx = Math.min(deathFNum, Math.floor(frame / 2.0));
                 if (idx === deathFNum) {
                     this.finishedDeath = true;
                 }
@@ -1975,8 +2009,6 @@ var Game;
 
             this.sprite.ULow.y = idx * 30 / this.sprite.Texture.Height;
             this.sprite.UHigh.y = (idx + 1) * 30 / this.sprite.Texture.Height;
-
-            this.frame++;
         };
 
         CarSprite.prototype.draw = function (view, cam) {
@@ -2206,6 +2238,27 @@ var Game;
 })(Game || (Game = {}));
 var Game;
 (function (Game) {
+    var FixedRateSnapshotProvider = (function () {
+        function FixedRateSnapshotProvider() {
+            this.snapshot = null;
+        }
+        FixedRateSnapshotProvider.prototype.reset = function () {
+            this.snapshot = null;
+        };
+
+        FixedRateSnapshotProvider.prototype.pushSnapshot = function (s) {
+            this.snapshot = s;
+        };
+
+        FixedRateSnapshotProvider.prototype.getSnapshot = function () {
+            return this.snapshot;
+        };
+        return FixedRateSnapshotProvider;
+    })();
+    Game.FixedRateSnapshotProvider = FixedRateSnapshotProvider;
+})(Game || (Game = {}));
+var Game;
+(function (Game) {
     var FPMath = (function () {
         function FPMath() {
         }
@@ -2228,6 +2281,54 @@ var Game;
         return GameSnapshot;
     })();
     Game.GameSnapshot = GameSnapshot;
+})(Game || (Game = {}));
+var Game;
+(function (Game) {
+    var InterpolatingSnapshoptProvider = (function () {
+        function InterpolatingSnapshoptProvider() {
+            this.first = null;
+            this.second = null;
+            this.tempState = new Game.GameSnapshot();
+        }
+        InterpolatingSnapshoptProvider.prototype.reset = function () {
+            this.first = null;
+            this.second = null;
+            this.tempState.Position = new TSM.vec3();
+            this.tempState.Velocity = new TSM.vec3();
+        };
+
+        InterpolatingSnapshoptProvider.prototype.pushSnapshot = function (s) {
+            this.second = this.first;
+            this.secondTime = this.firstTime;
+
+            this.first = s;
+            this.firstTime = Date.now();
+        };
+
+        InterpolatingSnapshoptProvider.prototype.getSnapshot = function () {
+            if (this.second === null) {
+                return this.first;
+            }
+
+            var timeSince = Date.now() - this.firstTime;
+            var percent = Math.max(0, Math.min(1.0, timeSince / (this.firstTime - this.secondTime)));
+
+            var first = this.first;
+            var second = this.second;
+            var temp = this.tempState;
+            temp.CraftState = first.CraftState;
+            temp.FuelPercent = first.FuelPercent;
+            temp.JumpOMasterInUse = first.JumpOMasterInUse;
+            temp.JumpOMasterVelocityDelta = first.JumpOMasterVelocityDelta;
+            temp.OxygenPercent = first.OxygenPercent;
+            temp.Position = first.Position.copy().subtract(second.Position).scale(percent).add(second.Position);
+            temp.Velocity = first.Velocity.copy().subtract(second.Velocity).scale(percent).add(second.Velocity);
+
+            return temp;
+        };
+        return InterpolatingSnapshoptProvider;
+    })();
+    Game.InterpolatingSnapshoptProvider = InterpolatingSnapshoptProvider;
 })(Game || (Game = {}));
 var Game;
 (function (Game) {
@@ -3573,7 +3674,9 @@ var Levels;
                 verts.push(new Vertices.Vertex3DC(p1, c));
             };
 
-            var addCube = function (colors, xLeft, xRight, yBottom, yTop, zStart, zEnd, drawFront, drawLeft, drawRight) {
+            var addCube = function (colors, xLeft, xRight, yBottom, yTop, zStart, zEnd, drawFront, drawLeft, drawRight, drawBack, drawBottom) {
+                if (typeof drawBack === "undefined") { drawBack = false; }
+                if (typeof drawBottom === "undefined") { drawBottom = false; }
                 var ltf = new TSM.vec3([xLeft, yTop, zStart]);
                 var rtf = new TSM.vec3([xRight, yTop, zStart]);
                 var lbf = new TSM.vec3([xLeft, yBottom, zStart]);
@@ -3594,6 +3697,11 @@ var Levels;
                 if (drawRight) {
                     addQuad(colors.Right, rtf, rbf, rbb, rtb);
                 }
+
+                if (drawBottom) {
+                    addQuad(colors.Top, lbf, rbf, rbb, lbb);
+                }
+
                 addQuad(colors.Top, ltf, rtf, rtb, ltb);
             };
 
@@ -3705,7 +3813,7 @@ var Levels;
                     var idx = (Math.floor(xp * cvs.width) + Math.floor(yp * cvs.height) * cvs.width) * 4;
                     var color = new Data.Color(colorData[idx + 0], colorData[idx + 1], colorData[idx + 2]);
 
-                    addCube(new Levels.CubeColors(color.scale(0.8), color.scale(0.9), color.scale(0.6), color), posX, posX + w, posY, posY + h, posZ, posZ - l, true, true, true);
+                    addCube(new Levels.CubeColors(color.scale(0.8), color.scale(0.9), color.scale(0.6), color), posX, posX + w, posY, posY + h, posZ, posZ - l, true, true, true, true, true);
                 }
             }
 
@@ -3732,7 +3840,7 @@ var Managers;
         function SettingsManager(store) {
             this.PlayMusic = true;
             this.Muted = true;
-            this.volume = 0.25;
+            this.volume = 0.2;
             this.store = store;
             this.Muted = JSON.parse(this.store.getValue('muted') || 'false');
         }
@@ -4369,7 +4477,7 @@ var Music;
                     this.synthTime -= Music.OPLConstants.SampleTime;
                 }
 
-                buffer[i] = synthOut;
+                buffer[i] = synthOut / 2.0;
             }
 
             return true;
@@ -5480,7 +5588,7 @@ var Sounds;
                 }
 
                 for (var j = 0; j < len; j++) {
-                    out[j] += buff[j] * this.gain;
+                    out[j] += Math.max(-1.0, Math.min(1.0, buff[j] * this.gain));
                 }
             }
 
@@ -5672,9 +5780,22 @@ var Sounds;
             this.worker = worker;
         }
         ChildProcessPlayable.prototype.play = function () {
-            this.worker.send(new Sounds.PlayPlayableCommand(this.id));
+            try  {
+                this.worker.send(new Sounds.PlayPlayableCommand(this.id));
+            } catch (ex) {
+                console.log('Audio exception on play');
+                console.log(ex);
+            }
         };
         return ChildProcessPlayable;
+    })();
+
+    var ChildProcessDummyPlayable = (function () {
+        function ChildProcessDummyPlayable() {
+        }
+        ChildProcessDummyPlayable.prototype.play = function () {
+        };
+        return ChildProcessDummyPlayable;
     })();
 
     var ChildProcessAudioProvider = (function () {
@@ -5685,17 +5806,33 @@ var Sounds;
             var id = ChildProcessAudioProvider.pId;
             ChildProcessAudioProvider.pId++;
 
-            var playable = new ChildProcessPlayable(id, this.worker);
-            this.worker.send(new Sounds.CreatePlayableCommand(id, buffer));
-            return playable;
+            try  {
+                var playable = new ChildProcessPlayable(id, this.worker);
+                this.worker.send(new Sounds.CreatePlayableCommand(id, buffer));
+                return playable;
+            } catch (ex) {
+                console.log('Audio exception on  createPlayable');
+                console.log(ex);
+                return new ChildProcessDummyPlayable();
+            }
         };
 
         ChildProcessAudioProvider.prototype.playSong = function (n) {
-            this.worker.send(new Sounds.PlaySongCommand(n));
+            try  {
+                this.worker.send(new Sounds.PlaySongCommand(n));
+            } catch (ex) {
+                console.log('Audio exception on playSong');
+                console.log(n);
+            }
         };
 
         ChildProcessAudioProvider.prototype.setGain = function (gain) {
-            this.worker.send(new Sounds.SetGainCommand(gain));
+            try  {
+                this.worker.send(new Sounds.SetGainCommand(gain));
+            } catch (ex) {
+                console.log('Audio exception on setGain');
+                console.log(ex);
+            }
         };
         ChildProcessAudioProvider.pId = 0;
         return ChildProcessAudioProvider;
@@ -5941,7 +6078,8 @@ var States;
             });
 
             this.game = new Game.StateManager(managers, level, this.controller);
-            this.snapshot = this.game.runFrame(this.eventBus);
+            managers.SnapshotProvider.reset();
+            managers.SnapshotProvider.pushSnapshot(this.game.runFrame(this.eventBus));
 
             var meshBuilder = new Levels.MeshBuilder();
             var meshVerts = meshBuilder.buildMesh(level, managers.VR !== null, managers.Textures.getImage(backgroundName));
@@ -5966,7 +6104,7 @@ var States;
             this.frame++;
             var level = this.game.getLevel();
             var snap = this.game.runFrame(this.eventBus);
-            this.snapshot = snap;
+            this.myManagers.SnapshotProvider.pushSnapshot(snap);
             if ((snap.Position.z >= level.length() && this.game.didWin) || this.myManagers.Controls.getExit()) {
                 this.myManagers.Frames.popState();
                 this.myManagers.Frames.addState(new States.Fade3D(this.myManagers, 1.0, this, false));
@@ -5975,8 +6113,9 @@ var States;
                     this.myManagers.Settings.incrementWonLevelCount(this.levelNum);
                 }
             }
+
+            this.carSprite.updateAnimation(snap, level);
             this.dash.update(snap, level);
-            this.carSprite.update(snap, level);
 
             if (this.carSprite.hasAnimationFinished() || snap.Position.y < -10 || (snap.Position.z >= level.length() && !this.game.didWin)) {
                 this.timeBeforeFade = 0;
@@ -5998,6 +6137,11 @@ var States;
                 this.loadResources(gl);
                 this.resourcesLoaded = true;
             }
+
+            var snap = this.myManagers.SnapshotProvider.getSnapshot();
+            var level = this.game.getLevel();
+            this.carSprite.updatePosition(snap, level);
+
             var isVR = this.myManagers.VR !== null;
             var scaleXY = 6.5 / 46.0;
             var scaleZ = 26.0 / 46.0;
@@ -6008,9 +6152,9 @@ var States;
             var scaleVec = new TSM.vec3([scaleXY, scaleXY, scaleZ]);
             this.background.ModelMatrix.setIdentity();
             if (this.myManagers.VR !== null) {
-                this.background.Size.x = 1280.0;
-                this.background.Size.y = 800;
-                this.background.ModelMatrix.translate(new TSM.vec3([-450, 200.0, -1200.0]));
+                this.background.Size.x = 1920.0;
+                this.background.Size.y = 1200.0;
+                this.background.ModelMatrix.translate(new TSM.vec3([-450, 800.0 * 200.0 / this.background.Size.y, 1280.0 * -1200.0 / this.background.Size.x]));
             }
 
             cam.HeadOrientation.inverse();
@@ -6023,12 +6167,12 @@ var States;
             gl.clear(gl.DEPTH_BUFFER_BIT);
 
             var headPos = cam.HeadPosition.copy();
-            headPos.add(new TSM.vec3([0.0, 130.0, -(this.snapshot.Position.z - (isVR ? 1 : 3)) * 46.0]).multiply(scaleVec));
+            headPos.add(new TSM.vec3([0.0, 130.0, -(snap.Position.z - (isVR ? 1 : 3)) * 46.0]).multiply(scaleVec));
             this.mesh.ViewMatrix.setIdentity();
+            this.mesh.ViewMatrix.translate(cam.EyeOffset);
             this.mesh.ViewMatrix.multiply(cam.HeadOrientation.toMat4());
             this.mesh.ViewMatrix.translate(headPos.scale(-1.0));
             this.mesh.ViewMatrix.scale(scaleVec);
-            this.mesh.ViewMatrix.translate(cam.EyeOffset.divide(scaleVec));
 
             this.mesh.ProjectionMatrix = cam.ProjectionMatrix;
             this.mesh.draw();
@@ -6178,7 +6322,7 @@ var States;
             this.myManagers.Frames.addState(gameState);
             this.myManagers.Frames.addState(new States.Fade3D(this.myManagers, 0.0, gameState, true));
             this.myManagers.Frames.addState(new States.Fade2D(this.myManagers, 1.0, this, false));
-            this.myManagers.Audio.playSong(Math.floor(Math.random() * 11) + 2);
+            this.myManagers.Audio.playSong(Math.round(Math.random() * 11) + 2);
         };
 
         GoMenu.prototype.updatePhysics = function (frameManager, frameTimeInfo) {
@@ -6468,13 +6612,11 @@ var States;
             }, function () {
                 return _this.enterMenu();
             }));
-            if (managers.VR !== null) {
-                this.watchers.push(new Controls.ConditionWatcher(function () {
-                    return controls.getExit();
-                }, function () {
-                    return managers.VR.exit();
-                }));
-            }
+            this.watchers.push(new Controls.ConditionWatcher(function () {
+                return controls.getExit();
+            }, function () {
+                return _this.exit();
+            }));
 
             //TODO: Way to exit NodeJS app
             this.myManagers.Audio.playSong(1);
@@ -6485,6 +6627,12 @@ var States;
 
         MainMenu.prototype.updateMenu = function (dir) {
             this.menuPos = Math.max(0, Math.min(2, this.menuPos + dir));
+        };
+
+        MainMenu.prototype.exit = function () {
+            if (this.myManagers.VR !== null && this.menuAlpha >= 1.0) {
+                this.myManagers.VR.exit();
+            }
         };
 
         MainMenu.prototype.enterMenu = function () {
@@ -7065,18 +7213,7 @@ var VR;
         };
 
         NodeVRProvider.prototype.getHeadCameraState = function (eyeNum) {
-            var headPosition = new TSM.vec3();
-            var vs = this.getJoystickValues();
-
-            //var offset = new TSM.vec3([-vs[0], -vs[2], -vs[1]]).scale(0.5);
-            //headPosition.add(offset);
-            var ry = TSM.quat.fromAxis(new TSM.vec3([0.0, 1.0, 0.0]), vs[4]);
-            var rx = TSM.quat.fromAxis(new TSM.vec3([1.0, 0.0, 0.0]), vs[3]);
-            var rz = new TSM.quat().setIdentity();
-            var rotation = rx.multiply(ry).multiply(rz);
-            rotation.setIdentity();
-
-            return new Engine.CameraState(this.getHeadPosition(eyeNum).add(headPosition), this.getHeadOrientation(eyeNum).multiply(rotation), this.getEyeViewAdjust(eyeNum), this.getEyeProjectionMatrix(eyeNum));
+            return new Engine.CameraState(this.getHeadPosition(eyeNum), this.getHeadOrientation(eyeNum), this.getEyeViewAdjust(eyeNum), this.getEyeProjectionMatrix(eyeNum));
         };
 
         NodeVRProvider.prototype.getEyeViewport = function (eyeNum) {
@@ -7099,8 +7236,11 @@ var VR;
             process.exit();
         };
 
+        NodeVRProvider.prototype.resetOrientation = function () {
+            this.glfw.resetVROrientation();
+        };
+
         NodeVRProvider.prototype.getEyeViewAdjust = function (n) {
-            var upIdx = 12, rightIdx = 13, downIdx = 14, leftIdx = 15;
             return new TSM.vec3(this.glfw.getEyeViewAdjust(n));
         };
 
@@ -7110,10 +7250,15 @@ var VR;
 
         NodeVRProvider.prototype.getHeadPosition = function (n) {
             return new TSM.vec3(this.glfw.getHeadPosition(n));
+            //var stick = this.getJoystickValues();
+            //return new TSM.vec3([stick[4] * 6, stick[2] * 6, stick[3] * 6]);
         };
 
         NodeVRProvider.prototype.getHeadOrientation = function (n) {
             return new TSM.quat(this.glfw.getHeadOrientation(n));
+            //var stick = this.getJoystickValues();
+            //return TSM.quat.fromAxis(new TSM.vec3([0.0, 1.0, 0.0]), stick[0] * 0.5)
+            //    .multiply(TSM.quat.fromAxis(new TSM.vec3([0.0, 0.0, 1.0]), stick[1] * 1.5));
         };
 
         NodeVRProvider.prototype.getJoystickValues = function () {
