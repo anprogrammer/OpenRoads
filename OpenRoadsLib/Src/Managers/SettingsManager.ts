@@ -1,31 +1,69 @@
 ﻿module Managers {
+    export class Setting<T> {
+        private name: string;
+        private value: T;
+        private store: Stores.KVStore;
+        constructor(store: Stores.KVStore, name: string, defaultValue: T) {
+            this.store = store;
+            this.name = name;
+            this.value = JSON.parse(store.getValue(name) || JSON.stringify(defaultValue));
+        }
+
+        public getValue(): T {
+            return this.value;
+        }
+
+        public setValue(val: T) {
+            this.value = val;
+            this.store.setValue(this.name, JSON.stringify(val));
+        }
+    }
+
+    export class NumberSetting extends Setting<number> {
+        constructor(store: Stores.KVStore, name: string, defaultValue: number) {
+            super(store, name, defaultValue);
+        }
+    }
+    
+    export class BooleanSetting extends Setting<boolean> {
+        constructor(store: Stores.KVStore, name: string, defaultValue: boolean) {
+            super(store, name, defaultValue);
+        }
+    }
+    
+
     export class SettingsManager {
-        private effectVolume: number = 0.5;
-        private musicVolume: number = 0.5;
+        public EffectVolume: NumberSetting;
+        public MusicVolume: NumberSetting;
+        public MenuDistance: NumberSetting;
+        public MenuSize: NumberSetting;
+
+        public WorldScale: NumberSetting;
+        public HudScale: NumberSetting;
+        public EyeHeight: NumberSetting;
+        public BackgroundScale: NumberSetting;
+
+        public FixedHud: BooleanSetting;
+        public FixedBackground: BooleanSetting;
+
         private store: Stores.KVStore;
 
         constructor(store: Stores.KVStore) {
             this.store = store;
-            this.effectVolume = JSON.parse(this.store.getValue('evolume') || '0.5');
-            this.musicVolume = JSON.parse(this.store.getValue('mvolume') || '0.5');
-        }
+            this.EffectVolume = new NumberSetting(store, 'effectVolume', 0.5);
+            this.MusicVolume = new NumberSetting(store, 'musicVolume', 0.5);
+            this.MenuDistance = new NumberSetting(store, 'menuDistance', 12.0);
+            this.MenuSize = new NumberSetting(store, 'menuSize', 5.0);            
 
-        public getEffectVolume(): number {
-            return this.effectVolume;
-        }
+            this.WorldScale = new NumberSetting(store, 'worldScale', 1.0);
+            this.HudScale = new NumberSetting(store, 'hudScale', 0.25);
+            this.EyeHeight = new NumberSetting(store, 'eyeHeight', 130.0);
 
-        public getMusicVolume(): number {
-            return this.musicVolume;
-        }
+            this.BackgroundScale = new NumberSetting(store, 'backgroundScale', 1920.0);
 
-        public setEffectVolume(n: number): void {
-            this.effectVolume = n;
-            this.store.setValue('evolume', JSON.stringify(n));
-        }
+            this.FixedHud = new BooleanSetting(store, 'fixedHud', false);
+            this.FixedBackground = new BooleanSetting(store, 'fixedBackground', false);
 
-        public setMusicVolume(n: number): void {
-            this.musicVolume = n;
-            this.store.setValue('mvolume', JSON.stringify(n));
         }
 
         public wonLevelCount(levelNum: number): number {

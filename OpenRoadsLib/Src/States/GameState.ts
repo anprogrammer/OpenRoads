@@ -106,6 +106,7 @@
                 this.resourcesLoaded = true;
             }
 
+            var settings = this.myManagers.Settings;
             var snap = this.myManagers.SnapshotProvider.getSnapshot();
             var level = this.game.getLevel();
             this.carSprite.updatePosition(snap, level);
@@ -120,8 +121,8 @@
             var scaleVec = new TSM.vec3([scaleXY, scaleXY, scaleZ]);
             this.background.ModelMatrix.setIdentity();
             if (this.myManagers.VR !== null) {
-                this.background.Size.x = 1920.0;
-                this.background.Size.y = 1200.0;
+                this.background.Size.x = settings.BackgroundScale.getValue();
+                this.background.Size.y = this.background.Size.x * 1200.0 / 1920.0;
                 this.background.ModelMatrix.translate(new TSM.vec3([-450, 800.0 * 200.0 / this.background.Size.y, 1280.0 * -1200.0 / this.background.Size.x]));
             }
 
@@ -135,11 +136,14 @@
             gl.clear(gl.DEPTH_BUFFER_BIT);
 
             var headPos = cam.HeadPosition.copy();
-            headPos.add(new TSM.vec3([0.0, 130.0, -(snap.Position.z - (isVR ? 1 : 3)) * 46.0]).multiply(scaleVec));
+
+            var worldScale = settings.WorldScale.getValue();
+
+            headPos.add(new TSM.vec3([0.0, settings.EyeHeight.getValue(), -(snap.Position.z - (isVR ? 1 : 3)) * 46.0]).multiply(scaleVec));
             this.mesh.ViewMatrix.setIdentity();
-            this.mesh.ViewMatrix.translate(cam.EyeOffset);
+            this.mesh.ViewMatrix.translate(cam.EyeOffset.copy().scale(worldScale));
             this.mesh.ViewMatrix.multiply(cam.HeadOrientation.toMat4());
-            this.mesh.ViewMatrix.translate(headPos.scale(-1.0));
+            this.mesh.ViewMatrix.translate(headPos.scale(-1.0).scale(worldScale));
             this.mesh.ViewMatrix.scale(scaleVec);
 
             this.mesh.ProjectionMatrix = cam.ProjectionMatrix;

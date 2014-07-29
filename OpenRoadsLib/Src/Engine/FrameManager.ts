@@ -77,8 +77,8 @@
                 this.managers.VR.resetOrientation();
             }
 
-            var effectsVol = this.managers.Settings.getEffectVolume();
-            var musicVol = this.managers.Settings.getMusicVolume();
+            var effectsVol = this.managers.Settings.EffectVolume.getValue();
+            var musicVol = this.managers.Settings.MusicVolume.getValue();
             if (this.lastEffectsVolume !== effectsVol || this.lastMusicVolume !== musicVol) {
                 this.managers.Audio.setEffectsGain(0.2 * effectsVol);
                 this.managers.Audio.setMusicGain(0.2 * musicVol);

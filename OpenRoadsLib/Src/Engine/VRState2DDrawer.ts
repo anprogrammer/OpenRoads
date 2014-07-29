@@ -17,7 +17,7 @@
             VRState2DDrawer.initialized = true;
 
             var color = new TSM.vec3([1.0, 1.0, 1.0]);
-            var w = 5.0;
+            var w = 1.0;
             var h = w * 200.0 / 320.0;
             var z = 0.0;
 
@@ -50,6 +50,12 @@
 
             helper.startFrame(gl);
             VRState2DDrawer.target.Texture.generateMipmap();
+
+            VRState2DDrawer.screenMesh.ModelMatrix.setIdentity();
+            VRState2DDrawer.screenMesh.ModelMatrix.translate(new TSM.vec3([0.0, 0.0, -this.managers.Settings.MenuDistance.getValue()]));
+
+            var scale = this.managers.Settings.MenuSize.getValue();
+            VRState2DDrawer.screenMesh.ModelMatrix.scale(new TSM.vec3([scale, scale, 1.0]));
 
             var me = this;
             function runPass(eyeNum: number) {

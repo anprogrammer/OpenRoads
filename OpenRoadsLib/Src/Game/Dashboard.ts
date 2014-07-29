@@ -1,5 +1,7 @@
 ﻿module Game {
     export class Dashboard {
+        private managers: Managers.ManagerSet;
+
         private dash: Drawing.Sprite;
         private oxyGauge: Drawing.Sprite[];
         private fuelGauge: Drawing.Sprite[];
@@ -77,10 +79,12 @@
             view.scale(scaleVec);
             view.translate(cam.EyeOffset.copy().divide(scaleVec));
 
+            var settings = this.managers.Settings;
+
             var model = new TSM.mat4().setIdentity();
             model.setIdentity().translate(new TSM.vec3([0.0, -50.0, -25.0]));
             model.rotate(-Math.PI / 9.0, new TSM.vec3([1.0, 0.0, 0.0]));
-            model.scale(new TSM.vec3([0.25, 0.25, 0.25]));
+            model.scale(new TSM.vec3([0.25, 0.25, 0.25]).scale(settings.HudScale.getValue()));
 
             var configAndDrawSprite = (s: Drawing.Sprite) => {
 

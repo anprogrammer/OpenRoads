@@ -1,4 +1,5 @@
-﻿Add instructions screen
+﻿Fix glTexImage2D performance
+Add instructions screen
 Program Icon
 Include server-side logging for fun stats
 

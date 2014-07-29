@@ -3,7 +3,7 @@
         private myManagers: Managers.ManagerSet;
         private menu: Drawing.Sprite[];
         private watchers: Controls.ConditionWatcher[] = [];
-        private settings: UI.NumberSetting[] = [];
+        private settings: UI.SettingUI[] = [];
         private settingsCanvas: HTMLCanvasElement;
         private settingsContext: CanvasRenderingContext2D;
         private settingsTexture: WGL.Texture;
@@ -21,8 +21,20 @@
             this.menu = managers.Textures.getTextures(gl, "SETMENU.LZS").map((tf) => new Drawing.Sprite(gl, managers, tf));
 
             var settings = managers.Settings;
-            this.settings.push(new UI.NumberSetting('Music Volume', 0.0, 2.0, 'Silent', 'Loud', () => settings.getMusicVolume(), (v: number) => settings.setMusicVolume(v)));
-            this.settings.push(new UI.NumberSetting('Effects Volume', 0.0, 2.0, 'Silent', 'Loud', () => settings.getEffectVolume(), (v: number) => settings.setEffectVolume(v)));
+            this.settings.push(new UI.NumberSetting('Music Volume', 0.0, 2.0, settings.MusicVolume));
+            this.settings.push(new UI.NumberSetting('Effects Volume', 0.0, 2.0, settings.EffectVolume));
+
+            if (this.myManagers.VR !== null) {
+                this.settings.push(new UI.NumberSetting('Menu Size', 0.5, 15.0, settings.MenuSize));
+                this.settings.push(new UI.NumberSetting('Menu Distance', 0.5, 36.0, settings.MenuDistance));
+
+                this.settings.push(new UI.NumberSetting('World Size', 0.1, 2.0, settings.WorldScale));
+                this.settings.push(new UI.NumberSetting('Hud Size', 0.125, 0.250, settings.HudScale));
+                this.settings.push(new UI.NumberSetting('View Height', 0.0, 250.0, settings.EyeHeight));
+                this.settings.push(new UI.NumberSetting('Background Size', 640.0, 3840.0, settings.BackgroundScale));
+                this.settings.push(new UI.BooleanSetting('Fixed Position HUD', settings.FixedHud));
+                this.settings.push(new UI.BooleanSetting('Fixed Position Background', settings.FixedBackground));
+            }
 
             this.settingsCanvas = managers.Canvas.getCanvas();
             this.settingsCanvas.width = 640;

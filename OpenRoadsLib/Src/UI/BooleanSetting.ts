@@ -1,23 +1,14 @@
 ﻿module UI {
-    export class NumberSetting implements SettingUI {
+    export class BooleanSetting implements SettingUI {
         private name: string;
 
-        private min: number;
-        private max: number;
-        private minLabel: string;
-        private maxLabel: string;
+        private setting: Managers.BooleanSetting;
 
-        private setting: Managers.NumberSetting;
-
-        private value: number;
+        private value: boolean;
 
         constructor(name: string,
-            min: number, max: number,
-            setting: Managers.NumberSetting) {
+            setting: Managers.BooleanSetting) {
             this.name = name;
-
-            this.min = min;
-            this.max = max;
 
             this.setting = setting;
 
@@ -35,7 +26,7 @@
             }
 
             if (d !== 0.0) {
-                this.value = Math.min(this.max, Math.max(this.min, this.value + fti.getPhysicsStep() * (this.max - this.min) * d / 2.0));
+                this.value = d < 0 ? false : true;
                 this.setting.setValue(this.value);
             }
 
@@ -48,12 +39,20 @@
             ctx.textBaseline = 'middle';
             ctx.fillText(this.name, cvs.width / 4, yPos);
 
-            var percent = (this.value - this.min) / (this.max - this.min);
             var BH = 5;
-            ctx.fillStyle = dark;
-            ctx.fillRect(cvs.width / 2 + P, yPos - BH, (cvs.width / 2 - P * 2), BH * 2);
+            var X = cvs.width / 2 + P;
+            var W = cvs.width / 2 - P * 2;
             ctx.fillStyle = bright;
-            ctx.fillRect(cvs.width / 2 + P, yPos - BH, (cvs.width / 2 - P * 2) * percent, BH * 2);
+            ctx.fillRect(X + (this.value ? W / 2 : 0), yPos - BH, W / 2, BH * 2);
+
+            ctx.strokeStyle = bright;
+            ctx.strokeRect(X, yPos - BH, W, BH * 2);
+
+            ctx.fillStyle = this.value ? bright : dark;
+            ctx.fillText('Off', 5 * cvs.width / 8, yPos);
+
+            ctx.fillStyle = this.value ? dark : bright;
+            ctx.fillText('On', 7 * cvs.width / 8, yPos);
         }
     }
 }
