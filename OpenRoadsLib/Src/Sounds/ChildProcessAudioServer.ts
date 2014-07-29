@@ -2,10 +2,20 @@
     var playSongCommand = 'PlaySong';
     var createPlayableCommand = 'CreatePlayable';
     var playPlayableCommand = 'PlayPlayable';
-    var setGainCommand = 'SetGain';
+    var setEffectGainCommand = 'SetEGain';
+    var setMusicGainCommand = 'SetMGain';
 
-    export class SetGainCommand {
-        private Command: string = setGainCommand;
+    export class SetEffectGainCommand {
+        private Command: string = setEffectGainCommand;
+        public Gain: number;
+
+        constructor(gain: number) {
+            this.Gain = gain;
+        }
+    }
+
+    export class SetMusicGainCommand {
+        private Command: string = setMusicGainCommand;
         public Gain: number;
 
         constructor(gain: number) {
@@ -76,9 +86,14 @@
                             this.playables[ppEvt.Id].play();
                         }
                         break;
-                    case setGainCommand:
-                        var sgEvt = <SetGainCommand><any>evt;
-                        this.provider.setGain(sgEvt.Gain);
+                    case setEffectGainCommand:
+                        var sgEvt = <SetEffectGainCommand><any>evt;
+                        this.provider.setEffectsGain(sgEvt.Gain);
+                        break;
+                case setMusicGainCommand:
+                        var smEvt = <SetMusicGainCommand><any>evt;
+                        this.musicPlayer.setGain(smEvt.Gain);
+                        break;
                 }
             });
         }

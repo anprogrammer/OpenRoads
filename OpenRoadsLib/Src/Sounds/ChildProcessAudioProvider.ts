@@ -59,9 +59,18 @@
             }
         }
 
-        setGain(gain: number): void {
+        setEffectsGain(gain: number): void {
             try {
-                this.worker.send(new SetGainCommand(gain));
+                this.worker.send(new SetEffectGainCommand(gain));
+            } catch (ex) {
+                console.log('Audio exception on setGain');
+                console.log(ex);
+            }
+        }
+
+        setMusicGain(gain: number): void {
+            try {
+                this.worker.send(new SetMusicGainCommand(gain));
             } catch (ex) {
                 console.log('Audio exception on setGain');
                 console.log(ex);

@@ -119,7 +119,7 @@
             }
 
             this.sampleRate = 44100;
-            llap.runPlayer(this);
+            llap.runPlayer(this, false);
         }
 
         public setSource(mp: Player) {
@@ -195,6 +195,7 @@
 
         public fillAudioBuffer(buffer: Float32Array): boolean {
             var synthOut = 0.0;
+            var gain = this.src !== null ? this.src.getGain() : 0.0;
             
             if (this.src == null) {
                 for (var i = 0; i < buffer.length; i++) {
@@ -223,7 +224,7 @@
                     this.synthTime -= OPLConstants.SampleTime;
                 }
 
-                buffer[i] = synthOut / 2.0;
+                buffer[i] = synthOut / 2.0 * gain;
             }
 
             return true;

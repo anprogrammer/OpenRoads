@@ -1,26 +1,31 @@
 ﻿module Managers {
     export class SettingsManager {
-        public PlayMusic: boolean = true;
-        private Muted: boolean = true;
-        private volume: number = 0.2;
+        private effectVolume: number = 0.5;
+        private musicVolume: number = 0.5;
         private store: Stores.KVStore;
 
         constructor(store: Stores.KVStore) {
             this.store = store;
-            this.Muted = JSON.parse(this.store.getValue('muted') || 'false');
+            this.effectVolume = JSON.parse(this.store.getValue('evolume') || '0.5');
+            this.musicVolume = JSON.parse(this.store.getValue('mvolume') || '0.5');
         }
 
-        public getMuted(): boolean {
-            return this.Muted;
+        public getEffectVolume(): number {
+            return this.effectVolume;
         }
 
-        public setMuted(m: boolean) {
-            this.Muted = m;
-            this.store.setValue('muted', JSON.stringify(m));
+        public getMusicVolume(): number {
+            return this.musicVolume;
         }
 
-        public getVolume(): number {
-            return this.Muted ? 0.0 : this.volume;
+        public setEffectVolume(n: number): void {
+            this.effectVolume = n;
+            this.store.setValue('evolume', JSON.stringify(n));
+        }
+
+        public setMusicVolume(n: number): void {
+            this.musicVolume = n;
+            this.store.setValue('mvolume', JSON.stringify(n));
         }
 
         public wonLevelCount(levelNum: number): number {

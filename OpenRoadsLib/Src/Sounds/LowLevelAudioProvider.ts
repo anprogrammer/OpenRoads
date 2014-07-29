@@ -9,7 +9,7 @@
 
     export interface LowLevelAudioProvider {
         createPlayable(buffer: Float32Array): Playable;
-        runPlayer(player: PlayerAudioSource): void;
-        setGain(gain: number): void;
+        runPlayer(player: PlayerAudioSource, useGain: boolean): void;
+        setEffectsGain(gain: number): void;
     }
 } 

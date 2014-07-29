@@ -16,7 +16,7 @@
         constructor(audio: PortAudioAudioProvider, buffer: Float32Array) {
             this.audio = audio;
             this.buffer = buffer;
-            this.audio.runPlayer(this);
+            this.audio.runPlayer(this, true);
         }
 
         public fillAudioBuffer(buff: Float32Array): boolean {
@@ -48,8 +48,19 @@
             new PortAudioPlayer(this.audio, this.buffer);
         }
     }
+
+    class PlayerPair {
+        public Src: PlayerAudioSource;
+        public UseGain: boolean;
+
+        constructor(src: PlayerAudioSource, useGain: boolean) {
+            this.Src = src;
+            this.UseGain = useGain;
+        }
+    }
+
     export class PortAudioAudioProvider implements LowLevelAudioProvider {
-        private players: PlayerAudioSource[] = [];
+        private players: PlayerPair[] = [];
         private gain: number = 0;
         private engine: CoreAudioEngine;
         private buffer: Float32Array = null;
@@ -67,11 +78,11 @@
             return new PortAudioPlayable(this, buffer);
         }
 
-        runPlayer(player: PlayerAudioSource): void {
-            this.players.push(player);
+        runPlayer(player: PlayerAudioSource, useGain: boolean): void {
+            this.players.push(new PlayerPair(player, useGain));
         }
 
-        setGain(gain: number): void {
+        setEffectsGain(gain: number): void {
             this.gain = gain;
         }
 
@@ -92,13 +103,14 @@
 
             for (var i = 0; i < players.length; i++) {
                 var p = players[i];
-                if (!p.fillAudioBuffer(buff)) {
+                if (!p.Src.fillAudioBuffer(buff)) {
                     players.splice(i, 1);
                     i--;
                 }
 
+                var gain = p.UseGain ? this.gain : 1.0;
                 for (var j = 0; j < len; j++) {
-                    out[j] += Math.max(-1.0, Math.min(1.0, buff[j] * this.gain));
+                    out[j] += Math.max(-1.0, Math.min(1.0, buff[j] * gain));
                 }
             }
 

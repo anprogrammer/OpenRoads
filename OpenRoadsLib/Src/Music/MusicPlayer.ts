@@ -8,11 +8,20 @@
         private paused: number;
         private jumpPos: number;
         private currentSong: number = -1;
+        private gain: number = 0.5;
 
         constructor(opl: OPL, managers: Managers.ManagerSet) {
             this.opl = opl;
             this.fullData = managers.Streams.getStream('MUZAX.LZS');
             this.stream = null;
+        }
+
+        public setGain(gain: number) {
+            this.gain = gain;
+        }
+
+        public getGain(): number {
+            return this.gain;
         }
 
         public loadSong(n: number) {

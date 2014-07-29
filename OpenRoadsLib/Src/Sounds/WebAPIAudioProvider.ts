@@ -44,17 +44,17 @@
             return new WebAPIPlayable(this.ctx, buffer, this.dest);
         }
 
-        runPlayer(player: PlayerAudioSource): void {
+        runPlayer(player: PlayerAudioSource, useGain: boolean): void {
             if (this.ctx) {
                 var node = this.ctx.createScriptProcessor(1024, 1, 1);
                 node.onaudioprocess = (evt: Event) => player.fillAudioBuffer((<AudioProcessingEvent>evt).outputBuffer.getChannelData(0));
-                node.connect(this.dest);
+                node.connect(useGain ? <AudioNode>this.dest : <AudioNode>this.ctx.destination);
                 this.players.push(player);
                 this.playerNodes.push(node);
             }
         }
 
-        setGain(gain: number): void {
+        setEffectsGain(gain: number): void {
             if (this.ctx) {
                 this.dest.gain.value = gain;
             }

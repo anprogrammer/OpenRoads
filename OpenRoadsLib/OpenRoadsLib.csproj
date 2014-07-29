@@ -164,6 +164,7 @@
     <TypeScriptCompile Include="Src\TestRuns\TestLevels.ts" />
     <TypeScriptCompile Include="Src\TestRuns\TestSounds.ts" />
     <TypeScriptCompile Include="Src\TestRuns\TestTrakDat.ts" />
+    <TypeScriptCompile Include="Src\UI\NumberSetting.ts" />
     <TypeScriptCompile Include="Src\Vertices\Vertex2D.ts" />
     <TypeScriptCompile Include="Src\Vertices\Vertex3DC.ts" />
     <TypeScriptCompile Include="Src\VR\NodeVRProvider.ts" />

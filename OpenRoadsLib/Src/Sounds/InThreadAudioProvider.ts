@@ -16,8 +16,12 @@
             this.player.loadSong(n);
         }
 
-        setGain(gain: number): void {
-            this.base.setGain(gain);
+        setEffectsGain(gain: number): void {
+            this.base.setEffectsGain(gain);
+        }
+
+        setMusicGain(gain: number): void {
+            this.player.setGain(gain);
         }
     }
 }

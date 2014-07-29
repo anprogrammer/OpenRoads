@@ -20,6 +20,8 @@
         private managers: Managers.ManagerSet;
         private frame: number = 0;
         private hasRunPhysics: boolean = false;
+        private lastEffectsVolume: number = -1;
+        private lastMusicVolume: number = -1;
 
         constructor(documentProvider: DocumentProvider, canvas: HTMLCanvasElement, managers: Managers.ManagerSet, gs: GameState, clock: Clock) {
             this.document = documentProvider;
@@ -75,8 +77,13 @@
                 this.managers.VR.resetOrientation();
             }
 
-            if (this.frame % 30 === 0) {
-                this.managers.Audio.setGain(this.managers.Settings.getMuted() ? 0.0 : this.managers.Settings.getVolume());
+            var effectsVol = this.managers.Settings.getEffectVolume();
+            var musicVol = this.managers.Settings.getMusicVolume();
+            if (this.lastEffectsVolume !== effectsVol || this.lastMusicVolume !== musicVol) {
+                this.managers.Audio.setEffectsGain(0.2 * effectsVol);
+                this.managers.Audio.setMusicGain(0.2 * musicVol);
+                this.lastEffectsVolume = effectsVol;
+                this.lastMusicVolume = musicVol;
             }
             this.frame++;
 
