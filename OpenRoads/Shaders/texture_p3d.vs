@@ -4,7 +4,7 @@ precision highp float;
 
 attribute vec3 aPos;
 attribute vec3 aColor;
-attribute vec3 aTexCoord;
+attribute vec2 aTexCoord;
 
 varying vec3 vColor;
 varying vec2 vTexCoord;
