@@ -38,12 +38,15 @@
         public MenuDistance: NumberSetting;
         public MenuSize: NumberSetting;
 
+        public UseInterpolation: BooleanSetting;
+        public EnableVSync: BooleanSetting;
+
         public WorldScale: NumberSetting;
         public HudScale: NumberSetting;
         public EyeHeight: NumberSetting;
+        public VRDistanceFromShip: NumberSetting;
         public BackgroundScale: NumberSetting;
 
-        public FixedHud: BooleanSetting;
         public FixedBackground: BooleanSetting;
 
         private store: Stores.KVStore;
@@ -55,13 +58,16 @@
             this.MenuDistance = new NumberSetting(store, 'menuDistance', 12.0);
             this.MenuSize = new NumberSetting(store, 'menuSize', 5.0);            
 
+            this.UseInterpolation = new BooleanSetting(store, 'useInterpolation', true);
+            this.EnableVSync = new BooleanSetting(store, 'useVsync', false);
+
             this.WorldScale = new NumberSetting(store, 'worldScale', 1.0);
             this.HudScale = new NumberSetting(store, 'hudScale', 0.25);
             this.EyeHeight = new NumberSetting(store, 'eyeHeight', 130.0);
+            this.VRDistanceFromShip = new NumberSetting(store, 'eyeDistance', 1.0);
 
             this.BackgroundScale = new NumberSetting(store, 'backgroundScale', 1920.0);
 
-            this.FixedHud = new BooleanSetting(store, 'fixedHud', false);
             this.FixedBackground = new BooleanSetting(store, 'fixedBackground', false);
 
         }

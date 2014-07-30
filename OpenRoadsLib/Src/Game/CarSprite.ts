@@ -57,7 +57,7 @@
             }
 
             this.sprite.ULow.y = idx * 30 / this.sprite.Texture.Height;
-            this.sprite.UHigh.y = (idx + 1) * 30 / this.sprite.Texture.Height;
+            this.sprite.UHigh.y = ((idx + 1) * 30 - 1) / this.sprite.Texture.Height;
         }
 
         public draw(view: TSM.mat4, cam: Engine.CameraState): void {

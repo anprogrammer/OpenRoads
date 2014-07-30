@@ -40,7 +40,7 @@ function runGame() {
     managers.Textures = new Managers.TextureManager(managers);
     managers.Canvas = new Drawing.HTMLCanvasProvider();
     managers.VR = null;
-    managers.SnapshotProvider = new Game.FixedRateSnapshotProvider();
+    managers.SnapshotProvider = managers.Settings.UseInterpolation ? new Game.InterpolatingSnapshoptProvider() : new Game.FixedRateSnapshotProvider();
 
     //managers.Graphics = new Shaders.VRShaderProvider();
     manager.loadMultiple([

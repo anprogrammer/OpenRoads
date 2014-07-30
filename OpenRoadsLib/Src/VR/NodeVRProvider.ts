@@ -11,8 +11,8 @@
             this.glfw = glfw;
         }
 
-        public enable(): boolean {
-            return this.glfw.enableHMD();
+        public enable(disableVsync: boolean): boolean {
+            return this.glfw.enableHMD(disableVsync);
         }
 
         public getTargetResolution(): TSM.vec2 {
@@ -69,7 +69,7 @@
             return new TSM.quat(this.glfw.getHeadOrientation(n));
             //var stick = this.getJoystickValues();
             //return TSM.quat.fromAxis(new TSM.vec3([0.0, 1.0, 0.0]), stick[0] * 0.5)
-            //    .multiply(TSM.quat.fromAxis(new TSM.vec3([0.0, 0.0, 1.0]), stick[1] * 1.5));
+            //    .multiply(TSM.quat.fromAxis(new TSM.vec3([1.0, 0.0, 0.0]), stick[1] * 1.5));
         }
 
         private getJoystickValues(): number[]{

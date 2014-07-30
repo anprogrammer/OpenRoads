@@ -1,6 +1,6 @@
 ﻿declare module GLFW {
     export class GLFW {
-        enableHMD(): boolean;
+        enableHMD(disableVsync: boolean): boolean;
         getHMDTargetSize(): number[];
         getHMDFboId(gl: WebGLRenderingContext): number;
         getEyeViewAdjust(n: number): number[];

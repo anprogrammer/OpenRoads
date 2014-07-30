@@ -123,13 +123,15 @@
             if (this.myManagers.VR !== null) {
                 this.background.Size.x = settings.BackgroundScale.getValue();
                 this.background.Size.y = this.background.Size.x * 1200.0 / 1920.0;
-                this.background.ModelMatrix.translate(new TSM.vec3([-450, 800.0 * 200.0 / this.background.Size.y, 1280.0 * -1200.0 / this.background.Size.x]));
+                this.background.ModelMatrix.translate(new TSM.vec3([-this.background.Size.x / 2.0 + 160.0, this.background.Size.y * 1.0 / 3.0 - 182, -1200.0]));
             }
 
             cam.HeadOrientation.inverse();
 
             this.background.ViewMatrix.setIdentity();
-            this.background.ViewMatrix.multiply(cam.HeadOrientation.toMat4());
+            if (!settings.FixedBackground.getValue()) {
+                this.background.ViewMatrix.multiply(cam.HeadOrientation.toMat4());
+            }
 
             this.background.ProjectionMatrix = cam.ProjectionMatrix;
             this.background.draw();
@@ -139,7 +141,7 @@
 
             var worldScale = settings.WorldScale.getValue();
 
-            headPos.add(new TSM.vec3([0.0, settings.EyeHeight.getValue(), -(snap.Position.z - (isVR ? 1 : 3)) * 46.0]).multiply(scaleVec));
+            headPos.add(new TSM.vec3([0.0, settings.EyeHeight.getValue() / worldScale, (-(snap.Position.z - (isVR ? settings.VRDistanceFromShip.getValue() : 3)) * 46.0) / worldScale]).multiply(scaleVec));
             this.mesh.ViewMatrix.setIdentity();
             this.mesh.ViewMatrix.translate(cam.EyeOffset.copy().scale(worldScale));
             this.mesh.ViewMatrix.multiply(cam.HeadOrientation.toMat4());

@@ -17,22 +17,28 @@
 
         load(gl: WebGLRenderingContext): void {
             super.load(gl);
-            var managers = this.myManagers;            
+            var managers = this.myManagers;          
+            var vr = this.myManagers.VR !== null;
+              
             this.menu = managers.Textures.getTextures(gl, "SETMENU.LZS").map((tf) => new Drawing.Sprite(gl, managers, tf));
 
             var settings = managers.Settings;
             this.settings.push(new UI.NumberSetting('Music Volume', 0.0, 2.0, settings.MusicVolume));
             this.settings.push(new UI.NumberSetting('Effects Volume', 0.0, 2.0, settings.EffectVolume));
 
-            if (this.myManagers.VR !== null) {
+            this.settings.push(new UI.BooleanSetting(vr ? 'Smooth Mode (Requires Restart)' : 'Smooth Mode(Requires Refresh)', settings.UseInterpolation));
+
+            if (vr) {
+                this.settings.push(new UI.BooleanSetting('VSync (Requires Restart)', settings.EnableVSync));
+
                 this.settings.push(new UI.NumberSetting('Menu Size', 0.5, 15.0, settings.MenuSize));
                 this.settings.push(new UI.NumberSetting('Menu Distance', 0.5, 36.0, settings.MenuDistance));
 
                 this.settings.push(new UI.NumberSetting('World Size', 0.1, 2.0, settings.WorldScale));
-                this.settings.push(new UI.NumberSetting('Hud Size', 0.125, 0.250, settings.HudScale));
+                this.settings.push(new UI.NumberSetting('Hud Size', 0.125, 0.5, settings.HudScale));
                 this.settings.push(new UI.NumberSetting('View Height', 0.0, 250.0, settings.EyeHeight));
-                this.settings.push(new UI.NumberSetting('Background Size', 640.0, 3840.0, settings.BackgroundScale));
-                this.settings.push(new UI.BooleanSetting('Fixed Position HUD', settings.FixedHud));
+                this.settings.push(new UI.NumberSetting('View Distance', 0.5, 10.0, settings.VRDistanceFromShip));
+                this.settings.push(new UI.NumberSetting('Background Size', 640.0, 7680.0, settings.BackgroundScale));
                 this.settings.push(new UI.BooleanSetting('Fixed Position Background', settings.FixedBackground));
             }
 

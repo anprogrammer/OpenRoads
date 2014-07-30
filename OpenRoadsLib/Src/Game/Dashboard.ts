@@ -31,6 +31,8 @@
             var loadGauge = (filename: string) => {
                 return managers.Textures.getTextures(gl, filename).map(t => managers.Graphics.get3DSprite(gl, managers, t));
             };
+
+            this.managers = managers;
             this.dash = managers.Graphics.get3DSprite(gl, managers, managers.Textures.getTexture(gl, "DASHBRD.LZS"));
             this.oxyGauge = loadGauge("OXY_DISP.DAT");
             this.fuelGauge = loadGauge("FUL_DISP.DAT");
@@ -84,7 +86,7 @@
             var model = new TSM.mat4().setIdentity();
             model.setIdentity().translate(new TSM.vec3([0.0, -50.0, -25.0]));
             model.rotate(-Math.PI / 9.0, new TSM.vec3([1.0, 0.0, 0.0]));
-            model.scale(new TSM.vec3([0.25, 0.25, 0.25]).scale(settings.HudScale.getValue()));
+            model.scale(new TSM.vec3([1.0, 1.0, 1.0]).scale(settings.HudScale.getValue()));
 
             var configAndDrawSprite = (s: Drawing.Sprite) => {
 

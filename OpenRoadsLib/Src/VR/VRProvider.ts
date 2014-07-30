@@ -1,6 +1,6 @@
 ﻿module VR {
     export interface VRProvider {
-        enable(): boolean;
+        enable(disableVsync: boolean): boolean;
         getTargetResolution(): TSM.vec2;
         getTargetFboId(gl: WebGLRenderingContext): number;
         getHeadCameraState(eyeNum: number): Engine.CameraState;
