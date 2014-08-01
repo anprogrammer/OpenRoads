@@ -129,9 +129,7 @@
             cam.HeadOrientation.inverse();
 
             this.background.ViewMatrix.setIdentity();
-            if (!settings.FixedBackground.getValue()) {
-                this.background.ViewMatrix.multiply(cam.HeadOrientation.toMat4());
-            }
+            this.background.ViewMatrix.multiply(cam.HeadOrientation.toMat4());
 
             this.background.ProjectionMatrix = cam.ProjectionMatrix;
             this.background.draw();
@@ -153,7 +151,9 @@
             this.mesh.draw();
             this.carSprite.draw(this.mesh.ViewMatrix, cam);
 
-            this.dash.draw(gl, cam, scaleVec);
+            if (settings.ShowHud.getValue()) {
+                this.dash.draw(gl, cam, scaleVec);
+            }
 
             if (this.game.didWin) {
                 this.roadCompleted.ModelMatrix.setIdentity();

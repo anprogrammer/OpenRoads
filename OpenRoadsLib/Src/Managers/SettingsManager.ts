@@ -45,11 +45,12 @@
 
         public WorldScale: NumberSetting;
         public HudScale: NumberSetting;
+        public HudHeight: NumberSetting;
+        public HudDist: NumberSetting;
+        public ShowHud: BooleanSetting;
         public EyeHeight: NumberSetting;
         public VRDistanceFromShip: NumberSetting;
         public BackgroundScale: NumberSetting;
-
-        public FixedBackground: BooleanSetting;
 
         private store: Stores.KVStore;
 
@@ -58,21 +59,21 @@
             this.MonitorIdx = new NumberSetting(store, 'monitorIdx', 0);
             this.EffectVolume = new NumberSetting(store, 'effectVolume', 0.5);
             this.MusicVolume = new NumberSetting(store, 'musicVolume', 0.5);
-            this.MenuDistance = new NumberSetting(store, 'menuDistance', 12.0);
-            this.MenuSize = new NumberSetting(store, 'menuSize', 5.0);            
+            this.MenuDistance = new NumberSetting(store, 'menuDistance', 1.6);
+            this.MenuSize = new NumberSetting(store, 'menuSize', 1.0);            
 
             this.UseInterpolation = new BooleanSetting(store, 'useInterpolation', true);
             this.EnableVSync = new BooleanSetting(store, 'useVsync', true);
 
-            this.WorldScale = new NumberSetting(store, 'worldScale', 1.0);
-            this.HudScale = new NumberSetting(store, 'hudScale', 0.25);
-            this.EyeHeight = new NumberSetting(store, 'eyeHeight', 130.0);
-            this.VRDistanceFromShip = new NumberSetting(store, 'eyeDistance', 1.0);
+            this.WorldScale = new NumberSetting(store, 'worldScale', 44.0);
+            this.HudScale = new NumberSetting(store, 'hudScale', 0.21);
+            this.HudHeight = new NumberSetting(store, 'hudPosHeight', 46.6);
+            this.HudDist = new NumberSetting(store, 'hudPosDist', 33.0);
+            this.EyeHeight = new NumberSetting(store, 'eyeHeight', 154.0);
+            this.VRDistanceFromShip = new NumberSetting(store, 'eyeDistance', 1.76);
+            this.ShowHud = new BooleanSetting(store, 'showHud', true);
 
-            this.BackgroundScale = new NumberSetting(store, 'backgroundScale', 1920.0);
-
-            this.FixedBackground = new BooleanSetting(store, 'fixedBackground', false);
-
+            this.BackgroundScale = new NumberSetting(store, 'backgroundScale', 3456.0);
         }
 
         public wonLevelCount(levelNum: number): number {

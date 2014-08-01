@@ -86,7 +86,7 @@
             
 
             var model = new TSM.mat4().setIdentity();
-            model.setIdentity().translate(new TSM.vec3([0.0, -50.0, -25.0]));
+            model.setIdentity().translate(new TSM.vec3([0.0, -settings.HudHeight.getValue(), -settings.HudDist.getValue()]));
             model.rotate(-Math.PI / 9.0, new TSM.vec3([1.0, 0.0, 0.0]));
             model.scale(new TSM.vec3([1.0, 1.0, 1.0]).scale(settings.HudScale.getValue()));
 

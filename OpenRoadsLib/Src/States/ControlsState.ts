@@ -35,11 +35,13 @@
                 this.settings.push(new UI.NumberSetting('Menu Distance', 0.25, 4.0, settings.MenuDistance));
 
                 this.settings.push(new UI.NumberSetting('World Size', 0.1, 100.0, settings.WorldScale));
+                this.settings.push(new UI.BooleanSetting('Show HUD', settings.ShowHud));
                 this.settings.push(new UI.NumberSetting('Hud Size', 0.125, 0.5, settings.HudScale));
+                this.settings.push(new UI.NumberSetting('Hud Height', 40.0, 60.0, settings.HudHeight));
+                this.settings.push(new UI.NumberSetting('Hud Distance', 20.0, 40.0, settings.HudDist));
                 this.settings.push(new UI.NumberSetting('View Height', 0.0, 250.0, settings.EyeHeight));
                 this.settings.push(new UI.NumberSetting('View Distance', 0.5, 10.0, settings.VRDistanceFromShip));
                 this.settings.push(new UI.NumberSetting('Background Size', 640.0, 7680.0, settings.BackgroundScale));
-                this.settings.push(new UI.BooleanSetting('Fixed Position Background', settings.FixedBackground));
             }
 
             this.settingsCanvas = managers.Canvas.getCanvas();
@@ -86,7 +88,7 @@
             var P = 4;
 
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = '16pt Arial';
+            ctx.font = '16pt Arial bold';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             ctx.fillText('Settings', cvs.width / 2, P);

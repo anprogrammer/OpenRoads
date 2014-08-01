@@ -1,18 +1,5 @@
-﻿Warning about Direct Mode/Primary Monitor/etc
-Add hud adjustment settings
-Remove fixed background setting
-Fix audio device selection
+﻿Fix audio problems
 
-Add options
--Increase HUD font-size+bold
--Centered HUD
--No HUD
--Ship distance
--Ship height
-
-Add instructions screen
-
-Monitor selection or SDK improvements
 Replace video with actual video
 
 GO LIVE VERSION!

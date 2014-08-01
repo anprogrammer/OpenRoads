@@ -43,7 +43,7 @@
             var dark = selected ? '#777777' : '#444444';
 
             ctx.fillStyle = bright;
-            ctx.font = '10pt Arial';
+            ctx.font = '12pt Arial bold';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(this.name, cvs.width / 4, yPos);
