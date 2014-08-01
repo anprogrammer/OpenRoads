@@ -201,10 +201,10 @@
                     this.zVelocity -= 0x12F / 0x10000;
                     break;
                 case Levels.TouchEffect.Kill:
-                    this.state = ShipState.Exploded;
                     if (this.state !== ShipState.Exploded) {
                         eventBus.fire(new ShipEvents.ShipExplodedEvent());
                     }
+                    this.state = ShipState.Exploded;
                     break;
                 case Levels.TouchEffect.RefillOxygen:
                     if (this.state === ShipState.Alive) {

@@ -59,7 +59,7 @@
             this.MenuSize = new NumberSetting(store, 'menuSize', 5.0);            
 
             this.UseInterpolation = new BooleanSetting(store, 'useInterpolation', true);
-            this.EnableVSync = new BooleanSetting(store, 'useVsync', false);
+            this.EnableVSync = new BooleanSetting(store, 'useVsync', true);
 
             this.WorldScale = new NumberSetting(store, 'worldScale', 1.0);
             this.HudScale = new NumberSetting(store, 'hudScale', 0.25);

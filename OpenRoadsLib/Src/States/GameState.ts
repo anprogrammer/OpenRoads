@@ -123,7 +123,7 @@
             if (this.myManagers.VR !== null) {
                 this.background.Size.x = settings.BackgroundScale.getValue();
                 this.background.Size.y = this.background.Size.x * 1200.0 / 1920.0;
-                this.background.ModelMatrix.translate(new TSM.vec3([-this.background.Size.x / 2.0 + 160.0, this.background.Size.y * 1.0 / 3.0 - 182, -1200.0]));
+                this.background.ModelMatrix.translate(new TSM.vec3([-this.background.Size.x / 2.0 + 160.0, this.background.Size.y * 2.0 / 3.0 - 182, -1200.0]));
             }
 
             cam.HeadOrientation.inverse();

@@ -31,10 +31,10 @@
             if (vr) {
                 this.settings.push(new UI.BooleanSetting('VSync (Requires Restart)', settings.EnableVSync));
 
-                this.settings.push(new UI.NumberSetting('Menu Size', 0.5, 15.0, settings.MenuSize));
-                this.settings.push(new UI.NumberSetting('Menu Distance', 0.5, 36.0, settings.MenuDistance));
+                this.settings.push(new UI.NumberSetting('Menu Size', 0.25, 2.0, settings.MenuSize));
+                this.settings.push(new UI.NumberSetting('Menu Distance', 0.25, 4.0, settings.MenuDistance));
 
-                this.settings.push(new UI.NumberSetting('World Size', 0.1, 2.0, settings.WorldScale));
+                this.settings.push(new UI.NumberSetting('World Size', 0.1, 100.0, settings.WorldScale));
                 this.settings.push(new UI.NumberSetting('Hud Size', 0.125, 0.5, settings.HudScale));
                 this.settings.push(new UI.NumberSetting('View Height', 0.0, 250.0, settings.EyeHeight));
                 this.settings.push(new UI.NumberSetting('View Distance', 0.5, 10.0, settings.VRDistanceFromShip));

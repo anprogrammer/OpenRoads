@@ -75,13 +75,15 @@
         }
 
         draw(gl: WebGLRenderingContext, cam: Engine.CameraState, scaleVec: TSM.vec3): void {
+            var settings = this.managers.Settings;
+            var worldScale = settings.WorldScale.getValue();
             var view = new TSM.mat4().setIdentity();
             view.multiply(cam.HeadOrientation.toMat4());
-            view.translate(cam.HeadPosition.copy().scale(-1.0));
+            view.translate(cam.HeadPosition.copy().scale(-1.0).scale(worldScale));
             view.scale(scaleVec);
-            view.translate(cam.EyeOffset.copy().divide(scaleVec));
+            view.translate(cam.EyeOffset.copy().scale(worldScale).divide(scaleVec));
 
-            var settings = this.managers.Settings;
+            
 
             var model = new TSM.mat4().setIdentity();
             model.setIdentity().translate(new TSM.vec3([0.0, -50.0, -25.0]));
