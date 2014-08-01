@@ -32,7 +32,7 @@ function runPhysTest() {
     managers.Sounds = new Managers.SoundManager(managers);
 
     var src = new Controls.CombinedControlSource();
-    src.addSource(new Controls.KeyboardControlsource(new Engine.KeyboardManager(document.body)));
+    src.addSource(new Controls.KeyboardControlSource(new Engine.KeyboardManager(document.body)));
     src.addSource(new Controls.JoystickControlSource(new Controls.NavigatorJoystick(navigator)));
     managers.Controls = src;
     managers.Settings = new Managers.SettingsManager(new Stores.LocalStorageStore(isXMas ? 'xmas' : 'classic'));

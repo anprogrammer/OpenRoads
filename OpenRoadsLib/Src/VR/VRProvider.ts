@@ -12,6 +12,8 @@
 
         resetOrientation(): void;
 
+        handlePlatformKeys(controls: Controls.ControlSource): void;
+
         exit(): void;
     }
 } 

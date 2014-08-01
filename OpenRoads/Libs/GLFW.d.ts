@@ -14,5 +14,7 @@
         endVREye(n: number): void;
         isVRSafetyWarningVisible(): boolean;
         resetVROrientation(): void;
+        getMonitorCount(): number;
+        destroyWindow(window: HTMLCanvasElement): void;
     }
 }

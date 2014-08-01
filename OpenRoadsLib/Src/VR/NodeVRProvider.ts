@@ -1,14 +1,35 @@
 ﻿module VR {
+    declare class ChildProcess {
+        unref(): void;
+    }
+    declare class ChildProcessStatic {
+        spawn(cmd: string, args: string[], opts: any): ChildProcess;
+    }
+
     declare class Process {
         exit(): void;
+        argv: string[];
+    }
+
+    declare class FS {
+        openSync(name: string, mode: string): void;
     }
 
     declare var process: Process;
 
     export class NodeVRProvider implements VRProvider {
         private glfw: GLFW.GLFW;
-        constructor(glfw: GLFW.GLFW) {
+        private managers: Managers.ManagerSet;
+        private window: HTMLCanvasElement;
+        private childProcess: ChildProcessStatic;
+        private fs: FS;
+
+        constructor(glfw: GLFW.GLFW, managers: Managers.ManagerSet, window: HTMLCanvasElement) {
             this.glfw = glfw;
+            this.managers = managers;
+            this.window = window;
+            this.childProcess = require('child_process');
+            this.fs = require('fs');
         }
 
         public enable(disableVsync: boolean): boolean {
@@ -49,6 +70,22 @@
 
         public resetOrientation() {
             this.glfw.resetVROrientation();
+        }
+
+        handlePlatformKeys(controls: Controls.ControlSource): void {
+            if (controls.getSwitchMonitor()) {
+                var monSetting = this.managers.Settings.MonitorIdx;
+                monSetting.setValue((monSetting.getValue() + 1) % this.glfw.getMonitorCount());
+                this.glfw.destroyWindow(this.window);
+
+                var out = this.fs.openSync('./out.log', 'a');
+                var err = this.fs.openSync('./out.log', 'a');
+
+                var proc = this.childProcess.spawn(process.argv[0], process.argv.slice(1), { detached: true, stdio: ['ignore', out, err] });
+                proc.unref();
+
+                process.exit();
+            }
         }
 
         private getEyeViewAdjust(n: number): TSM.vec3 {

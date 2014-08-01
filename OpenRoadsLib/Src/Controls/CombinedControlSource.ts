@@ -56,6 +56,10 @@
             return this.foldVal((src) => src.getExit());
         }
 
+        getSwitchMonitor(): boolean {
+            return this.foldVal((src) => src.getSwitchMonitor());
+        }
+
         getResetOrientation(): boolean {
             return this.foldVal((src) => src.getResetOrientation());
         }

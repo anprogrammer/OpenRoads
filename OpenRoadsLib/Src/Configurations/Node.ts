@@ -66,15 +66,17 @@ module Configurations {
                 exe.load();
 
                 var doc = wgl.document();
-                var cvs = doc.createElement('canvas', 1280, 800, true);
+                //If they unplug a monitor we should still start
+                managers.Settings.MonitorIdx.setValue(Math.min(doc.getMonitorCount() - 1, managers.Settings.MonitorIdx.getValue()));
+                var cvs = doc.createElement('canvas', 1280, 800, managers.Settings.MonitorIdx.getValue(), true);
                 cvs.setTitle('SkyRoads VR');
 
                 var controls = new Controls.CombinedControlSource();
-                controls.addSource(new Controls.KeyboardControlsource(new Engine.KeyboardManager(<any>doc)));
+                controls.addSource(new Controls.KeyboardControlSource(new Engine.KeyboardManager(<any>doc)));
                 controls.addSource(new Controls.JoystickControlSource(new Controls.GLFWJoystick(doc)));
                 managers.Controls = controls;
 
-                managers.VR = new VR.NodeVRProvider(doc);
+                managers.VR = new VR.NodeVRProvider(doc, managers, cvs);
                 managers.VR.enable(!managers.Settings.EnableVSync.getValue());
 
                 var state = new States.Intro(managers);

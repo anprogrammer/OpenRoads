@@ -81,6 +81,10 @@
             return this.getValuesFromChannelsAndButtons([], [], this.joystick.getEnterButtons()) > 0.5;
         }
 
+        public getSwitchMonitor(): boolean {
+            return false;
+        }
+
         public getExit(): boolean {
             return this.getValuesFromChannelsAndButtons([], [], this.joystick.getExitButtons()) > 0.5;
         }

@@ -14,6 +14,8 @@
         getEnter(): boolean;
         getExit(): boolean;
 
+        getSwitchMonitor(): boolean;
+
         getResetOrientation(): boolean;
     }
 }

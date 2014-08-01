@@ -77,6 +77,10 @@
                 this.managers.VR.resetOrientation();
             }
 
+            if (this.managers.VR !== null) {
+                this.managers.VR.handlePlatformKeys(this.managers.Controls);
+            }
+
             var effectsVol = this.managers.Settings.EffectVolume.getValue();
             var musicVol = this.managers.Settings.MusicVolume.getValue();
             if (this.lastEffectsVolume !== effectsVol || this.lastMusicVolume !== musicVol) {

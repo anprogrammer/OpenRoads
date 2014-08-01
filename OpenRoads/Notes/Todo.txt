@@ -3,8 +3,14 @@ Match z-buffer to world scaling
 Warning about Direct Mode/Primary Monitor/etc
 Add hud adjustment settings
 Remove fixed background setting
-Look into reducing SDE
-Shrink background
+Fix audio device selection
+
+Add options
+-Incrase HUD font-size+bold
+-Centered HUD
+-No HUD
+-Ship distance
+-Ship height
 
 Add instructions screen
 

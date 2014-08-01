@@ -33,6 +33,8 @@
     
 
     export class SettingsManager {
+        public MonitorIdx: NumberSetting;
+
         public EffectVolume: NumberSetting;
         public MusicVolume: NumberSetting;
         public MenuDistance: NumberSetting;
@@ -53,6 +55,7 @@
 
         constructor(store: Stores.KVStore) {
             this.store = store;
+            this.MonitorIdx = new NumberSetting(store, 'monitorIdx', 0);
             this.EffectVolume = new NumberSetting(store, 'effectVolume', 0.5);
             this.MusicVolume = new NumberSetting(store, 'musicVolume', 0.5);
             this.MenuDistance = new NumberSetting(store, 'menuDistance', 12.0);

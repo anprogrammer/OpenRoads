@@ -1,5 +1,5 @@
 ﻿module Controls {
-    export class KeyboardControlsource implements ControlSource {
+    export class KeyboardControlSource implements ControlSource {
         private kbd: Engine.KeyboardManager;
         constructor(kbd: Engine.KeyboardManager) {
             this.kbd = kbd;
@@ -54,7 +54,11 @@
             return this.kbd.isDown(27);
         }
 
-        getResetOrientation(): boolean {
+        public getSwitchMonitor(): boolean {
+            return this.kbd.isDown(123);
+        }
+
+        public getResetOrientation(): boolean {
             return this.kbd.isDown(82);
         }
     }
