@@ -1,12 +1,10 @@
-﻿Ability to switch monitors via F9 key
-Match z-buffer to world scaling
-Warning about Direct Mode/Primary Monitor/etc
+﻿Warning about Direct Mode/Primary Monitor/etc
 Add hud adjustment settings
 Remove fixed background setting
 Fix audio device selection
 
 Add options
--Incrase HUD font-size+bold
+-Increase HUD font-size+bold
 -Centered HUD
 -No HUD
 -Ship distance

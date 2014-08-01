@@ -143,6 +143,7 @@
 
             headPos.add(new TSM.vec3([0.0, settings.EyeHeight.getValue() / worldScale, (-(snap.Position.z - (isVR ? settings.VRDistanceFromShip.getValue() : 3)) * 46.0) / worldScale]).multiply(scaleVec));
             this.mesh.ViewMatrix.setIdentity();
+            this.mesh.ViewMatrix.scale(new TSM.vec3([1.0 / worldScale, 1.0 / worldScale, 1.0 / worldScale])); //We pre-shrink everything so regardless oif user scale, it all fits into z-buffer
             this.mesh.ViewMatrix.translate(cam.EyeOffset.copy().scale(worldScale));
             this.mesh.ViewMatrix.multiply(cam.HeadOrientation.toMat4());
             this.mesh.ViewMatrix.translate(headPos.scale(-1.0).scale(worldScale));

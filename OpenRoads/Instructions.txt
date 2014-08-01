@@ -4,6 +4,8 @@ http://www.openroadsgame.com/
 https://github.com/anprogrammer/OpenRoads
 CrazyNorman@gmail.com
 
+Be sure to set your Rift to Extended Mode.  I'll add Direct Mode support once some Win8/AMD/OpenGL issues are worked out.  If the game appears on your monitor instead of your Rift, press F9 to change displays.  Be sure to have the Rift set as your primary display device or else you may encounter unpleasent judder.
+
 Controls:
 	You can use either an X-Box 360 controller or a keyboard.  Other game-pads may work, I haven't tested them.
 	Keyboard:
@@ -11,6 +13,7 @@ Controls:
 		Spacebar to Jump
 		Escape to Exit/Go-Back
 		'r' to reset Rift orientation
+		F9 to change displays (restarts game)
 	X-Box 360 Controller:
 		Use any joystick, triggers, or d-pad to turn, slow-down, speed-up
 		A to jump/enter a menu
@@ -22,5 +25,3 @@ Common Issues:
 		Be sure to install the x86/32-bit version of the Visual C++ Redistributable Packages for Visual Studio 2013 from http://www.microsoft.com/en-us/download/details.aspx?id=40784
 	2.  I have no sound
 		Check whether your firewall is blocking local applicatoins from talking to each-other.  SkyRoads VR uses sockets to communicate with its audio process
-	3.  I have an AMD card and this won't work
-		Be sure to run your Rift in extended mode.  This game uses OpenGL, which is currently incompatible with AMD in direct mode due to a bug
