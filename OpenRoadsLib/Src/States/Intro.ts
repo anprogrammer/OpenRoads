@@ -18,6 +18,7 @@ module States {
         private titleProgress: number;
         private enabled: boolean;
         private hasPlayedSong: boolean = false;
+        private introText: Drawing.Sprite;
 
         constructor(managers: Managers.ManagerSet) {
             super(managers);
@@ -42,6 +43,9 @@ module States {
             this.titleRight.Brightness = 1;
 
             this.introSound = managers.Sounds.getSound(managers.Sounds.Sounds.Intro);
+            this.introText = new Drawing.TextHelper(managers).getSpriteFromText(gl, managers, "Press Space to Continue", "11pt Arial", 20, true);
+            this.introText.Position.x = 320 / 2 - this.introText.Size.x / 2;
+            this.introText.Position.y = 2;
 
             this.frames = intro.slice(2);
             this.animFrame = null;
@@ -76,6 +80,7 @@ module States {
             }
 
             this.background.Brightness = this.frame < fps ? this.frame / fps : 1.0;
+            this.introText.Brightness = this.frame < fps ? this.frame / fps : 1.0;
 
             var animStartFrame = fps * 2, titleStartFrame = animStartFrame + this.anim.length,
                 creditsStartFrame = titleStartFrame + fps * 4;
@@ -138,6 +143,8 @@ module States {
                     this.titleRight.draw();
                 }
             }
+
+            this.introText.draw();
         }
     }
 } 
