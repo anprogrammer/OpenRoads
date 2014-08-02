@@ -21,8 +21,10 @@ Controls:
 		X to reset Rift orientation
 
 Common Issues:
-	1.  I get a missing DLL error.
+	1.  I'm way to close to the dashboard
+		Be sure to reset your orientation using "X" on a gamepad or 'r' on your keyboard
+	2.  I get a missing DLL error.
 		Be sure to install the x86/32-bit version of the Visual C++ Redistributable Packages for Visual Studio 2013 from http://www.microsoft.com/en-us/download/details.aspx?id=40784
-	2.  I have no sound
+	3.  I have no sound
 		Open the "Manage Audio Devices" screen (can be accessed via Start Menu or right-clicking the speaker icon in the System Tray), and verify that your headphones are set as the "Default Device".  If setting them as the "Default Device" does not resolve the issue please e-mail me with a screenshot of your audio devices at
 		CrazyNorman@gmail.com.  I'm still trying to track down some audio issues.
