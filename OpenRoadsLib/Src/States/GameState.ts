@@ -137,7 +137,7 @@
 
             var headPos = cam.HeadPosition.copy();
 
-            var worldScale = settings.WorldScale.getValue();
+            var worldScale = this.myManagers.VR !== null ? settings.WorldScale.getValue() : 1.0;
 
             headPos.add(new TSM.vec3([0.0, settings.EyeHeight.getValue() / worldScale, (-(snap.Position.z - (isVR ? settings.VRDistanceFromShip.getValue() : 3)) * 46.0) / worldScale]).multiply(scaleVec));
             this.mesh.ViewMatrix.setIdentity();
