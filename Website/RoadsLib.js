@@ -1347,7 +1347,8 @@ var Drawing;
         function TextHelper(managers) {
             this.managers = managers;
         }
-        TextHelper.prototype.getSpriteFromText = function (gl, managers, text, font, height) {
+        TextHelper.prototype.getSpriteFromText = function (gl, managers, text, font, height, force2D) {
+            if (typeof force2D === "undefined") { force2D = false; }
             var cvs = managers.Canvas.getCanvas();
             var ctx = cvs.getContext('2d');
             cvs.width = 600;
@@ -1367,7 +1368,7 @@ var Drawing;
 
             var tf = new Drawing.TextureFragment(tex, 0, 0, cvs.width, cvs.height);
 
-            return managers.Graphics.get3DSprite(gl, managers, tf);
+            return force2D ? managers.Graphics.get2DSprite(gl, managers, tf) : managers.Graphics.get3DSprite(gl, managers, tf);
         };
         return TextHelper;
     })();
@@ -6670,6 +6671,9 @@ var States;
             this.titleRight.Brightness = 1;
 
             this.introSound = managers.Sounds.getSound(managers.Sounds.Sounds.Intro);
+            this.introText = new Drawing.TextHelper(managers).getSpriteFromText(gl, managers, "Press Space to Continue", "11pt Arial", 20, true);
+            this.introText.Position.x = 320 / 2 - this.introText.Size.x / 2;
+            this.introText.Position.y = 2;
 
             this.frames = intro.slice(2);
             this.animFrame = null;
@@ -6704,6 +6708,7 @@ var States;
             }
 
             this.background.Brightness = this.frame < fps ? this.frame / fps : 1.0;
+            this.introText.Brightness = this.frame < fps ? this.frame / fps : 1.0;
 
             var animStartFrame = fps * 2, titleStartFrame = animStartFrame + this.anim.length, creditsStartFrame = titleStartFrame + fps * 4;
 
@@ -6765,6 +6770,8 @@ var States;
                     this.titleRight.draw();
                 }
             }
+
+            this.introText.draw();
         };
         return Intro;
     })(Engine.State2D);
