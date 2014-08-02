@@ -431,7 +431,7 @@ var Configurations;
         managers.Canvas = new Drawing.NodeCanvasProvider();
         managers.Audio = new Sounds.ChildProcessAudioProvider(audioProc);
         managers.Graphics = new Shaders.VRShaderProvider();
-        managers.SnapshotProvider = new Game.InterpolatingSnapshoptProvider();
+        managers.SnapshotProvider = managers.Settings.UseInterpolation ? new Game.InterpolatingSnapshoptProvider() : new Game.FixedRateSnapshotProvider();
 
         manager.loadMultiple([
             "Shaders/basic_2d.fs", "Shaders/basic_2d.vs", 'Shaders/title_2d.fs', 'Shaders/title_2d.vs', 'Shaders/color_3d.vs', 'Shaders/color_3d.fs',
@@ -469,16 +469,19 @@ var Configurations;
             exe.load();
 
             var doc = wgl.document();
-            var cvs = doc.createElement('canvas', 1280, 800, true);
+
+            //If they unplug a monitor we should still start
+            managers.Settings.MonitorIdx.setValue(Math.min(doc.getMonitorCount() - 1, managers.Settings.MonitorIdx.getValue()));
+            var cvs = doc.createElement('canvas', 1280, 800, managers.Settings.MonitorIdx.getValue(), true);
             cvs.setTitle('SkyRoads VR');
 
             var controls = new Controls.CombinedControlSource();
-            controls.addSource(new Controls.KeyboardControlsource(new Engine.KeyboardManager(doc)));
+            controls.addSource(new Controls.KeyboardControlSource(new Engine.KeyboardManager(doc)));
             controls.addSource(new Controls.JoystickControlSource(new Controls.GLFWJoystick(doc)));
             managers.Controls = controls;
 
-            managers.VR = new VR.NodeVRProvider(doc);
-            managers.VR.enable();
+            managers.VR = new VR.NodeVRProvider(doc, managers, cvs);
+            managers.VR.enable(!managers.Settings.EnableVSync.getValue());
 
             var state = new States.Intro(managers);
 
@@ -589,6 +592,12 @@ var Controls;
         CombinedControlSource.prototype.getExit = function () {
             return this.foldVal(function (src) {
                 return src.getExit();
+            });
+        };
+
+        CombinedControlSource.prototype.getSwitchMonitor = function () {
+            return this.foldVal(function (src) {
+                return src.getSwitchMonitor();
             });
         };
 
@@ -781,6 +790,10 @@ var Controls;
             return this.getValuesFromChannelsAndButtons([], [], this.joystick.getEnterButtons()) > 0.5;
         };
 
+        JoystickControlSource.prototype.getSwitchMonitor = function () {
+            return false;
+        };
+
         JoystickControlSource.prototype.getExit = function () {
             return this.getValuesFromChannelsAndButtons([], [], this.joystick.getExitButtons()) > 0.5;
         };
@@ -794,14 +807,14 @@ var Controls;
 })(Controls || (Controls = {}));
 var Controls;
 (function (Controls) {
-    var KeyboardControlsource = (function () {
-        function KeyboardControlsource(kbd) {
+    var KeyboardControlSource = (function () {
+        function KeyboardControlSource(kbd) {
             this.kbd = kbd;
         }
-        KeyboardControlsource.prototype.update = function () {
+        KeyboardControlSource.prototype.update = function () {
         };
 
-        KeyboardControlsource.prototype.getTurnAmount = function () {
+        KeyboardControlSource.prototype.getTurnAmount = function () {
             if (this.getLeft()) {
                 return -1;
             } else if (this.getRight()) {
@@ -811,7 +824,7 @@ var Controls;
             }
         };
 
-        KeyboardControlsource.prototype.getAccelAmount = function () {
+        KeyboardControlSource.prototype.getAccelAmount = function () {
             if (this.getUp()) {
                 return 1;
             } else if (this.getDown()) {
@@ -821,39 +834,43 @@ var Controls;
             }
         };
 
-        KeyboardControlsource.prototype.getJump = function () {
+        KeyboardControlSource.prototype.getJump = function () {
             return this.kbd.isDown(32);
         };
 
-        KeyboardControlsource.prototype.getLeft = function () {
+        KeyboardControlSource.prototype.getLeft = function () {
             return this.kbd.isDown(37) || this.kbd.isDown(65);
         };
 
-        KeyboardControlsource.prototype.getRight = function () {
+        KeyboardControlSource.prototype.getRight = function () {
             return this.kbd.isDown(39) || this.kbd.isDown(68);
         };
-        KeyboardControlsource.prototype.getUp = function () {
+        KeyboardControlSource.prototype.getUp = function () {
             return this.kbd.isDown(38) || this.kbd.isDown(87);
         };
 
-        KeyboardControlsource.prototype.getDown = function () {
+        KeyboardControlSource.prototype.getDown = function () {
             return this.kbd.isDown(40) || this.kbd.isDown(83);
         };
 
-        KeyboardControlsource.prototype.getEnter = function () {
+        KeyboardControlSource.prototype.getEnter = function () {
             return this.kbd.isDown(32) || this.kbd.isDown(13);
         };
 
-        KeyboardControlsource.prototype.getExit = function () {
+        KeyboardControlSource.prototype.getExit = function () {
             return this.kbd.isDown(27);
         };
 
-        KeyboardControlsource.prototype.getResetOrientation = function () {
+        KeyboardControlSource.prototype.getSwitchMonitor = function () {
+            return this.kbd.isDown(123);
+        };
+
+        KeyboardControlSource.prototype.getResetOrientation = function () {
             return this.kbd.isDown(82);
         };
-        return KeyboardControlsource;
+        return KeyboardControlSource;
     })();
-    Controls.KeyboardControlsource = KeyboardControlsource;
+    Controls.KeyboardControlSource = KeyboardControlSource;
 })(Controls || (Controls = {}));
 var Controls;
 (function (Controls) {
@@ -1483,6 +1500,8 @@ var Engine;
             this.lastHeight = 0;
             this.frame = 0;
             this.hasRunPhysics = false;
+            this.lastEffectsVolume = -1;
+            this.lastMusicVolume = -1;
             this.document = documentProvider;
             this.canvas = canvas;
             this.ctx = this.canvas.getContext('webgl') || this.canvas.getContext('experimental-webgl');
@@ -1540,8 +1559,17 @@ var Engine;
                 this.managers.VR.resetOrientation();
             }
 
-            if (this.frame % 30 === 0) {
-                this.managers.Audio.setGain(this.managers.Settings.getMuted() ? 0.0 : this.managers.Settings.getVolume());
+            if (this.managers.VR !== null) {
+                this.managers.VR.handlePlatformKeys(this.managers.Controls);
+            }
+
+            var effectsVol = this.managers.Settings.EffectVolume.getValue();
+            var musicVol = this.managers.Settings.MusicVolume.getValue();
+            if (this.lastEffectsVolume !== effectsVol || this.lastMusicVolume !== musicVol) {
+                this.managers.Audio.setEffectsGain(0.2 * effectsVol);
+                this.managers.Audio.setMusicGain(0.2 * musicVol);
+                this.lastEffectsVolume = effectsVol;
+                this.lastMusicVolume = musicVol;
             }
             this.frame++;
 
@@ -1708,7 +1736,7 @@ var Engine;
             VRState2DDrawer.initialized = true;
 
             var color = new TSM.vec3([1.0, 1.0, 1.0]);
-            var w = 5.0;
+            var w = 1.0;
             var h = w * 200.0 / 320.0;
             var z = 0.0;
 
@@ -1739,6 +1767,12 @@ var Engine;
 
             helper.startFrame(gl);
             VRState2DDrawer.target.Texture.generateMipmap();
+
+            VRState2DDrawer.screenMesh.ModelMatrix.setIdentity();
+            VRState2DDrawer.screenMesh.ModelMatrix.translate(new TSM.vec3([0.0, 0.0, -this.managers.Settings.MenuDistance.getValue()]));
+
+            var scale = this.managers.Settings.MenuSize.getValue();
+            VRState2DDrawer.screenMesh.ModelMatrix.scale(new TSM.vec3([scale, scale, 1.0]));
 
             var me = this;
             function runPass(eyeNum) {
@@ -2008,7 +2042,7 @@ var Game;
             }
 
             this.sprite.ULow.y = idx * 30 / this.sprite.Texture.Height;
-            this.sprite.UHigh.y = (idx + 1) * 30 / this.sprite.Texture.Height;
+            this.sprite.UHigh.y = ((idx + 1) * 30 - 1) / this.sprite.Texture.Height;
         };
 
         CarSprite.prototype.draw = function (view, cam) {
@@ -2068,6 +2102,8 @@ var Game;
                     return managers.Graphics.get3DSprite(gl, managers, t);
                 });
             };
+
+            this.managers = managers;
             this.dash = managers.Graphics.get3DSprite(gl, managers, managers.Textures.getTexture(gl, "DASHBRD.LZS"));
             this.oxyGauge = loadGauge("OXY_DISP.DAT");
             this.fuelGauge = loadGauge("FUL_DISP.DAT");
@@ -2108,16 +2144,18 @@ var Game;
         };
 
         Dashboard.prototype.draw = function (gl, cam, scaleVec) {
+            var settings = this.managers.Settings;
+            var worldScale = settings.WorldScale.getValue();
             var view = new TSM.mat4().setIdentity();
             view.multiply(cam.HeadOrientation.toMat4());
-            view.translate(cam.HeadPosition.copy().scale(-1.0));
+            view.translate(cam.HeadPosition.copy().scale(-1.0).scale(worldScale));
             view.scale(scaleVec);
-            view.translate(cam.EyeOffset.copy().divide(scaleVec));
+            view.translate(cam.EyeOffset.copy().scale(worldScale).divide(scaleVec));
 
             var model = new TSM.mat4().setIdentity();
-            model.setIdentity().translate(new TSM.vec3([0.0, -50.0, -25.0]));
+            model.setIdentity().translate(new TSM.vec3([0.0, -settings.HudHeight.getValue(), -settings.HudDist.getValue()]));
             model.rotate(-Math.PI / 9.0, new TSM.vec3([1.0, 0.0, 0.0]));
-            model.scale(new TSM.vec3([0.25, 0.25, 0.25]));
+            model.scale(new TSM.vec3([1.0, 1.0, 1.0]).scale(settings.HudScale.getValue()));
 
             var configAndDrawSprite = function (s) {
                 s.ViewMatrix = view;
@@ -2493,10 +2531,10 @@ var Game;
                     this.zVelocity -= 0x12F / 0x10000;
                     break;
                 case 3 /* Kill */:
-                    this.state = 1 /* Exploded */;
                     if (this.state !== 1 /* Exploded */) {
                         eventBus.fire(new Game.ShipEvents.ShipExplodedEvent());
                     }
+                    this.state = 1 /* Exploded */;
                     break;
                 case 5 /* RefillOxygen */:
                     if (this.state === 0 /* Alive */) {
@@ -3836,27 +3874,64 @@ var Managers;
 })(Managers || (Managers = {}));
 var Managers;
 (function (Managers) {
+    var Setting = (function () {
+        function Setting(store, name, defaultValue) {
+            this.store = store;
+            this.name = name;
+            this.value = JSON.parse(store.getValue(name) || JSON.stringify(defaultValue));
+        }
+        Setting.prototype.getValue = function () {
+            return this.value;
+        };
+
+        Setting.prototype.setValue = function (val) {
+            this.value = val;
+            this.store.setValue(this.name, JSON.stringify(val));
+        };
+        return Setting;
+    })();
+    Managers.Setting = Setting;
+
+    var NumberSetting = (function (_super) {
+        __extends(NumberSetting, _super);
+        function NumberSetting(store, name, defaultValue) {
+            _super.call(this, store, name, defaultValue);
+        }
+        return NumberSetting;
+    })(Setting);
+    Managers.NumberSetting = NumberSetting;
+
+    var BooleanSetting = (function (_super) {
+        __extends(BooleanSetting, _super);
+        function BooleanSetting(store, name, defaultValue) {
+            _super.call(this, store, name, defaultValue);
+        }
+        return BooleanSetting;
+    })(Setting);
+    Managers.BooleanSetting = BooleanSetting;
+
     var SettingsManager = (function () {
         function SettingsManager(store) {
-            this.PlayMusic = true;
-            this.Muted = true;
-            this.volume = 0.2;
             this.store = store;
-            this.Muted = JSON.parse(this.store.getValue('muted') || 'false');
+            this.MonitorIdx = new NumberSetting(store, 'monitorIdx', 0);
+            this.EffectVolume = new NumberSetting(store, 'effectVolume', 0.5);
+            this.MusicVolume = new NumberSetting(store, 'musicVolume', 0.5);
+            this.MenuDistance = new NumberSetting(store, 'menuDistance', 1.6);
+            this.MenuSize = new NumberSetting(store, 'menuSize', 1.0);
+
+            this.UseInterpolation = new BooleanSetting(store, 'useInterpolation', true);
+            this.EnableVSync = new BooleanSetting(store, 'useVsync', true);
+
+            this.WorldScale = new NumberSetting(store, 'worldScale', 44.0);
+            this.HudScale = new NumberSetting(store, 'hudScale', 0.21);
+            this.HudHeight = new NumberSetting(store, 'hudPosHeight', 46.6);
+            this.HudDist = new NumberSetting(store, 'hudPosDist', 33.0);
+            this.EyeHeight = new NumberSetting(store, 'eyeHeight', 154.0);
+            this.VRDistanceFromShip = new NumberSetting(store, 'eyeDistance', 1.76);
+            this.ShowHud = new BooleanSetting(store, 'showHud', true);
+
+            this.BackgroundScale = new NumberSetting(store, 'backgroundScale', 3456.0);
         }
-        SettingsManager.prototype.getMuted = function () {
-            return this.Muted;
-        };
-
-        SettingsManager.prototype.setMuted = function (m) {
-            this.Muted = m;
-            this.store.setValue('muted', JSON.stringify(m));
-        };
-
-        SettingsManager.prototype.getVolume = function () {
-            return this.Muted ? 0.0 : this.volume;
-        };
-
         SettingsManager.prototype.wonLevelCount = function (levelNum) {
             var c = this.store.getValue('wonlevel_' + levelNum);
             return parseInt(c) || 0;
@@ -4074,10 +4149,19 @@ var Music;
     var Player = (function () {
         function Player(opl, managers) {
             this.currentSong = -1;
+            this.gain = 0.5;
             this.opl = opl;
             this.fullData = managers.Streams.getStream('MUZAX.LZS');
             this.stream = null;
         }
+        Player.prototype.setGain = function (gain) {
+            this.gain = gain;
+        };
+
+        Player.prototype.getGain = function () {
+            return this.gain;
+        };
+
         Player.prototype.loadSong = function (n) {
             if (n === this.currentSong) {
                 return;
@@ -4377,7 +4461,7 @@ var Music;
             }
 
             this.sampleRate = 44100;
-            llap.runPlayer(this);
+            llap.runPlayer(this, false);
         }
         OPL.prototype.setSource = function (mp) {
             this.src = mp;
@@ -4450,6 +4534,7 @@ var Music;
 
         OPL.prototype.fillAudioBuffer = function (buffer) {
             var synthOut = 0.0;
+            var gain = this.src !== null ? this.src.getGain() : 0.0;
 
             if (this.src == null) {
                 for (var i = 0; i < buffer.length; i++) {
@@ -4477,7 +4562,7 @@ var Music;
                     this.synthTime -= Music.OPLConstants.SampleTime;
                 }
 
-                buffer[i] = synthOut / 2.0;
+                buffer[i] = synthOut / 2.0 * gain;
             }
 
             return true;
@@ -5496,8 +5581,12 @@ var Sounds;
             this.player.loadSong(n);
         };
 
-        InThreadAudioProvider.prototype.setGain = function (gain) {
-            this.base.setGain(gain);
+        InThreadAudioProvider.prototype.setEffectsGain = function (gain) {
+            this.base.setEffectsGain(gain);
+        };
+
+        InThreadAudioProvider.prototype.setMusicGain = function (gain) {
+            this.player.setGain(gain);
         };
         return InThreadAudioProvider;
     })();
@@ -5510,7 +5599,7 @@ var Sounds;
             this.position = 0;
             this.audio = audio;
             this.buffer = buffer;
-            this.audio.runPlayer(this);
+            this.audio.runPlayer(this, true);
         }
         PortAudioPlayer.prototype.fillAudioBuffer = function (buff) {
             var start = this.position, end = start + buff.length, readEnd = Math.min(end, this.buffer.length);
@@ -5540,6 +5629,15 @@ var Sounds;
         };
         return PortAudioPlayable;
     })();
+
+    var PlayerPair = (function () {
+        function PlayerPair(src, useGain) {
+            this.Src = src;
+            this.UseGain = useGain;
+        }
+        return PlayerPair;
+    })();
+
     var PortAudioAudioProvider = (function () {
         function PortAudioAudioProvider() {
             var _this = this;
@@ -5557,11 +5655,11 @@ var Sounds;
             return new PortAudioPlayable(this, buffer);
         };
 
-        PortAudioAudioProvider.prototype.runPlayer = function (player) {
-            this.players.push(player);
+        PortAudioAudioProvider.prototype.runPlayer = function (player, useGain) {
+            this.players.push(new PlayerPair(player, useGain));
         };
 
-        PortAudioAudioProvider.prototype.setGain = function (gain) {
+        PortAudioAudioProvider.prototype.setEffectsGain = function (gain) {
             this.gain = gain;
         };
 
@@ -5582,13 +5680,14 @@ var Sounds;
 
             for (var i = 0; i < players.length; i++) {
                 var p = players[i];
-                if (!p.fillAudioBuffer(buff)) {
+                if (!p.Src.fillAudioBuffer(buff)) {
                     players.splice(i, 1);
                     i--;
                 }
 
+                var gain = p.UseGain ? this.gain : 1.0;
                 for (var j = 0; j < len; j++) {
-                    out[j] += Math.max(-1.0, Math.min(1.0, buff[j] * this.gain));
+                    out[j] += Math.max(-1.0, Math.min(1.0, buff[j] * gain));
                 }
             }
 
@@ -5671,19 +5770,19 @@ var Sounds;
             return new WebAPIPlayable(this.ctx, buffer, this.dest);
         };
 
-        WebAPIAudioProvider.prototype.runPlayer = function (player) {
+        WebAPIAudioProvider.prototype.runPlayer = function (player, useGain) {
             if (this.ctx) {
                 var node = this.ctx.createScriptProcessor(1024, 1, 1);
                 node.onaudioprocess = function (evt) {
                     return player.fillAudioBuffer(evt.outputBuffer.getChannelData(0));
                 };
-                node.connect(this.dest);
+                node.connect(useGain ? this.dest : this.ctx.destination);
                 this.players.push(player);
                 this.playerNodes.push(node);
             }
         };
 
-        WebAPIAudioProvider.prototype.setGain = function (gain) {
+        WebAPIAudioProvider.prototype.setEffectsGain = function (gain) {
             if (this.ctx) {
                 this.dest.gain.value = gain;
             }
@@ -5698,16 +5797,26 @@ var Sounds;
     var playSongCommand = 'PlaySong';
     var createPlayableCommand = 'CreatePlayable';
     var playPlayableCommand = 'PlayPlayable';
-    var setGainCommand = 'SetGain';
+    var setEffectGainCommand = 'SetEGain';
+    var setMusicGainCommand = 'SetMGain';
 
-    var SetGainCommand = (function () {
-        function SetGainCommand(gain) {
-            this.Command = setGainCommand;
+    var SetEffectGainCommand = (function () {
+        function SetEffectGainCommand(gain) {
+            this.Command = setEffectGainCommand;
             this.Gain = gain;
         }
-        return SetGainCommand;
+        return SetEffectGainCommand;
     })();
-    Sounds.SetGainCommand = SetGainCommand;
+    Sounds.SetEffectGainCommand = SetEffectGainCommand;
+
+    var SetMusicGainCommand = (function () {
+        function SetMusicGainCommand(gain) {
+            this.Command = setMusicGainCommand;
+            this.Gain = gain;
+        }
+        return SetMusicGainCommand;
+    })();
+    Sounds.SetMusicGainCommand = SetMusicGainCommand;
 
     var PlaySongCommand = (function () {
         function PlaySongCommand(songNumber) {
@@ -5762,9 +5871,14 @@ var Sounds;
                             _this.playables[ppEvt.Id].play();
                         }
                         break;
-                    case setGainCommand:
+                    case setEffectGainCommand:
                         var sgEvt = evt;
-                        _this.provider.setGain(sgEvt.Gain);
+                        _this.provider.setEffectsGain(sgEvt.Gain);
+                        break;
+                    case setMusicGainCommand:
+                        var smEvt = evt;
+                        _this.musicPlayer.setGain(smEvt.Gain);
+                        break;
                 }
             });
         }
@@ -5826,9 +5940,18 @@ var Sounds;
             }
         };
 
-        ChildProcessAudioProvider.prototype.setGain = function (gain) {
+        ChildProcessAudioProvider.prototype.setEffectsGain = function (gain) {
             try  {
-                this.worker.send(new Sounds.SetGainCommand(gain));
+                this.worker.send(new Sounds.SetEffectGainCommand(gain));
+            } catch (ex) {
+                console.log('Audio exception on setGain');
+                console.log(ex);
+            }
+        };
+
+        ChildProcessAudioProvider.prototype.setMusicGain = function (gain) {
+            try  {
+                this.worker.send(new Sounds.SetMusicGainCommand(gain));
             } catch (ex) {
                 console.log('Audio exception on setGain');
                 console.log(ex);
@@ -5846,25 +5969,60 @@ var States;
         function ControlsMenu(managers) {
             _super.call(this, managers);
             this.watchers = [];
+            this.settings = [];
+            this.selectedIdx = 0;
             this.myManagers = managers;
         }
         ControlsMenu.prototype.load = function (gl) {
             var _this = this;
             _super.prototype.load.call(this, gl);
             var managers = this.myManagers;
+            var vr = this.myManagers.VR !== null;
+
             this.menu = managers.Textures.getTextures(gl, "SETMENU.LZS").map(function (tf) {
                 return new Drawing.Sprite(gl, managers, tf);
             });
+
+            var settings = managers.Settings;
+            this.settings.push(new UI.NumberSetting('Music Volume', 0.0, 2.0, settings.MusicVolume));
+            this.settings.push(new UI.NumberSetting('Effects Volume', 0.0, 2.0, settings.EffectVolume));
+
+            this.settings.push(new UI.BooleanSetting(vr ? 'Smooth Mode (Requires Restart)' : 'Smooth Mode(Requires Refresh)', settings.UseInterpolation));
+
+            if (vr) {
+                this.settings.push(new UI.BooleanSetting('VSync (Requires Restart)', settings.EnableVSync));
+
+                this.settings.push(new UI.NumberSetting('Menu Size', 0.25, 2.0, settings.MenuSize));
+                this.settings.push(new UI.NumberSetting('Menu Distance', 0.25, 4.0, settings.MenuDistance));
+
+                this.settings.push(new UI.NumberSetting('World Size', 0.1, 100.0, settings.WorldScale));
+                this.settings.push(new UI.BooleanSetting('Show HUD', settings.ShowHud));
+                this.settings.push(new UI.NumberSetting('Hud Size', 0.125, 0.5, settings.HudScale));
+                this.settings.push(new UI.NumberSetting('Hud Height', 40.0, 60.0, settings.HudHeight));
+                this.settings.push(new UI.NumberSetting('Hud Distance', 20.0, 40.0, settings.HudDist));
+                this.settings.push(new UI.NumberSetting('View Height', 0.0, 250.0, settings.EyeHeight));
+                this.settings.push(new UI.NumberSetting('View Distance', 0.5, 10.0, settings.VRDistanceFromShip));
+                this.settings.push(new UI.NumberSetting('Background Size', 640.0, 7680.0, settings.BackgroundScale));
+            }
+
+            this.settingsCanvas = managers.Canvas.getCanvas();
+            this.settingsCanvas.width = 640;
+            this.settingsCanvas.height = 400;
+            this.settingsContext = this.settingsCanvas.getContext('2d');
+            this.settingsTexture = new WGL.Texture(gl);
+            this.settingsTexture.loadData(this.settingsCanvas);
+            this.settingsSprite = this.myManagers.Graphics.get2DSprite(gl, managers, new Drawing.TextureFragment(this.settingsTexture, 0, 0, 320, 200));
+
             var controls = managers.Controls;
             this.watchers.push(new Controls.ConditionWatcher(function () {
-                return controls.getLeft();
+                return controls.getUp();
             }, function () {
-                return _this.updateMenu(false);
+                return _this.updateMenu(-1);
             }));
             this.watchers.push(new Controls.ConditionWatcher(function () {
-                return controls.getRight();
+                return controls.getDown();
             }, function () {
-                return _this.updateMenu(true);
+                return _this.updateMenu(1);
             }));
             this.watchers.push(new Controls.ConditionWatcher(function () {
                 return controls.getExit();
@@ -5877,8 +6035,9 @@ var States;
         ControlsMenu.prototype.unload = function () {
         };
 
-        ControlsMenu.prototype.updateMenu = function (mute) {
-            this.myManagers.Settings.setMuted(mute);
+        ControlsMenu.prototype.updateMenu = function (dir) {
+            this.selectedIdx = this.selectedIdx + dir;
+            this.selectedIdx = Math.min(this.settings.length - 1, Math.max(0, this.selectedIdx));
         };
 
         ControlsMenu.prototype.exitMenu = function () {
@@ -5889,11 +6048,45 @@ var States;
             for (var i = 0; i < this.watchers.length; i++) {
                 this.watchers[i].update(frameTimeInfo);
             }
+
+            var cvs = this.settingsCanvas;
+            var ctx = this.settingsContext;
+            ctx.fillStyle = '#000000';
+            ctx.globalAlpha = 0.5;
+            ctx.clearRect(0, 0, cvs.width, cvs.height);
+            ctx.fillRect(0, 0, cvs.width, cvs.height);
+
+            ctx.globalAlpha = 1.0;
+
+            var P = 4;
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '16pt Arial bold';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.fillText('Settings', cvs.width / 2, P);
+
+            var yPos = 50;
+            for (var i = 0; i < this.settings.length; i++) {
+                var setting = 0 /* None */;
+                var selected = this.selectedIdx === i;
+                if (selected) {
+                    if (this.myManagers.Controls.getLeft()) {
+                        setting = 2 /* Decrease */;
+                    } else if (this.myManagers.Controls.getRight()) {
+                        setting = 1 /* Increase */;
+                    }
+                }
+                this.settings[i].drawAndUpdate(cvs, ctx, frameTimeInfo, yPos, selected, setting);
+                yPos += 15;
+            }
+
+            this.settingsTexture.loadData(this.settingsCanvas);
         };
 
         ControlsMenu.prototype.drawFrame2D = function (gl, canvas, frameManager, frameTimeInfo) {
             this.menu[0].draw();
-            this.menu[this.myManagers.Settings.getMuted() ? 5 : 4].draw();
+            this.settingsSprite.draw();
         };
         return ControlsMenu;
     })(Engine.State2D);
@@ -6138,6 +6331,7 @@ var States;
                 this.resourcesLoaded = true;
             }
 
+            var settings = this.myManagers.Settings;
             var snap = this.myManagers.SnapshotProvider.getSnapshot();
             var level = this.game.getLevel();
             this.carSprite.updatePosition(snap, level);
@@ -6152,9 +6346,9 @@ var States;
             var scaleVec = new TSM.vec3([scaleXY, scaleXY, scaleZ]);
             this.background.ModelMatrix.setIdentity();
             if (this.myManagers.VR !== null) {
-                this.background.Size.x = 1920.0;
-                this.background.Size.y = 1200.0;
-                this.background.ModelMatrix.translate(new TSM.vec3([-450, 800.0 * 200.0 / this.background.Size.y, 1280.0 * -1200.0 / this.background.Size.x]));
+                this.background.Size.x = settings.BackgroundScale.getValue();
+                this.background.Size.y = this.background.Size.x * 1200.0 / 1920.0;
+                this.background.ModelMatrix.translate(new TSM.vec3([-this.background.Size.x / 2.0 + 160.0, this.background.Size.y * 2.0 / 3.0 - 182, -1200.0]));
             }
 
             cam.HeadOrientation.inverse();
@@ -6167,18 +6361,24 @@ var States;
             gl.clear(gl.DEPTH_BUFFER_BIT);
 
             var headPos = cam.HeadPosition.copy();
-            headPos.add(new TSM.vec3([0.0, 130.0, -(snap.Position.z - (isVR ? 1 : 3)) * 46.0]).multiply(scaleVec));
+
+            var worldScale = settings.WorldScale.getValue();
+
+            headPos.add(new TSM.vec3([0.0, settings.EyeHeight.getValue() / worldScale, (-(snap.Position.z - (isVR ? settings.VRDistanceFromShip.getValue() : 3)) * 46.0) / worldScale]).multiply(scaleVec));
             this.mesh.ViewMatrix.setIdentity();
-            this.mesh.ViewMatrix.translate(cam.EyeOffset);
+            this.mesh.ViewMatrix.scale(new TSM.vec3([1.0 / worldScale, 1.0 / worldScale, 1.0 / worldScale])); //We pre-shrink everything so regardless oif user scale, it all fits into z-buffer
+            this.mesh.ViewMatrix.translate(cam.EyeOffset.copy().scale(worldScale));
             this.mesh.ViewMatrix.multiply(cam.HeadOrientation.toMat4());
-            this.mesh.ViewMatrix.translate(headPos.scale(-1.0));
+            this.mesh.ViewMatrix.translate(headPos.scale(-1.0).scale(worldScale));
             this.mesh.ViewMatrix.scale(scaleVec);
 
             this.mesh.ProjectionMatrix = cam.ProjectionMatrix;
             this.mesh.draw();
             this.carSprite.draw(this.mesh.ViewMatrix, cam);
 
-            this.dash.draw(gl, cam, scaleVec);
+            if (settings.ShowHud.getValue()) {
+                this.dash.draw(gl, cam, scaleVec);
+            }
 
             if (this.game.didWin) {
                 this.roadCompleted.ModelMatrix.setIdentity();
@@ -7138,6 +7338,116 @@ var TestRuns;
     }
     TestRuns.TestTrekDat = TestTrekDat;
 })(TestRuns || (TestRuns = {}));
+var UI;
+(function (UI) {
+    var BooleanSetting = (function () {
+        function BooleanSetting(name, setting) {
+            this.name = name;
+
+            this.setting = setting;
+
+            this.value = setting.getValue();
+        }
+        BooleanSetting.prototype.drawAndUpdate = function (cvs, ctx, fti, yPos, selected, action) {
+            var P = 4;
+
+            var d = 0.0;
+            if (action === 2 /* Decrease */) {
+                d = -1.0;
+            } else if (action === 1 /* Increase */) {
+                d = 1.0;
+            }
+
+            if (d !== 0.0) {
+                this.value = d < 0 ? false : true;
+                this.setting.setValue(this.value);
+            }
+
+            var bright = selected ? '#FFFF77' : '#FFFFFF';
+            var dark = selected ? '#777777' : '#444444';
+
+            ctx.fillStyle = bright;
+            ctx.font = '12pt Arial bold';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.name, cvs.width / 4, yPos);
+
+            var BH = 5;
+            var X = cvs.width / 2 + P;
+            var W = cvs.width / 2 - P * 2;
+            ctx.fillStyle = bright;
+            ctx.fillRect(X + (this.value ? W / 2 : 0), yPos - BH, W / 2, BH * 2);
+
+            ctx.strokeStyle = bright;
+            ctx.strokeRect(X, yPos - BH, W, BH * 2);
+
+            ctx.fillStyle = this.value ? bright : dark;
+            ctx.fillText('Off', 5 * cvs.width / 8, yPos);
+
+            ctx.fillStyle = this.value ? dark : bright;
+            ctx.fillText('On', 7 * cvs.width / 8, yPos);
+        };
+        return BooleanSetting;
+    })();
+    UI.BooleanSetting = BooleanSetting;
+})(UI || (UI = {}));
+var UI;
+(function (UI) {
+    var NumberSetting = (function () {
+        function NumberSetting(name, min, max, setting) {
+            this.name = name;
+
+            this.min = min;
+            this.max = max;
+
+            this.setting = setting;
+
+            this.value = setting.getValue();
+        }
+        NumberSetting.prototype.drawAndUpdate = function (cvs, ctx, fti, yPos, selected, action) {
+            var P = 4;
+
+            var d = 0.0;
+            if (action === 2 /* Decrease */) {
+                d = -1.0;
+            } else if (action === 1 /* Increase */) {
+                d = 1.0;
+            }
+
+            if (d !== 0.0) {
+                this.value = Math.min(this.max, Math.max(this.min, this.value + fti.getPhysicsStep() * (this.max - this.min) * d / 2.0));
+                this.setting.setValue(this.value);
+            }
+
+            var bright = selected ? '#FFFF77' : '#FFFFFF';
+            var dark = selected ? '#777777' : '#444444';
+
+            ctx.fillStyle = bright;
+            ctx.font = '12pt Arial bold';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.name, cvs.width / 4, yPos);
+
+            var percent = (this.value - this.min) / (this.max - this.min);
+            var BH = 5;
+            ctx.fillStyle = dark;
+            ctx.fillRect(cvs.width / 2 + P, yPos - BH, (cvs.width / 2 - P * 2), BH * 2);
+            ctx.fillStyle = bright;
+            ctx.fillRect(cvs.width / 2 + P, yPos - BH, (cvs.width / 2 - P * 2) * percent, BH * 2);
+        };
+        return NumberSetting;
+    })();
+    UI.NumberSetting = NumberSetting;
+})(UI || (UI = {}));
+var UI;
+(function (UI) {
+    (function (SettingAction) {
+        SettingAction[SettingAction["None"] = 0] = "None";
+        SettingAction[SettingAction["Increase"] = 1] = "Increase";
+        SettingAction[SettingAction["Decrease"] = 2] = "Decrease";
+    })(UI.SettingAction || (UI.SettingAction = {}));
+    var SettingAction = UI.SettingAction;
+})(UI || (UI = {}));
 var Vertices;
 (function (Vertices) {
     var Vertex2D = (function () {
@@ -7169,13 +7479,13 @@ var Vertices;
             if (typeof uv === "undefined") { uv = new TSM.vec2([0.0, 0.0]); }
             this.Position = pos;
             this.Color = color;
-            this.UV = new TSM.vec3([uv.x, uv.y, 0.0]);
+            this.UV = uv;
         }
         Vertex3DC.getDescriptor = function (gl) {
             return new WGL.VertexDescriptor([
                 new WGL.VertexAttributeDescription(gl, "aPos", 3, gl.FLOAT, true, 32, 0),
                 new WGL.VertexAttributeDescription(gl, "aColor", 3, gl.FLOAT, true, 32, 12),
-                new WGL.VertexAttributeDescription(gl, "aTexCoord", 3, gl.FLOAT, true, 36, 24)
+                new WGL.VertexAttributeDescription(gl, "aTexCoord", 2, gl.FLOAT, true, 32, 24)
             ]);
         };
 
@@ -7185,7 +7495,7 @@ var Vertices;
             } else if (name == "aColor") {
                 return this.Color.xyz;
             } else if (name === "aTexCoord") {
-                return this.UV.xyz;
+                return this.UV.xy;
             } else {
                 throw "Bad component: " + name;
             }
@@ -7197,11 +7507,15 @@ var Vertices;
 var VR;
 (function (VR) {
     var NodeVRProvider = (function () {
-        function NodeVRProvider(glfw) {
+        function NodeVRProvider(glfw, managers, window) {
             this.glfw = glfw;
+            this.managers = managers;
+            this.window = window;
+            this.childProcess = require('child_process');
+            this.fs = require('fs');
         }
-        NodeVRProvider.prototype.enable = function () {
-            return this.glfw.enableHMD();
+        NodeVRProvider.prototype.enable = function (disableVsync) {
+            return this.glfw.enableHMD(disableVsync);
         };
 
         NodeVRProvider.prototype.getTargetResolution = function () {
@@ -7240,6 +7554,22 @@ var VR;
             this.glfw.resetVROrientation();
         };
 
+        NodeVRProvider.prototype.handlePlatformKeys = function (controls) {
+            if (controls.getSwitchMonitor()) {
+                var monSetting = this.managers.Settings.MonitorIdx;
+                monSetting.setValue((monSetting.getValue() + 1) % this.glfw.getMonitorCount());
+                this.glfw.destroyWindow(this.window);
+
+                var out = this.fs.openSync('./out.log', 'a');
+                var err = this.fs.openSync('./out.log', 'a');
+
+                var proc = this.childProcess.spawn(process.argv[0], process.argv.slice(1), { detached: true, stdio: ['ignore', out, err] });
+                proc.unref();
+
+                process.exit();
+            }
+        };
+
         NodeVRProvider.prototype.getEyeViewAdjust = function (n) {
             return new TSM.vec3(this.glfw.getEyeViewAdjust(n));
         };
@@ -7258,7 +7588,7 @@ var VR;
             return new TSM.quat(this.glfw.getHeadOrientation(n));
             //var stick = this.getJoystickValues();
             //return TSM.quat.fromAxis(new TSM.vec3([0.0, 1.0, 0.0]), stick[0] * 0.5)
-            //    .multiply(TSM.quat.fromAxis(new TSM.vec3([0.0, 0.0, 1.0]), stick[1] * 1.5));
+            //    .multiply(TSM.quat.fromAxis(new TSM.vec3([1.0, 0.0, 0.0]), stick[1] * 1.5));
         };
 
         NodeVRProvider.prototype.getJoystickValues = function () {

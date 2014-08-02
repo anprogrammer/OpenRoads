@@ -32,7 +32,7 @@ function runGame() {
     managers.Sounds = new Managers.SoundManager(managers);
 
     var src = new Controls.CombinedControlSource();
-    src.addSource(new Controls.KeyboardControlsource(new Engine.KeyboardManager(document.body)));
+    src.addSource(new Controls.KeyboardControlSource(new Engine.KeyboardManager(document.body)));
     src.addSource(new Controls.JoystickControlSource(new Controls.NavigatorJoystick(navigator)));
     managers.Controls = src;
     managers.Settings = new Managers.SettingsManager(new Stores.LocalStorageStore(isXMas ? 'xmas' : 'classic'));
@@ -40,7 +40,7 @@ function runGame() {
     managers.Textures = new Managers.TextureManager(managers);
     managers.Canvas = new Drawing.HTMLCanvasProvider();
     managers.VR = null;
-    managers.SnapshotProvider = new Game.FixedRateSnapshotProvider();
+    managers.SnapshotProvider = managers.Settings.UseInterpolation ? new Game.InterpolatingSnapshoptProvider() : new Game.FixedRateSnapshotProvider();
 
     //managers.Graphics = new Shaders.VRShaderProvider();
     manager.loadMultiple([
